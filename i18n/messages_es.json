@@ -1,0 +1,376 @@
+{
+	"pathMath" : "Matemáticas",
+	
+	"nameNumber"   : "Número",
+	"leafNumber"   : "Número",
+	"enterNumber"  : "Introduzca número",
+	"updateNumber" : "Actualice número",
+	"actionNumber" : "Actualizar número...",
+	
+	"mnemonicNumeric" : "N",
+	"nameNumeric"     : "Numérico",
+	"leafNumeric"     : "Numérico",
+	"childrenNumeric" : [ "Argumento", "Precisión" ],
+	
+	"pathPrecision" : "Matemáticas.Aritmética.Precisión",
+	
+	"mnemonicPrecision" : "Precisión",
+	"namePrecision"     : "Precisión",
+	"leafPrecision"     : "Precisión",
+	
+	"mnemonicGetMaxPrecision" : "ObtenerPrecisiónMáxima",
+	"nameGetMaxPrecision"     : "Obtener precisión máxima",
+	"leafGetMaxPrecision"     : "Obtener precisión máxima",
+	
+	"mnemonicSetMaxPrecision" : "FijarPrecisiónMáxima",
+	"nameSetMaxPrecision"     : "Fijar Precisión Máxima",
+	"leafSetMaxPrecision"     : "Fijar Precisión Máxima",
+	
+	"PathRoundingMode" : "Matemáticas.Aritmética.Tipo de redondeo",
+	
+	"mnemonicGetRoundingMode" : "ObtenerTipoRedondeo",
+	"nameGetRoundingMode"     : "Obtener tipo de redondeo",
+	"leafGetRoundingMode"     : "Obtener tipo de redondeo",
+	
+	"mnemonicSetRoundingMode" : "FijarTipoRedondeo",
+	"nameSetRoundingMode"     : "Fijar tipo de redondeo",
+	"leafSetRoundingMode"     : "Fijar tipo de redondeo",
+	
+	"PathRoundingModes" : "Matemáticas.Aritmética.Tipo de redondeo.Tipos",
+	
+	"labelRoundingModeTowardsZero"                      : "Hacia 0 / Truncación",
+	"labelRoundingModeAwayFromZero"                     : "Alejado de  0",
+	"labelRoundingModeTowardsMinusInfinity"             : "Hacia -∞ / Piso",
+	"labelRoundingModeTowardsInfinity"                  : "Hacia ∞ / Techo",
+	"labelRoundingModeNearest.HalfTowardsZero"          : "Hacia cercano, ½ hacia 0",
+	"labelRoundingModeNearest.HalfAwayFromZero"         : "Hacia cercano, ½ alejado de 0",
+	"labelRoundingModeNearest.HalfTowardsMinusInfinity" : "Hacia cercano, ½ hacia -∞",
+	"labelRoundingModeNearest.HalfTowardsInfinity"      : "Hacia cercano, ½ hacia ∞",
+	"labelRoundingModeNearest.HalfEven"                 : "Hacia cercano, ½ a par",
+	
+	"nameInfinity" : "Infinito",
+	
+	"pathArithmetic" : "Matemáticas.Aritmética",
+	
+	"nameNegative" : "Negativo",
+	"leafNegative" : "Negativo",
+	
+	"pathAddition" : "Matemáticas.Aritmética.Suma",
+	
+	"nameAddition"             : "Suma",
+	"childAddition"            : "Sumando",
+	"leafAdditionAfter"        : "Añadir sumando",
+	"leafAdditionAfterForced"  : "Añadir sumando!",
+	"leafAdditionBefore"       : "Anteponer sumando",
+	"leafAdditionBeforeForced" : "Anteponer sumando!",
+	
+	"pathSubtraction" : "Matemáticas.Aritmética.Resta",
+	
+	"leafSubtractionAfter"        : "Añadir sustraendo",
+	"leafSubtractionAfterForced"  : "añadir sustraendo!",
+	"leafSubtractionBefore"       : "Anteponer minuendo",
+	"leafSubtractionBeforeForced" : "Anteponer minuendo!",
+	
+	"pathMultiplication" : "Matemáticas.Aritmética.Multiplicación",
+	
+	"nameMultiplication"             : "Multiplicación",
+	"childMultiplication"            : "Factor",
+	"leafMultiplicationAfter"        : "Añadir factor",
+	"leafMultiplicationAfterForced"  : "Añadir factor!",
+	"leafMultiplicationBefore"       : "Anteponer factor",
+	"leafMultiplicationBeforeForced" : "Anteponer factor!",
+	
+	"pathDivision" : "Matemáticas.Aritmética.División",
+	
+	"nameDivision"     : "División",
+	"childrenDivision" : [ "Numerador", "Denominador" ],
+	"leafNumerator"    : "Crear numerador",
+	"leafDenominator"  : "Crear denominador",
+	
+	"pathExponentiation"     : "Matemáticas.Aritmética.Exponenciación",
+	"nameExponentiation"     : "Exponencición",
+	"childrenExponentiation" : [ "Base", "Exponente" ],
+	"leafBase"               : "Crear base",
+	"leafExponent"           : "Crear exponente",
+	
+	"mnemonicRationalize" : "Racionalizar",
+	"nameRationalize"     : "Racionalizar",
+	"childrenRationalize" : [ "Argument", "Precisión" ],
+	"leafRationalize"     : "Racionalizar",
+	
+	"leafSquareRoot" : "√ Raíz cuadrada",
+	"nameSquareRoot" : "Raíz cuadrada",
+	
+	"leafFactorial"  : "▪! Factorial",
+	"nameFactorial"  : "Factorial",
+	
+	"nameAbsoluteValue" : "Valor absoluto",
+	"leafAbsoluteValue" : "∣▪∣ Valor absoluto",
+	
+	"childrenRoundingTruncation" : [ "Argumento", "Escala" ],
+	
+	"nameFloor"     : "Piso",
+	"mnemonicFloor" : "piso",
+	"leafFloor"     : "⌊▪⌋ Piso",
+	
+	"nameCeiling"     : "Techo",
+	"mnemonicCeiling" : "techo",
+	"leafCeiling"     : "⌈▪⌉ Techo",
+	
+	"nameTruncate"     : "Truncación",
+	"mnemonicTruncate" : "Truncación",
+	"leafTruncate"     : "Truncación",
+	
+	"nameRound"     : "Redondeo",
+	"mnemonicRound" : "Redondeo",
+	"leafRound"     : "Redondeo",
+	
+	"nameIntegerPart"     : "Parte entera",
+	"mnemonicIntegerPart" : "ParteEntera",
+	"leafIntegerPart"     : "Parte entera",
+	
+	"nameFractionalPart"     : "Parte fraccionaria",
+	"mnemonicFractionalPart" : "ParteFraccionaria",
+	"leafFractionalPart"     : "Parte fraccionaria",
+	
+	"nameFactors"     : "Factores",
+	"mnemonicFactors" : "Factores",
+	"leafFactors"     : "Factores",
+	
+	"nameGreatestCommonDivisor"    : "Máximo común divisor",
+	"literalGreatestCommonDivisor" : "MCD",
+	"leafGreatestCommonDivisor"    : "Máximo común divisor",
+	
+	"nameLeastCommonMultiple"    : "Mínimo común múltiplo",
+	"literalLeastCommonMultiple" : "MCM",
+	"leafLeastCommonMultiple"    : "Mínimo común múltiplo",
+	
+	"nameSign"     : "Signo",
+	"mnemonicSign" : "Signo",
+	"leafSign"     : "Signo",
+	
+	"nameDigits"     : "Dígitos",
+	"mnemonicDigits" : "Dígitos",
+	"childrenDigits" : [ "Argumento", "Base", "Tamaño" ],
+	"leafDigits"     : "Dígitos",
+	
+	"nameRandom"     : "Aleatorio",
+	"mnemonicRandom" : "Aleatorio",
+	"leafRandom"     : "Aleatorio",
+	"leafRandomPrecision" : "Aleatorio con precisión",
+	"childrenRandom"      : [ "Precisión" ],
+	
+	"nameRandomInRange"     : "Aleatorio en rango",
+	"mnemonicRandomInRange" : "AleatorioEnRango",
+	"childrenRandomInRange" : [ "Mínimo valor", "Máximo valor" ],
+	"leafRandomInRange"     : "Aleatorio en rango",
+	
+	"pathTesting" : "Matemáticas.Aritmética.Pruebas",
+	
+	"nameIsRealNumber"     : "Es número real",
+	"mnemonicIsRealNumber" : "EsNúmeroReal",
+	"leafIsRealNumber"     : "Es número real",
+	
+	"nameIsRationalNumber"     : "Es número racional",
+	"mnemonicIsRationalNumber" : "EsNúmeroRacional",
+	"leafIsRationalNumber"     : "Es número racional",
+	
+	"nameIsNumeric"     : "Es numérico",
+	"mnemonicIsNumeric" : "EsNumérico",
+	"leafIsNumeric"     : "Es numérico",
+	
+	"nameIsIntegerValue"     : "Es valor entero",
+	"mnemonicIsIntegerValue" : "EsValorEntero",
+	"leafIsIntegerValue"     : "Es valor entero",
+	
+	"nameIsInteger"     : "Es entero",
+	"mnemonicIsInteger" : "EsEntero",
+	"leafIsInteger"     : "Es entero",
+	
+	"nameIsDecimal"     : "Es decimal",
+	"mnemonicIsDecimal" : "EsDecimal",
+	"leafIsDecimal"     : "Es decimal",
+	
+	"nameIsPositiveNumber"     : "Es número positivo",
+	"mnemonicIsPositiveNumber" : "EsNúmeroPositivo",
+	"leafIsPositiveNumber"     : "Es número positivo",
+	
+	"nameIsNegativeNumber"     : "Es número negativo",
+	"mnemonicIsNegativeNumber" : "EsNúmeroNegativo",
+	"leafIsNegativeNumber"     : "Es número negativo",
+	
+	"nameIsNumberZero"     : "Es número cero",
+	"mnemonicIsNumberZero" : "EsNúmeroCero",
+	"leafIsNumberZero"     : "Es número cero",
+	
+	"nameIsEven"     : "Es par",
+	"mnemonicIsEven" : "EsPar",
+	"leafIsEven"     : "Es par",
+	
+	"nameIsOdd"     : "Es impar",
+	"mnemonicIsOdd" : "EsImpar",
+	"leafIsOdd"     : "Es impar",
+	
+	"nameIsPrime"     : "Es primo",
+	"mnemonicIsPrime" : "EsPrimo",
+	"leafIsPrime"     : "Es primo",
+	
+	"nameDivides" : "Divide a",
+	"leafDivides" : "∣ Divide a",
+	
+	"nameDoesNotDivide" : "No divide a",
+	"leafDoesNotDivide" : "∤ No divide a",
+	
+	"childrenDivisions" : [ "Dividendo", "Divisor" ],
+	
+	"pathConversion" : "Matemáticas.Aritmética.Conversión",
+	
+	"nameToInteger"     : "A entero",
+	"mnemonicToInteger" : "AEntero",
+	"leafToInteger"     : "A entero",
+	
+	"nameToIfInteger"     : "A si entero",
+	"mnemonicToIfInteger" : "ASiEntero",
+	"leafToIfInteger"     : "A si entero",
+	
+	"nameToDecimal"     : "A decimal",
+	"mnemonicToDecimal" : "ADecimal",
+	"leafToDecimal"     : "A decimal",
+	
+	"nameToNumber"     : "A número",
+	"mnemonicToNumber" : "ANúmero",
+	"childrenToNumber" : [ "Argumento", "Base" ],
+	"leafToNumber"     : "A número",
+	
+	"pathEuclideanDivision" : "Matemáticas.Aritmética.Divison entera",
+	
+	"operatorDivMod" : "DivMod",
+	"operatorDiv"    : "Div",
+	"operatorMod"    : "Mod",
+	
+	"nameDivMod" : "Cociente y residuo de division entera",
+	"nameDiv"    : "Cociente de division entera",
+	"nameMod"    : "Residuo y residuo de division entera",
+	
+	"leafDivMod" : "DivMod",
+	"leafDiv"    : "Div",
+	"leafMod"    : "Mod",
+	
+	"PathEuclideanDivisionMode" : "Matemáticas.Aritmética.Divison entera.Tipo",
+	
+	"mnemonicGetEuclideanDivisionMode" : "ObtenerTipoDivisiónEntera",
+	"nameGetEuclideanDivisionMode"     : "Obtener tipo de división entera",
+	"leafGetEuclideanDivisionMode"     : "Obtener tipo de división entera",
+	
+	"mnemonicSetEuclideanDivisionMode" : "FijarTipoDivisiónEntera",
+	"nameSetEuclideanDivisionMode"     : "Fijar tipo de división entera",
+	"leafSetEuclideanDivisionMode"     : "Fijar tipo de división entera",
+	
+	"labelEuclideanMode" : "Tipo euclídeo",
+	"leafEuclideanMode" : "Tipo euclídeo",
+	
+	"nameModularExponentiation"     : "Exponenciación modular",
+	"mnemonicModularExponentiation" : "ExponentcaciónModular",
+	"childrenModularExponentiation" : [ "Base", "Exponente", "Módulo" ],
+	"leafModularExponentiation"     : "Exponenciación modular",
+	
+	"nameModularMultiplicativeInverse"     : "Inverso multiplicativo modular",
+	"mnemonicModularMultiplicativeInverse" : "InversoMultiplicativoModular",
+	"childrenModularMultiplicativeInverse" : [ "Númbero", "Módulo" ],
+	"leafModularMultiplicativeInverse"     : "Inverso multiplicativo modular",
+	
+	"pathSummation" : "Matemáticas.Aritmética.∑",
+	"pathProduct" : "Matemáticas.Aritmética.∏",
+	
+	"nameSummation" : "Sumatoria",
+	"nameProduct"   : "Producto",
+	
+	"childSummation0"         : "Expresión a ser usada para la sumatoria",
+	"childProduct0"           : "Expresión a ser usada para el producto",
+	"childSummationproduct1"  : "Símbolo a ser usado durante la iteración",
+	"childSummationproduct23" : "Lista conteniéndo los elementos para iterar",
+	"childSummationproduct2X" : "Valor inicial de la iteración",
+	"childSummationproduct3"  : "Valor final de la iteración",
+	"childSummationproduct4"  : "Incremento de la iteración",
+	
+	"pathTrascendental" : "Matemáticas.Funciones trascendentales",
+	
+	"nameDecimalLogarithm"     : "logaritmo decimal",
+	"mnemonicDecimalLogarithm" : "log₁₀",
+	"leafDecimalLogarithm"     : "logaritmo decimal",
+	
+	"nameNaturalLogarithm"     : "Logarithm natural",
+	"mnemonicNaturalLogarithm" : "ln",
+	"leafNaturalLogarithm"     : "Logarithm natural",
+	
+	"nameBinaryLogarithm"     : "Logarithm binario",
+	"mnemonicBinaryLogarithm" : "lg",
+	"leafBinaryLogarithm"     : "Logarithm binario",
+	
+	"nameLogarithm"     : "Logaritmo",
+	"mnemonicLogarithm" : "log",
+	"childrenLogarithm" : [ "Argumento", "Base" ],
+	"leafLogarithm"     : "Logaritmo",
+	
+	"pathTrigonometric" : "Matemáticas.Funciones trigonométricas",
+	
+	"leafSine"         : "Seno",
+	"leafCosine"       : "Coseno",
+	"leafTangent"      : "Tangente",
+	"leafCotangent"    : "Cotangente",
+	"leafSecant"       : "Secante",
+	"leafCosecant"     : "Cosecante",
+	"leafArcSine"      : "Arco seno",
+	"leafArcCosine"    : "Arco coseno",
+	"leafArcTangent"   : "Arco tangente",
+	"leafArcCotangent" : "Arco cotangente",
+	"leafArcSecant"    : "Arco secante",
+	"leafArcCosecant"  : "Arco cosecante",
+	
+	"nameTSine"      : "Seno trigonométrico",       "mnemonicTSine"      : "sen",
+	"nameTCosine"    : "Coseno trigonométrico",     "mnemonicTCosine"    : "cos",
+	"nameTTangent"   : "Tangente trigonométrica",   "mnemonicTTangent"   : "tan",
+	"nameTCotangent" : "Cotangente trigonométrico", "mnemonicTCotangent" : "cot",
+	"nameTSecant"    : "Secante trigonométrica",    "mnemonicTSecant"    : "sec",
+	"nameTCosecant"  : "Cosecante trigonométrica",  "mnemonicTCosecant"  : "csc",
+	
+	"nameTArcSine"      : "Arco seno trigonométrico",       "mnemonicTArcSine"      : "asen",
+	"nameTArcCosine"    : "Arco coseno trigonométrico",     "mnemonicTArcCosine"    : "acos",
+	"nameTArcTangent"   : "Arco tangente trigonométrico",   "mnemonicTArcTangent"   : "atan",
+	"nameTArcCotangent" : "Arco cotangento trigonométrico", "mnemonicTArcCotangent" : "acot",
+	"nameTArcSecant"    : "Arco secante trigonométrico",    "mnemonicTArcSecant"    : "asec",
+	"nameTArcCosecant"  : "Arco cosecante trigonométrico",  "mnemonicTArcCosecant"  : "acsc",
+	
+	"nameArcTangent2"     : "Arco tangente de dos argumentos",
+	"mnemonicArcTangent2" : "atan2",
+	"leafArcTangent2"     : "Arco tangente de dos argumentos",
+	"childrenArcTangent2" : [ "Coordenada y", "Coordenada x" ],
+	
+	"pathHyperbolic" : "Matemáticas.Funciones hiperbólicas",
+	
+	"nameHSine"      : "Seno hiperbolico",       "mnemonicHSine"      : "senh",
+	"nameHCosine"    : "Coseno hiperbolico",     "mnemonicHCosine"    : "cosh",
+	"nameHTangent"   : "Tangente hiperbolica",   "mnemonicHTangent"   : "tanh",
+	"nameHCotangent" : "Cotangente hiperbolica", "mnemonicHCotangent" : "coth",
+	"nameHSecant"    : "Secante hiperbolica",    "mnemonicHSecant"    : "sech",
+	"nameHCosecant"  : "Cosecante hiperbolica",  "mnemonicHCosecant"  : "csch",
+	
+	"nameHArcSine"      : "Arco seno hiperbolico",      "mnemonicHArcSine"      : "asenh",
+	"nameHArcCosine"    : "Arco coseno hiperbolico",    "mnemonicHArcCosine"    : "acosh",
+	"nameHArcTangent"   : "Arco tangent hiperbolica",   "mnemonicHArcTangent"   : "atanh",
+	"nameHArcCotangent" : "Arco cotangent hiperbolica", "mnemonicHArcCotangent" : "acoth",
+	"nameHArcSecant"    : "Arco secant hiperbolica",    "mnemonicHArcSecant"    : "asech",
+	"nameHArcCosecant"  : "Arco cosecant hiperbolica",  "mnemonicHArcCosecant"  : "acsch",
+	
+	"pathConstant" : "Matemáticas.Constantes",
+	
+	"namePi" : "Número π",
+	"nameE" : "Número e",
+	
+	"pathComplex" : "Matemáticas.Números complejos",
+	
+	"nameImaginary" : "Unidad imaginaria",
+	"nameConjugate" : "Complejo conjugado",
+	"leafConjugate" : "Complejo conjugado"
+}
+

@@ -1,0 +1,376 @@
+{
+	"pathMath" : "Math",
+	
+	"nameNumber"   : "Number",
+	"leafNumber"   : "Number",
+	"enterNumber"  : "Enter number",
+	"updateNumber" : "Update number",
+	"actionNumber" : "Update number...",
+	
+	"mnemonicNumeric" : "N",
+	"nameNumeric"     : "Numeric",
+	"leafNumeric"     : "Numeric",
+	"childrenNumeric" : [ "Argument", "Precision" ],
+	
+	"pathPrecision" : "Math.Arithmetic.Precision",
+	
+	"mnemonicPrecision" : "Precision",
+	"namePrecision"     : "Precision",
+	"leafPrecision"     : "Precision of",
+	
+	"mnemonicGetMaxPrecision" : "GetMaxPrecision",
+	"nameGetMaxPrecision"     : "Get max precision",
+	"leafGetMaxPrecision"     : "Get max precision",
+	
+	"mnemonicSetMaxPrecision" : "SetMaxPrecision",
+	"nameSetMaxPrecision"     : "Set max precision",
+	"leafSetMaxPrecision"     : "Set max precision",
+	
+	"PathRoundingMode" : "Math.Arithmetic.Rounding mode",
+	
+	"mnemonicGetRoundingMode" : "GetRoundingMode",
+	"nameGetRoundingMode"     : "Get rounding mode",
+	"leafGetRoundingMode"     : "Get rounding mode",
+	
+	"mnemonicSetRoundingMode" : "SetRoundingMode",
+	"nameSetRoundingMode"     : "Set rounding mode",
+	"leafSetRoundingMode"     : "Set rounding mode",
+	
+	"PathRoundingModes" : "Math.Arithmetic.Rounding mode.Modes",
+	
+	"labelRoundingModeTowardsZero"                      : "Towards 0 / Truncate",
+	"labelRoundingModeAwayFromZero"                     : "Away from 0",
+	"labelRoundingModeTowardsMinusInfinity"             : "Towards -∞ / Floor",
+	"labelRoundingModeTowardsInfinity"                  : "Towards ∞ / Ceiling",
+	"labelRoundingModeNearest.HalfTowardsZero"          : "Nearest, ½ towards 0",
+	"labelRoundingModeNearest.HalfAwayFromZero"         : "Nearest, ½ away from 0",
+	"labelRoundingModeNearest.HalfTowardsMinusInfinity" : "Nearest, ½ towards -∞",
+	"labelRoundingModeNearest.HalfTowardsInfinity"      : "Nearest, ½ towards ∞",
+	"labelRoundingModeNearest.HalfEven"                 : "Nearest, ½ to even",
+	
+	"nameInfinity" : "Infinity",
+	
+	"pathArithmetic" : "Math.Arithmetic",
+	
+	"nameNegative" : "Negative",
+	"leafNegative" : "Negative",
+	
+	"pathAddition" : "Math.Arithmetic.Addition",
+	
+	"nameAddition"             : "Addition",
+	"childAddition"            : "Addend",
+	"leafAdditionAfter"        : "Append addend",
+	"leafAdditionAfterForced"  : "Append addend!",
+	"leafAdditionBefore"       : "Prepend addend",
+	"leafAdditionBeforeForced" : "Prepend addend!",
+	
+	"pathSubtraction" : "Math.Arithmetic.Subtraction",
+	
+	"leafSubtractionAfter"        : "Create subtrahend",
+	"leafSubtractionAfterForced"  : "Create subtrahend!",
+	"leafSubtractionBefore"       : "Create minuend",
+	"leafSubtractionBeforeForced" : "Create minuend!",
+	
+	"pathMultiplication" : "Math.Arithmetic.Multiplication",
+	
+	"nameMultiplication"             : "Multiplication",
+	"childMultiplication"            : "Factor",
+	"leafMultiplicationAfter"        : "Append factor",
+	"leafMultiplicationAfterForced"  : "Append factor!",
+	"leafMultiplicationBefore"       : "Prepend factor",
+	"leafMultiplicationBeforeForced" : "Prepend factor!",
+	
+	"pathDivision" : "Math.Arithmetic.Division",
+	
+	"nameDivision"     : "Division",
+	"childrenDivision" : [ "Numerator", "Denominator" ],
+	"leafNumerator"    : "Create numerator",
+	"leafDenominator"  : "Create denominator",
+	
+	"pathExponentiation"     : "Math.Arithmetic.Exponentiation",
+	"nameExponentiation"     : "Exponentiation",
+	"childrenExponentiation" : [ "Base", "Exponent" ],
+	"leafBase"               : "Create base",
+	"leafExponent"           : "Create exponent",
+	
+	"mnemonicRationalize" : "Rationalize",
+	"nameRationalize"     : "Rationalization",
+	"childrenRationalize" : [ "Argument", "Precision" ],
+	"leafRationalize"     : "Rationalize",
+	
+	"leafSquareRoot" : "√ Square root",
+	"nameSquareRoot" : "Square root",
+	
+	"leafFactorial"  : "▮! Factorial",
+	"nameFactorial"  : "Factorial",
+	
+	"nameAbsoluteValue" : "Absolute value",
+	"leafAbsoluteValue" : "∣▮∣ Absolute value",
+	
+	"childrenRoundingTruncation" : [ "Argument", "Scale" ],
+	
+	"nameFloor"     : "Floor",
+	"mnemonicFloor" : "floor",
+	"leafFloor"     : "⌊▮⌋ Floor",
+	
+	"nameCeiling"     : "Ceiling",
+	"mnemonicCeiling" : "ceiling",
+	"leafCeiling"     : "⌈▮⌉ Ceiling",
+	
+	"nameTruncate"     : "Truncation",
+	"mnemonicTruncate" : "Truncate",
+	"leafTruncate"     : "Truncate",
+	
+	"nameRound"     : "Rounding",
+	"mnemonicRound" : "Round",
+	"leafRound"     : "Round",
+	
+	"nameIntegerPart"     : "Integer part",
+	"mnemonicIntegerPart" : "IntegerPart",
+	"leafIntegerPart"     : "Integer part",
+	
+	"nameFractionalPart"     : "Fractional part",
+	"mnemonicFractionalPart" : "FractionalPart",
+	"leafFractionalPart"     : "Fractional part",
+	
+	"nameFactors"     : "Factors",
+	"mnemonicFactors" : "Factors",
+	"leafFactors"     : "Factors",
+	
+	"nameGreatestCommonDivisor"    : "Greatest common divisor",
+	"literalGreatestCommonDivisor" : "GCD",
+	"leafGreatestCommonDivisor"    : "Greatest common divisor",
+	
+	"nameLeastCommonMultiple"    : "Least common multiple",
+	"literalLeastCommonMultiple" : "LCM",
+	"leafLeastCommonMultiple"    : "Least common multiple",
+	
+	"nameSign"     : "Sign",
+	"mnemonicSign" : "Sign",
+	"leafSign"     : "Sign",
+	
+	"nameDigits"     : "Digits",
+	"mnemonicDigits" : "Digits",
+	"childrenDigits" : [ "Argument", "Base", "Size" ],
+	"leafDigits"     : "Digits",
+	
+	"nameRandom"          : "Random",
+	"mnemonicRandom"      : "Random",
+	"leafRandom"          : "Random",
+	"leafRandomPrecision" : "Random with precision",
+	"childrenRandom"      : [ "Precision" ],
+	
+	"nameRandomInRange"     : "Random in range",
+	"mnemonicRandomInRange" : "RandomInRange",
+	"childrenRandomInRange" : [ "Minimum value", "Maximum value" ],
+	"leafRandomInRange"     : "Random in range",
+	
+	"pathTesting" : "Math.Arithmetic.Testing",
+	
+	"nameIsRealNumber"     : "Is real number",
+	"mnemonicIsRealNumber" : "IsRealNumber",
+	"leafIsRealNumber"     : "Is real number",
+	
+	"nameIsRationalNumber"     : "Is rational number",
+	"mnemonicIsRationalNumber" : "IsRationalNumber",
+	"leafIsRationalNumber"     : "Is rationl number",
+	
+	"nameIsNumeric"     : "Is numeric",
+	"mnemonicIsNumeric" : "IsNumeric",
+	"leafIsNumeric"     : "Is numeric",
+	
+	"nameIsIntegerValue"     : "Is integer value",
+	"mnemonicIsIntegerValue" : "IsIntegerValue",
+	"leafIsIntegerValue"     : "Is integer value",
+	
+	"nameIsInteger"     : "Is integer",
+	"mnemonicIsInteger" : "IsInteger",
+	"leafIsInteger"     : "Is integer",
+	
+	"nameIsDecimal"     : "Is decimal",
+	"mnemonicIsDecimal" : "IsDecimal",
+	"leafIsDecimal"     : "Is decimal",
+	
+	"nameIsPositiveNumber"     : "Is positive number",
+	"mnemonicIsPositiveNumber" : "IsPositiveNumber",
+	"leafIsPositiveNumber"     : "Is positive number",
+	
+	"nameIsNegativeNumber"     : "Is negative number",
+	"mnemonicIsNegativeNumber" : "IsNegativeNumber",
+	"leafIsNegativeNumber"     : "Is negative number",
+	
+	"nameIsNumberZero"     : "Is number zero",
+	"mnemonicIsNumberZero" : "IsNumberZero",
+	"leafIsNumberZero"     : "Is number zero",
+	
+	"nameIsEven"     : "Is even",
+	"mnemonicIsEven" : "IsEven",
+	"leafIsEven"     : "Is even",
+	
+	"nameIsOdd"     : "Is odd",
+	"mnemonicIsOdd" : "IsOdd",
+	"leafIsOdd"     : "Is odd",
+	
+	"nameIsPrime"     : "Is prime",
+	"mnemonicIsPrime" : "IsPrime",
+	"leafIsPrime"     : "Is prime",
+	
+	"nameDivides" : "Divides",
+	"leafDivides" : "∣ Divides",
+	
+	"nameDoesNotDivide" : "Does not divide",
+	"leafDoesNotDivide" : "∤ Does not divide",
+	
+	"childrenDivisions" : [ "Dividend", "Divisor" ],
+	
+	"pathConversion" : "Math.Arithmetic.Conversion",
+	
+	"nameToInteger"     : "To integer",
+	"mnemonicToInteger" : "ToInteger",
+	"leafToInteger"     : "To integer",
+	
+	"nameToIfInteger"     : "To if integer",
+	"mnemonicToIfInteger" : "ToIfInteger",
+	"leafToIfInteger"     : "To if integer",
+	
+	"nameToDecimal"     : "To decimal",
+	"mnemonicToDecimal" : "ToDecimal",
+	"leafToDecimal"     : "To decimal",
+	
+	"nameToNumber"     : "To number",
+	"mnemonicToNumber" : "ToNumber",
+	"childrenToNumber" : [ "Argument", "Base" ],
+	"leafToNumber"     : "To number",
+	
+	"pathEuclideanDivision" : "Math.Arithmetic.Euclidean division",
+	
+	"operatorDivMod" : "DivMod",
+	"operatorDiv"    : "Div",
+	"operatorMod"    : "Mod",
+	
+	"nameDivMod" : "Quotient and remainder of euclidean division",
+	"nameDiv"    : "Quotient of euclidean division",
+	"nameMod"    : "Remainder of euclidean division",
+	
+	"leafDivMod" : "DivMod",
+	"leafDiv"    : "Div",
+	"leafMod"    : "Mod",
+	
+	"PathEuclideanDivisionMode" : "Math.Arithmetic.Euclidean division.Mode",
+	
+	"mnemonicGetEuclideanDivisionMode" : "GetEuclideanDivisionMode",
+	"nameGetEuclideanDivisionMode"     : "Get euclidean division mode",
+	"leafGetEuclideanDivisionMode"     : "Get euclidean division mode",
+	
+	"mnemonicSetEuclideanDivisionMode" : "SetEuclideanDivisionMode",
+	"nameSetEuclideanDivisionMode"     : "Set euclidean division mode",
+	"leafSetEuclideanDivisionMode"     : "Set euclidean division mode",
+	
+	"labelEuclideanMode" : "Euclidean mode",
+	"leafEuclideanMode" : "Euclidean mode",
+	
+	"nameModularExponentiation"     : "Modular exponentiation",
+	"mnemonicModularExponentiation" : "ModularExponentiation",
+	"childrenModularExponentiation" : [ "Base", "Exponent", "Modulo" ],
+	"leafModularExponentiation"     : "Modular exponentiation",
+	
+	"nameModularMultiplicativeInverse"     : "Modular multiplicative inverse",
+	"mnemonicModularMultiplicativeInverse" : "ModularMultiplicativeInverse",
+	"childrenModularMultiplicativeInverse" : [ "Number", "Modulo" ],
+	"leafModularMultiplicativeInverse"     : "Modular multiplicative inverse",
+	
+	"pathSummation" : "Math.Arithmetic.∑",
+	"pathProduct" : "Math.Arithmetic.∏",
+	
+	"nameSummation" : "Summation",
+	"nameProduct"   : "Product",
+	
+	"childSummation0"         : "Expression to be used to create the summation",
+	"childProduct0"           : "Expression to be used to create the product",
+	"childSummationProduct1"  : "Symbol to be used over the iteration",
+	"childSummationProduct23" : "List containing the elements to be iterated over",
+	"childSummationProduct2X" : "Starting value of iteration",
+	"childSummationProduct3"  : "Ending value of iteration",
+	"childSummationProduct4"  : "Step of the iteration",
+	
+	"pathTrascendental" : "Math.Trascendental",
+	
+	"nameDecimalLogarithm"     : "Decimal logarithm",
+	"mnemonicDecimalLogarithm" : "log₁₀",
+	"leafDecimalLogarithm"     : "Decimal logarithm",
+	
+	"nameNaturalLogarithm"     : "Natural logarithm",
+	"mnemonicNaturalLogarithm" : "ln",
+	"leafNaturalLogarithm"     : "Natural logarithm",
+	
+	"nameBinaryLogarithm"     : "Binary logarithm",
+	"mnemonicBinaryLogarithm" : "lg",
+	"leafBinaryLogarithm"     : "Binary logarithm",
+	
+	"nameLogarithm"     : "Logarithm",
+	"mnemonicLogarithm" : "log",
+	"childrenLogarithm" : [ "Argument", "Base" ],
+	"leafLogarithm"     : "Logarithm",
+	
+	"pathTrigonometric" : "Math.Trigonometric",
+	
+	"leafSine"         : "Sine",
+	"leafCosine"       : "Cosine",
+	"leafTangent"      : "Tangent",
+	"leafCotangent"    : "Cotangent",
+	"leafSecant"       : "Secant",
+	"leafCosecant"     : "Cosecant",
+	"leafArcSine"      : "Arc sine",
+	"leafArcCosine"    : "Arc cosine",
+	"leafArcTangent"   : "Arc tangent",
+	"leafArcCotangent" : "Arc cotangent",
+	"leafArcSecant"    : "Arc secant",
+	"leafArcCosecant"  : "Arc cosecant",
+	
+	"nameTSine"      : "Trigonometric sine",      "mnemonicTSine"      : "sin",
+	"nameTCosine"    : "Trigonometric cosine",    "mnemonicTCosine"    : "cos",
+	"nameTTangent"   : "Trigonometric tangent",   "mnemonicTTangent"   : "tan",
+	"nameTCotangent" : "Trigonometric cotangent", "mnemonicTCotangent" : "cot",
+	"nameTSecant"    : "Trigonometric secant",    "mnemonicTSecant"    : "sec",
+	"nameTCosecant"  : "Trigonometric cosecant",  "mnemonicTCosecant"  : "csc",
+	
+	"nameTArcSine"      : "Trigonometric arc sine",      "mnemonicTArcSine"      : "asin",
+	"nameTArcCosine"    : "Trigonometric arc cosine",    "mnemonicTArcCosine"    : "acos",
+	"nameTArcTangent"   : "Trigonometric arc tangent",   "mnemonicTArcTangent"   : "atan",
+	"nameTArcCotangent" : "Trigonometric arc cotangent", "mnemonicTArcCotangent" : "acot",
+	"nameTArcSecant"    : "Trigonometric arc secant",    "mnemonicTArcSecant"    : "asec",
+	"nameTArcCosecant"  : "Trigonometric arc cosecant",  "mnemonicTArcCosecant"  : "acsc",
+	
+	"nameArcTangent2"     : "2-argument arc tangent",
+	"mnemonicArcTangent2" : "atan2",
+	"leafArcTangent2"     : "2-argument arc tangent",
+	"childrenArcTangent2" : [ "y-coordinate", "x-coordinate" ],
+	
+	"pathHyperbolic" : "Math.Hyperbolic",
+	
+	"nameHSine"      : "Hyperbolic sine",      "mnemonicHSine"      : "sinh",
+	"nameHCosine"    : "Hyperbolic cosine",    "mnemonicHCosine"    : "cosh",
+	"nameHTangent"   : "Hyperbolic tangent",   "mnemonicHTangent"   : "tanh",
+	"nameHCotangent" : "Hyperbolic cotangent", "mnemonicHCotangent" : "coth",
+	"nameHSecant"    : "Hyperbolic secant",    "mnemonicHSecant"    : "sech",
+	"nameHCosecant"  : "Hyperbolic cosecant",  "mnemonicHCosecant"  : "csch",
+	
+	"nameHArcSine"      : "Hyperbolic arc sine",      "mnemonicHArcSine"      : "asinh",
+	"nameHArcCosine"    : "Hyperbolic arc cosine",    "mnemonicHArcCosine"    : "acosh",
+	"nameHArcTangent"   : "Hyperbolic arc tangent",   "mnemonicHArcTangent"   : "atanh",
+	"nameHArcCotangent" : "Hyperbolic arc cotangent", "mnemonicHArcCotangent" : "acoth",
+	"nameHArcSecant"    : "Hyperbolic arc secant",    "mnemonicHArcSecant"    : "asech",
+	"nameHArcCosecant"  : "Hyperbolic arc cosecant",  "mnemonicHArcCosecant"  : "acsch",
+	
+	"pathConstant" : "Math.Constant",
+	
+	"namePi" : "π number",
+	"nameE" : "Euler number",
+	
+	"pathComplex" : "Math.Complex",
+	
+	"nameImaginary" : "Imaginary unit",
+	"nameConjugate" : "Complex conjugate",
+	"leafConjugate" : "Conjugate"
+}
+
