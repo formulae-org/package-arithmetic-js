@@ -1858,7 +1858,7 @@ Arithmetic.atan2 = async (atan2, session) => {
 	}
 	
 	atan2.replaceBy(CanonicalArithmetic.decimal2Expr(
-		session.Decimal.atan(numbery.decimal, numberx.decimal)
+		session.Decimal.atan2(numbery.decimal, numberx.decimal)
 	));
 	
 	return true;
