@@ -7,3 +7,5 @@ Fōrmulæ is a set of programs for visualization, edition and manipulation of co
 This repository contains the source code for the **arithmetic package**, in Javascript.
 
 The GitHub organization [formulae-org](https://github.com/formulae-org) encompasses the source code for the rest of packages, as well as the core programs.
+
+Take a look at this [tutorial](https://formulae.org/?tutorial=Arithmetic) to know the capabilities of the Fōrmulæ arithmetic package.
