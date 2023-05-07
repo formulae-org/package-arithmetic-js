@@ -1315,7 +1315,6 @@ Arithmetic.rationalize = async (rationalize, session) => {
 		);
 		rational.minimize(session);
 		rationalize.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(rational));
-		return true;
 	}
 	else {
 		let repeating = CanonicalArithmetic.getInteger(rationalize.children[1]);
@@ -1335,10 +1334,9 @@ Arithmetic.rationalize = async (rationalize, session) => {
 		
 		let result = rational1.addition(rational2, session);
 		rationalize.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(result));
-		return true;
 	}
 	
-	return false;
+	return true;
 };
 
 Arithmetic.absNumeric = async (abs, session) => {
