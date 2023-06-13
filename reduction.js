@@ -2571,6 +2571,109 @@ Arithmetic.summationProductListReducer = async (summationProduct, session) => {
 	return true;
 };
 
+/**
+	Modular exponetiation
+	given b, e, m: BigInt
+	returns (b ^ e) mod m
+ */
+
+Arithmetic.modularExponentiationNumeric = (x, y, p) => {
+	// Initialize result
+	let res = 1;
+	
+	// Update x if it is more than or
+	// equal to p
+	x = x % p;
+	while (y > 0) {
+		// If y is odd, multiply
+		// x with result
+		if (y & 1) {
+			res = (res * x) % p;
+		}
+		
+		// y must be even now
+		y = y >> 1; // y = y/2
+		x = (x * x) % p;
+	}
+	return res;
+};
+
+/**
+	Miller-Rabin primality test
+ */
+
+Arithmetic.millerRabinTestNumeric = (n, d) => {
+	// Pick a random number in [2..n-2]
+	// Corner cases make sure that n > 4
+	let a = 2 + Math.floor(Math.random() * (n - 2)) % (n - 4);
+	
+	// Compute a^d % n
+	let x = Arithmetic.modularExponentiationNumeric(a, d, n);
+	
+	if (x == 1 || x == n - 1) {
+		return true;
+	}
+	
+	// Keep squaring x while one
+	// of the following doesn't
+	// happen
+	// (i) d does not reach n-1
+	// (ii) (x^2) % n is not 1
+	// (iii) (x^2) % n is not n-1
+	
+	while (d != n - 1) {
+		x = (x * x) % n;
+		d *= 2;
+		
+		if (x == 1) return false;
+		if (x == n - 1) return true;
+	}
+	
+	// Return composite
+	return false;
+};
+
+Arithmetic.isProbablePrimeNumeric = (n, k) => {
+	// Corner cases
+	if (n <= 1 || n == 4) return false;
+	if (n <= 3) return true;
+	
+	// Find r such that n =
+	// 2^d * r + 1 for some r >= 1
+	
+	let d = n - 1;
+	while (d % 2 == 0) {
+		d /= 2;
+	}
+	
+	// Iterate given number of 'k' times
+	
+	for (let i = 0; i < k; ++i) {
+		if (!Arithmetic.millerRabinTestNumeric(n, d)) {
+			return false;
+		}
+	}
+	
+	return true;
+};
+
+Arithmetic.isPrime = async (isPrime, session) => {
+	let n = CanonicalArithmetic.expr2CanonicalNumeric(isPrime.children[0]);
+	if (n === null || !(n instanceof CanonicalArithmetic.Integer) || n.integer < 0n) {
+		ReductionManager.setInError(isPrime.children[0], "Expression must be an integer, non-negative number");
+		throw new ReductionError();
+	}
+	
+	if (n.integer > Number.MAX_SAFE_INTEGER) {
+		ReductionManager.setInError(isPrime.children[0], "Number is too big");
+		throw new ReductionError();
+	}
+	
+	n = Number(n.integer);
+	isPrime.replaceBy(Formulae.createExpression(Arithmetic.isProbablePrimeNumeric(n, 17) ? "Logic.True" : "Logic.False"));
+	return true;
+};
+
 Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.Precision", Arithmetic.precision);
 	ReductionManager.addReducer("Math.Arithmetic.SetMaxPrecision", Arithmetic.setMaxPrecision);
@@ -2710,4 +2813,6 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductListReducer, true);
 	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductReducer    , true);
 	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductListReducer, true);
+	
+	ReductionManager.addReducer("Math.Arithmetic.IsPrime", Arithmetic.isPrime);
 };
