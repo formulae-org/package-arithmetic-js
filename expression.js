@@ -20,8 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export class Arithmetic extends Formulae.ExpressionPackage {};
 
-Arithmetic.symbolic = false;
-
 Arithmetic.TAG_NUMBER   = "Math.Number";
 Arithmetic.TAG_NUMERIC  = "Math.Numeric";
 Arithmetic.TAG_INFINITY = "Math.Infinity";

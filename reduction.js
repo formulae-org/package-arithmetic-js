@@ -20,6 +20,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export class Arithmetic extends Formulae.ReductionPackage {};
 
+Arithmetic.TAG_NUMBER   = "Math.Number";
+Arithmetic.TAG_NUMERIC  = "Math.Numeric";
+Arithmetic.TAG_INFINITY = "Math.Infinity";
+
+Arithmetic.symbolic = false;
+
 ///////////////
 // precision //
 ///////////////
@@ -2703,7 +2709,7 @@ Arithmetic.setReducers = () => {
 	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumericAddition);
 	
 	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNegatives);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionZeroOne);
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionZeroOne);
 	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionIntegers);
 	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNumerics);
 	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumerics);
