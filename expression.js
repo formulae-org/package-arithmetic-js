@@ -21,11 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export class Arithmetic extends Formulae.ExpressionPackage {};
 
 Arithmetic.TAG_NUMBER   = "Math.Number";
-Arithmetic.TAG_NUMERIC  = "Math.Numeric";
-Arithmetic.TAG_INFINITY = "Math.Infinity";
 
 Arithmetic.decimalIntegerZero = true; // true -> 5.0    false -> 5.
-Arithmetic.defaultMaxPrecision = 25;
 
 Arithmetic.Number = class extends Expression.NullaryExpression {
 	getTag() { return Arithmetic.TAG_NUMBER; }

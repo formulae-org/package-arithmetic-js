@@ -21,7 +21,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export class Arithmetic extends Formulae.ReductionPackage {};
 
 Arithmetic.TAG_NUMBER   = "Math.Number";
-Arithmetic.TAG_NUMERIC  = "Math.Numeric";
 Arithmetic.TAG_INFINITY = "Math.Infinity";
 
 Arithmetic.symbolic = false;
@@ -1401,20 +1400,8 @@ Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
 		decimal = new session.Decimal(numeric.integer.toString());
 	}
 	else { // rational
-		let sn = numeric.numerator.toString();
-		let sd = numeric.denominator.toString();
-		
-		//let precision = sn.length - sd.length;
-		//if (precision < 0) precision = 0;
-		//precision += places + 10;
-		
-		let oldPrecision = session.Decimal.precision;
-		session.Decimal.set({ precision: sn.length + places + 10 });
-		
-		decimal = session.Decimal.div(sn, sd);
-		//decimal = (new session.Decimal(sn)).dividedToIntegerBy(sd);
-		
-		session.Decimal.set({ precision: oldPrecision });
+		let q = CanonicalArithmetic.integerDivision(numeric.numerator, numeric.denominator, session);
+		decimal = new session.Decimal(q.toString());
 	}
 	
 	switch (fcrt.getTag()) {
