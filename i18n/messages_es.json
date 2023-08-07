@@ -133,6 +133,10 @@
 	"mnemonicFractionalPart" : "ParteFraccionaria",
 	"leafFractionalPart"     : "Parte fraccionaria",
 	
+	"nameDecimalPlaces"     : "Lugares decimales",
+	"mnemonicDecimalPlaces" : "LugaresDecimales",
+	"leafDecimalPlaces"     : "Lugares decimales",
+	
 	"nameFactors"     : "Factores",
 	"mnemonicFactors" : "Factores",
 	"leafFactors"     : "Factores",

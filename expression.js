@@ -895,7 +895,7 @@ Arithmetic.setExpressions = function(module) {
 	
 	[ // 1-parameter function, no child name
 		"Precision",    "SetMaxPrecision", "SetRoundingMode", "SetEuclideanDivisionMode",
-		"IntegerPart",  "FractionalPart",
+		"IntegerPart",  "FractionalPart", "DecimalPlaces",
 		"Sign",         "Factors",
 		"IsRealNumber", "IsRationalNumber", "IsNumeric", "IsIntegerValue", "IsInteger", "IsDecimal", "IsPositiveNumber", "IsNegativeNumber", "IsNumberZero",
 		"IsEven",       "IsOdd",            "IsPrime",

@@ -187,6 +187,7 @@ Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSign,           () => Expression.wrapperEdition("Math.Arithmetic.Sign"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafIntegerPart,    () => Expression.wrapperEdition("Math.Arithmetic.IntegerPart"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFractionalPart, () => Expression.wrapperEdition("Math.Arithmetic.FractionalPart"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDecimalPlaces,  () => Expression.wrapperEdition("Math.Arithmetic.DecimalPlaces"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactors,        () => Expression.wrapperEdition("Math.Arithmetic.Factors"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDigits,         () => Expression.wrapperEdition("Math.Arithmetic.Digits"));
 	

@@ -1314,8 +1314,14 @@ Arithmetic.rationalize = async (rationalize, session) => {
 	
 	if (rationalize.children.length == 1) {
 		let tenPow = session.Decimal.pow(10, canonicalNumber.decimal.decimalPlaces());
+		
+		let bkpPrecision = session.Decimal.precision;
+		session.Decimal.precision = canonicalNumber.decimal.precision();
+		let numerator = session.Decimal.mul(canonicalNumber.decimal, tenPow);
+		session.Decimal.precision = bkpPrecision;
+		
 		let rational = new CanonicalArithmetic.Rational(
-			BigInt(session.Decimal.mul(canonicalNumber.decimal, tenPow).toFixed()),
+			BigInt(numerator.toFixed()),
 			BigInt(tenPow.toFixed())
 		);
 		rational.minimize(session);
@@ -1328,11 +1334,16 @@ Arithmetic.rationalize = async (rationalize, session) => {
 		let places = canonicalNumber.decimal.decimalPlaces();
 		let offset = places - repeating;
 		
+		let bkpPrecision = session.Decimal.precision;
+		session.Decimal.precision = canonicalNumber.decimal.precision();
+		
 		canonicalNumber.decimal = Arithmetic.movePointToRight(session, canonicalNumber.decimal, offset);
 		let integralPart = canonicalNumber.decimal.floor();
 		let fractionalPart = Arithmetic.movePointToRight(session, Decimal.sub(canonicalNumber.decimal, integralPart), repeating);
 		let divisor1 = Arithmetic.movePointToRight(session, 1, offset);
 		let divisor2 = Arithmetic.movePointToRight(session, session.Decimal.sub(Arithmetic.movePointToRight(session, 1, repeating), 1), offset);
+		
+		session.Decimal.precision = bkpPrecision;
 		
 		let rational1 = new CanonicalArithmetic.Rational(BigInt(integralPart.toFixed()),   BigInt(divisor1.toFixed()));
 		let rational2 = new CanonicalArithmetic.Rational(BigInt(fractionalPart.toFixed()), BigInt(divisor2.toFixed()));
@@ -1902,6 +1913,24 @@ Arithmetic.fractionalPart = async (f, session) => {
 	} 
 	
 	return true;
+};
+
+Arithmetic.decimalPlaces = async (f, session) => {
+	let arg = f.children[0];
+	let numeric = CanonicalArithmetic.expr2CanonicalNumeric(arg);
+	if (numeric === null) return false; // to forward to another forms of integer/fraction part
+	
+	if (numeric instanceof CanonicalArithmetic.Decimal) {
+		//f.replaceBy(CanonicalArithmetic.bigInt2Expr(BigInt(numeric.decimal.decimalPlaces().toNumber())));
+		f.replaceBy(CanonicalArithmetic.bigInt2Expr(BigInt(numeric.decimal.decimalPlaces())));
+		return true;
+	}
+	else if (numeric instanceof CanonicalArithmetic.Integer) {
+		f.replaceBy(CanonicalArithmetic.bigInt2Expr(0n));
+		return true;
+	}
+	
+	return false;
 };
 
 Arithmetic.isX = async (is, session) => {
@@ -2764,6 +2793,7 @@ Arithmetic.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.Arithmetic.IntegerPart",    Arithmetic.integerPart);
 	ReductionManager.addReducer("Math.Arithmetic.FractionalPart", Arithmetic.fractionalPart);
+	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces", Arithmetic.decimalPlaces);
 	
 	ReductionManager.addReducer("Math.Arithmetic.IsRealNumber",     Arithmetic.isX);
 	ReductionManager.addReducer("Math.Arithmetic.IsRationalNumber", Arithmetic.isX);
