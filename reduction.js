@@ -2697,7 +2697,7 @@ Arithmetic.isPrime = async (isPrime, session) => {
 };
 
 Arithmetic.setReducers = () => {
-	ReductionManager.addReducer("Math.Arithmetic.Precision", Arithmetic.precision);
+	ReductionManager.addReducer("Math.Arithmetic.Precision",       Arithmetic.precision);
 	ReductionManager.addReducer("Math.Arithmetic.SetMaxPrecision", Arithmetic.setMaxPrecision);
 	ReductionManager.addReducer("Math.Arithmetic.GetMaxPrecision", Arithmetic.getMaxPrecision);
 	
@@ -2708,10 +2708,10 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", Arithmetic.getEuclideanDivisionMode);
 	
 	ReductionManager.addReducer("Math.Numeric", Arithmetic.nNumeric);
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPrecision, true, ReductionManager.PRECEDENCE_HIGH);
+	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPrecision, { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
 	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPi);
 	ReductionManager.addReducer("Math.Numeric", Arithmetic.nE);
-	ReductionManager.addReducer("Math.Numeric", ReductionManager.expansionReducer, false, ReductionManager.PRECEDENCE_LOW);
+	ReductionManager.addReducer("Math.Numeric", ReductionManager.expansionReducer, { precedence: ReductionManager.PRECEDENCE_LOW});
 	
 	//ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNumeric, false, ReductionManager.PRECEDENCE_HIGH);
 	ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNumeric);
@@ -2793,7 +2793,7 @@ Arithmetic.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.Arithmetic.IntegerPart",    Arithmetic.integerPart);
 	ReductionManager.addReducer("Math.Arithmetic.FractionalPart", Arithmetic.fractionalPart);
-	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces", Arithmetic.decimalPlaces);
+	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces",  Arithmetic.decimalPlaces);
 	
 	ReductionManager.addReducer("Math.Arithmetic.IsRealNumber",     Arithmetic.isX);
 	ReductionManager.addReducer("Math.Arithmetic.IsRationalNumber", Arithmetic.isX);
@@ -2832,10 +2832,10 @@ Arithmetic.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.Arithmetic.Piecewise", Arithmetic.piecewise);
 	
-	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductReducer,     true);
-	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductListReducer, true);
-	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductReducer    , true);
-	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductListReducer, true);
+	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductReducer,     { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductListReducer, { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductReducer    , { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductListReducer, { special: true });
 	
 	ReductionManager.addReducer("Math.Arithmetic.IsPrime", Arithmetic.isPrime);
 };
