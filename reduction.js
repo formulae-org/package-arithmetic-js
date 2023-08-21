@@ -23,8 +23,6 @@ export class Arithmetic extends Formulae.ReductionPackage {};
 Arithmetic.TAG_NUMBER   = "Math.Number";
 Arithmetic.TAG_INFINITY = "Math.Infinity";
 
-Arithmetic.symbolic = false;
-
 ///////////////
 // precision //
 ///////////////
@@ -218,42 +216,40 @@ Arithmetic.additionNumeric = async (addition, session) => {
 		}
 	}
 	
+	if (canonicalNumeric.isZero()) {
+		switch (addition.children.length) {
+			case 1:
+				addition.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(canonicalNumeric));
+				return true;
+			
+			case 2:
+				addition.replaceBy(addition.children[1 - pos]);
+				return true;
+			
+			default:
+				addition.removeChildAt(pos);
+				return true;
+		}
+	}
+	
 	if (!performed) return false; // forward to other forms of Addition(...)
 	
-	//addition.setChild(pos, CanonicalArithmetic.canonicalNumeric2Expr(canonicalNumeric));
 	let numericExpression = CanonicalArithmetic.canonicalNumeric2Expr(canonicalNumeric);
 	
 	if (addition.children.length == 1) { // just one child
 		addition.replaceBy(numericExpression);
-		//session.log("Addition of numeric addends");
 		return true;
 	}
 	else { // more than one child
-		if (CanonicalArithmetic.isZero(numericExpression)) { //  the numeric one is zero (no pun intended)
-			// remove the zero expression
-			addition.removeChildAt(pos);
-			
-			if (addition.children.length == 1) { // just one child
-				addition.replaceBy(addition.children[0]);
-				//session.log("Addition of numeric addends");
-				return true;
-			}
+		if (pos == 0) {
+			addition.setChild(0, numericExpression);
 		}
-		else { // numeric result was not zero
-			if (pos == 0) {
-				if (performed) {
-					addition.setChild(0, numericExpression);
-				}
-			}
-			else {
-				addition.removeChildAt(pos);
-				addition.addChildAt(0, numericExpression);
-				performed = true;
-			}
+		else {
+			addition.removeChildAt(pos);
+			addition.addChildAt(0, numericExpression);
 		}
 		
-		//if (performed) session.log("Addition of numeric addends");
-		return false; // Ok, forward to other forms of Addition(...)
+		return false;
 	}
 };
 
@@ -314,9 +310,13 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 	}
 	
 	// there was not any numeric child
+	
 	if (pos >= n) return false; // forward to other forms of Multiplication(...)
 	
 	// there was, index is (pos)
+	
+	// performs multiplication with other numeric addends
+	
 	let sibling;
 	let performed = false;
 	
@@ -330,47 +330,56 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 		}
 	}
 	
+	// Numeric result was zero
+	
+	if (canonicalNumeric.isZero()) {
+		multiplication.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(canonicalNumeric));
+		return true;
+	}
+	
+	// Numeric result was one
+	
+	if (canonicalNumeric.isOne()) {
+		switch (multiplication.children.length) {
+			case 1:
+				multiplication.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(canonicalNumeric));
+				return true;
+			
+			case 2:
+				multiplication.replaceBy(multiplication.children[1 - pos]);
+				return true;
+			
+			default:
+				multiplication.removeChildAt(pos);
+				return true;
+		}
+	}
+	
 	if (!performed) return false; // forward to other forms of Multiplication(...)
 	
-	//addition.setChild(pos, CanonicalArithmetic.canonicalNumeric2Expr(canonicalNumeric));
+	// numerical result is neither zero nor oner
+	
 	let numericExpression = CanonicalArithmetic.canonicalNumeric2Expr(canonicalNumeric);
 	
 	if (multiplication.children.length == 1) { // just one child
 		multiplication.replaceBy(numericExpression);
-		//session.log("Addition of numeric addends");
 		return true;
 	}
 	else { // more than one child
-		if (CanonicalArithmetic.isOne(numericExpression)) { //  the numeric one is one (no pun intended)
-			// remove the one expression
-			multiplication.removeChildAt(pos);
-			
-			if (multiplication.children.length == 1) { // just one child
-				multiplication.replaceBy(multiplication.children[0]);
-				//session.log("Addition of numeric addends");
-				return true;
-			}
+		if (pos == 0) {
+			multiplication.setChild(0, numericExpression);
 		}
-		else { // numeric result was not one
-			if (pos == 0) {
-				if (performed) {
-					multiplication.setChild(0, numericExpression);
-				}
-			}
-			else {
-				multiplication.removeChildAt(pos);
-				multiplication.addChildAt(0, numericExpression);
-				performed = true;
-			}
+		else {
+			multiplication.removeChildAt(pos);
+			multiplication.addChildAt(0, numericExpression);
 		}
 		
-		//if (performed) session.log("Addition of numeric addends");
-		return false; // Ok, forward to other forms of Multiplication(...)
+		return false;
 	}
 };
 
 // -W * X * -Y * Z   ->   [-] (W * X * Y * Z)
-Arithmetic.multiplicationNegative = async (multiplication, session) => {
+Arithmetic.multiplicationNegatives = async (multiplication, session) => {
 	let child;
 	let updates = 0;
 	
@@ -1074,62 +1083,72 @@ Arithmetic.exponentiationNegativePositiveInteger = async (exponentiation, sessio
 // number ^ number
 
 Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
-	let base;
-	if ((base = CanonicalArithmetic.expr2CanonicalNumeric(exponentiation.children[0])) === null) return false;
+	let base = CanonicalArithmetic.expr2CanonicalNumeric(exponentiation.children[0]);
+	let exponent = CanonicalArithmetic.expr2CanonicalNumeric(exponentiation.children[1]);;
 	
-	let exponent;
-	if ((exponent = CanonicalArithmetic.expr2CanonicalNumeric(exponentiation.children[1])) === null) return false;
+	if (exponent !== null) {
+		if (exponent.isZero()) {
+			if (exponent instanceof CanonicalArithmetic.Integer) { // exponent is 0
+				if (base === null || base instanceof CanonicalArithmetic.Integer) {  // base is not numeric or it is integer
+					exponentiation.replaceBy(CanonicalArithmetic.bigInt2Expr(1n));
+				}
+				else { // base is decimal
+					exponentiation.replaceBy(CanonicalArithmetic.decimal2Expr(new session.Decimal(1)));
+				}
+			}
+			else { // exponent is 0.0
+				exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
+			}
+			
+			return true;
+		}
+		
+		if (exponent.isOne()) {
+			if (base === null) {
+				exponentiation.replaceBy(exponentiation.children[0]);
+				return true;
+			}
+			
+			if (exponent instanceof CanonicalArithmetic.Integer) {
+				exponentiation.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(base));
+			}
+			else {
+				exponentiation.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(base.toDecimal(session)));
+			}
+			
+			return true;
+		}
+	}
 	
-	if (exponent.isZero()) {
-		if (exponent instanceof CanonicalArithmetic.Integer) {
-			if (base instanceof CanonicalArithmetic.Decimal) {
+	if (base !== null) {
+		// 0 ^ x   ->   0 or infinity (if x is negative)
+		if (base.isZero()) {
+			if (exponent.isNegative()) {
+				exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
+			}
+			else {
+				if (base instanceof CanonicalArithmetic.Integer) {
+					exponentiation.replaceBy(CanonicalArithmetic.bigInt2Expr(0n));
+				}
+				else {
+					exponentiation.replaceBy(CanonicalArithmetic.decimal2Expr(new session.Decimal(0)));
+				}
+			}
+			return true;
+		}
+		
+		if (base.isOne()) {
+			if (base instanceof CanonicalArithmetic.Decimal || exponent instanceof CanonicalArithmetic.Decimal) {
 				exponentiation.replaceBy(CanonicalArithmetic.decimal2Expr(new session.Decimal(1)));
 			}
 			else {
 				exponentiation.replaceBy(CanonicalArithmetic.bigInt2Expr(1n));
 			}
+			return true;
 		}
-		else {
-			exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
-		}
-		return true;
 	}
 	
-	if (exponent.isOne()) {
-		if (exponent instanceof CanonicalArithmetic.Integer) {
-			exponentiation.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(base));
-		}
-		else {
-			exponentiation.replaceBy(CanonicalArithmetic.canonicalNumeric2Expr(base.toDecimal(session)));
-		}
-		return true;
-	}
-	
-	// 0 ^ x   ->   0 or infinity (if x is negative)
-	if (base.isZero()) {
-		if (exponent.isNegative()) {
-			exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
-		}
-		else {
-			if (base instanceof CanonicalArithmetic.Integer) {
-				exponentiation.replaceBy(CanonicalArithmetic.bigInt2Expr(0n));
-			}
-			else {
-				exponentiation.replaceBy(CanonicalArithmetic.decimal2Expr(new session.Decimal(0)));
-			}
-		}
-		return true;
-	}
-
-	if (base.isOne()) {
-		if (base instanceof CanonicalArithmetic.Decimal || exponent instanceof CanonicalArithmetic.Decimal) {
-			exponentiation.replaceBy(CanonicalArithmetic.decimal2Expr(new session.Decimal(1)));
-		}
-		else {
-			exponentiation.replaceBy(CanonicalArithmetic.bigInt2Expr(1n));
-		}
-		return true;
-	}
+	if (base === null || exponent === null) return false;
 	
 	////////////////////////////////////////////////////////////////////////////
 	// if base is negative and exponent is non-integer, the result is complex //
@@ -1419,7 +1438,7 @@ Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
 		case "Math.Arithmetic.Truncate": decimal = decimal.toDecimalPlaces(places, 1); break;
 		case "Math.Arithmetic.Ceiling" : decimal = decimal.toDecimalPlaces(places, 2); break;
 		case "Math.Arithmetic.Floor"   : decimal = decimal.toDecimalPlaces(places, 3); break;
-		case "Math.Arithmetic.Round"   : decimal = decimal.toDecimalPlaces(places   ); break;
+		case "Math.Arithmetic.Round"   : decimal = decimal.toDecimalPlaces(places, 5); break;
 	}
 	
 	if (places <= 0) {
@@ -2713,30 +2732,28 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Numeric", Arithmetic.nE);
 	ReductionManager.addReducer("Math.Numeric", ReductionManager.expansionReducer, { precedence: ReductionManager.PRECEDENCE_LOW});
 	
-	//ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNumeric, false, ReductionManager.PRECEDENCE_HIGH);
 	ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNumeric);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Addition", ReductionManager.itselfReducer);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNegativeAddition);
+	ReductionManager.addReducer("Math.Arithmetic.Addition", ReductionManager.itselfReducer, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNegativeAddition, { symbolic: true });
 	
-	//ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumeric, false, ReductionManager.PRECEDENCE_HIGH);
 	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumeric);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Multiplication", ReductionManager.itselfReducer);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNegative);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumericAddition);
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", ReductionManager.itselfReducer, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNegatives, { symbolic: false });
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumericAddition, { symbolic: true });
 	
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNegatives);
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNegatives, { symbolic: true });
 	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionZeroOne);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionIntegers);
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionIntegers, { symbolic: true });
 	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNumerics);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumerics);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumericsAlone);
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumerics, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumericsAlone, { symbolic: true });
 	
 	ReductionManager.addReducer("Math.Arithmetic.Negative", Arithmetic.negativeSpecials);
-
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationSpecials);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationMultiplicationOrDivision);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumericToNegativeInteger);
-	if (Arithmetic.symbolic) ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNegativePositiveInteger);
+	
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationSpecials, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationMultiplicationOrDivision, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumericToNegativeInteger, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNegativePositiveInteger, { symbolic: true });
 	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumerics);
 	
 	ReductionManager.addReducer("Relation.Compare", Arithmetic.comparisonNumerics);
