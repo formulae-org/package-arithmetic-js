@@ -1419,6 +1419,14 @@ Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
 		return false;
 	}
 	
+	let roundingMode, roundingModeBkp;
+	switch (fcrt.getTag()) {
+		case "Math.Arithmetic.Truncate": roundingMode = 1; break;
+		case "Math.Arithmetic.Ceiling" : roundingMode = 2; break;
+		case "Math.Arithmetic.Floor"   : roundingMode = 3; break;
+		case "Math.Arithmetic.Round"   : roundingMode = 5; break;
+	}
+	
 	let numeric = CanonicalArithmetic.expr2CanonicalNumeric(arg);
 	if (numeric === null) return false;
 	
@@ -1430,16 +1438,22 @@ Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
 		decimal = new session.Decimal(numeric.integer.toString());
 	}
 	else { // rational
+		roundingModeBkp = session.Decimal.rounding;
+		session.Decimal.rounding = roundingMode;
 		let q = CanonicalArithmetic.integerDivision(numeric.numerator, numeric.denominator, session);
+		session.Decimal.rounding = roundingModeBkp;
+		
 		decimal = new session.Decimal(q.toString());
 	}
 	
-	switch (fcrt.getTag()) {
-		case "Math.Arithmetic.Truncate": decimal = decimal.toDecimalPlaces(places, 1); break;
-		case "Math.Arithmetic.Ceiling" : decimal = decimal.toDecimalPlaces(places, 2); break;
-		case "Math.Arithmetic.Floor"   : decimal = decimal.toDecimalPlaces(places, 3); break;
-		case "Math.Arithmetic.Round"   : decimal = decimal.toDecimalPlaces(places, 5); break;
-	}
+	
+	//switch (fcrt.getTag()) {
+	//	case "Math.Arithmetic.Truncate": decimal = decimal.toDecimalPlaces(places, 1); break;
+	//	case "Math.Arithmetic.Ceiling" : decimal = decimal.toDecimalPlaces(places, 2); break;
+	//	case "Math.Arithmetic.Floor"   : decimal = decimal.toDecimalPlaces(places, 3); break;
+	//	case "Math.Arithmetic.Round"   : decimal = decimal.toDecimalPlaces(places, 5); break;
+	//}
+	decimal = decimal.toDecimalPlaces(places, roundingMode);
 	
 	if (places <= 0) {
 		fcrt.replaceBy(CanonicalArithmetic.bigInt2Expr(BigInt(decimal.toFixed())));
