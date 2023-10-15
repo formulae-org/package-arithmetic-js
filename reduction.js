@@ -2730,143 +2730,143 @@ Arithmetic.isPrime = async (isPrime, session) => {
 };
 
 Arithmetic.setReducers = () => {
-	ReductionManager.addReducer("Math.Arithmetic.Precision",       Arithmetic.precision);
-	ReductionManager.addReducer("Math.Arithmetic.SetMaxPrecision", Arithmetic.setMaxPrecision);
-	ReductionManager.addReducer("Math.Arithmetic.GetMaxPrecision", Arithmetic.getMaxPrecision);
+	ReductionManager.addReducer("Math.Arithmetic.Precision",       Arithmetic.precision,       "Arithmetic.precision");
+	ReductionManager.addReducer("Math.Arithmetic.SetMaxPrecision", Arithmetic.setMaxPrecision, "Arithmetic.setMaxPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.GetMaxPrecision", Arithmetic.getMaxPrecision, "Arithmetic.getMaxPrecision");
 	
-	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode", Arithmetic.setRoundingMode);
-	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode", Arithmetic.getRoundingMode);
+	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode", Arithmetic.setRoundingMode, "Arithmetic.setRoundingMode");
+	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode", Arithmetic.getRoundingMode, "Arithmetic.getRoundingMode");
 	
-	ReductionManager.addReducer("Math.Arithmetic.SetEuclideanDivisionMode", Arithmetic.setEuclideanDivisionMode);
-	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", Arithmetic.getEuclideanDivisionMode);
+	ReductionManager.addReducer("Math.Arithmetic.SetEuclideanDivisionMode", Arithmetic.setEuclideanDivisionMode, "Arithmetic.setEuclideanDivisionMode");
+	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", Arithmetic.getEuclideanDivisionMode, "Arithmetic.getEuclideanDivisionMode");
 	
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nNumeric);
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPrecision, { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPi);
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nE);
-	ReductionManager.addReducer("Math.Numeric", ReductionManager.expansionReducer, { precedence: ReductionManager.PRECEDENCE_LOW});
+	ReductionManager.addReducer("Math.Numeric", Arithmetic.nNumeric,               "Arithmetic.nNumeric");
+	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPrecision,             "Arithmetic.nPrecision", { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
+	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPi,                    "Arithmetic.nPi");
+	ReductionManager.addReducer("Math.Numeric", Arithmetic.nE,                     "Arithmetic.nE");
+	ReductionManager.addReducer("Math.Numeric", ReductionManager.expansionReducer, "ReductionManager.expansionReducer", { precedence: ReductionManager.PRECEDENCE_LOW});
 	
-	ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNumeric);
-	ReductionManager.addReducer("Math.Arithmetic.Addition", ReductionManager.itselfReducer, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNegativeAddition, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNumeric,          "Arithmetic.additionNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.Addition", ReductionManager.itselfReducer,      "ReductionManager.itselfReducer",      { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Addition", Arithmetic.additionNegativeAddition, "Arithmetic.additionNegativeAddition", { symbolic: true });
 	
-	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumeric);
-	ReductionManager.addReducer("Math.Arithmetic.Multiplication", ReductionManager.itselfReducer, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNegatives, { symbolic: false });
-	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumericAddition, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumeric,         "Arithmetic.multiplicationNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", ReductionManager.itselfReducer,           "ReductionManager.itselfReducer", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNegatives,       "Arithmetic.multiplicationNegatives", { symbolic: false });
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumericAddition, "Arithmetic.multiplicationNumericAddition", { symbolic: true });
 	
-	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNegatives, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionZeroOne);
-	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionIntegers, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNumerics);
-	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumerics, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumericsAlone, { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNegatives,            "Arithmetic.divisionNegatives", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionZeroOne,              "Arithmetic.divisionZeroOne");
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionIntegers,             "Arithmetic.divisionIntegers", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionNumerics,             "Arithmetic.divisionNumerics");
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumerics,      "Arithmetic.divisionExtractNumerics", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Division", Arithmetic.divisionExtractNumericsAlone, "Arithmetic.divisionExtractNumericsAlone", { symbolic: true });
 	
-	ReductionManager.addReducer("Math.Arithmetic.Negative", Arithmetic.negativeSpecials);
+	ReductionManager.addReducer("Math.Arithmetic.Negative", Arithmetic.negativeSpecials, "Arithmetic.negativeSpecials");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationSpecials, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationMultiplicationOrDivision, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumericToNegativeInteger, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNegativePositiveInteger, { symbolic: true });
-	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumerics);
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationSpecials,                 "Arithmetic.exponentiationSpecials", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationMultiplicationOrDivision, "Arithmetic.exponentiationMultiplicationOrDivision", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumericToNegativeInteger, "Arithmetic.exponentiationNumericToNegativeInteger", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNegativePositiveInteger,  "Arithmetic.exponentiationNegativePositiveInteger", { symbolic: true });
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumerics,                 "Arithmetic.exponentiationNumerics");
 	
-	ReductionManager.addReducer("Relation.Compare", Arithmetic.comparisonNumerics);
+	ReductionManager.addReducer("Relation.Compare", Arithmetic.comparisonNumerics, "Arithmetic.comparisonNumerics");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Rationalize",   Arithmetic.rationalize);
-	ReductionManager.addReducer("Math.Arithmetic.AbsoluteValue", Arithmetic.absNumeric);
-	ReductionManager.addReducer("Math.Arithmetic.Sign",          Arithmetic.signNumeric);
+	ReductionManager.addReducer("Math.Arithmetic.Rationalize",   Arithmetic.rationalize, "Arithmetic.rationalize");
+	ReductionManager.addReducer("Math.Arithmetic.AbsoluteValue", Arithmetic.absNumeric,  "Arithmetic.absNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.Sign",          Arithmetic.signNumeric, "Arithmetic.signNumeric");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Truncate", Arithmetic.floorCeilingRoundTruncate);
-	ReductionManager.addReducer("Math.Arithmetic.Ceiling",  Arithmetic.floorCeilingRoundTruncate);
-	ReductionManager.addReducer("Math.Arithmetic.Floor",    Arithmetic.floorCeilingRoundTruncate);
-	ReductionManager.addReducer("Math.Arithmetic.Round",    Arithmetic.floorCeilingRoundTruncate);
+	ReductionManager.addReducer("Math.Arithmetic.Truncate", Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
+	ReductionManager.addReducer("Math.Arithmetic.Ceiling",  Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
+	ReductionManager.addReducer("Math.Arithmetic.Floor",    Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
+	ReductionManager.addReducer("Math.Arithmetic.Round",    Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Div",    Arithmetic.divMod);
-	ReductionManager.addReducer("Math.Arithmetic.Mod",    Arithmetic.divMod);
-	ReductionManager.addReducer("Math.Arithmetic.DivMod", Arithmetic.divMod);
+	ReductionManager.addReducer("Math.Arithmetic.Div",    Arithmetic.divMod, "Arithmetic.divMod");
+	ReductionManager.addReducer("Math.Arithmetic.Mod",    Arithmetic.divMod, "Arithmetic.divMod");
+	ReductionManager.addReducer("Math.Arithmetic.DivMod", Arithmetic.divMod, "Arithmetic.divMod");
 	
-	ReductionManager.addReducer("Math.Arithmetic.ModularExponentiation"       , Arithmetic.modPow);
-	ReductionManager.addReducer("Math.Arithmetic.ModularMultiplicativeInverse", Arithmetic.modInverse);
+	ReductionManager.addReducer("Math.Arithmetic.ModularExponentiation"       , Arithmetic.modPow,     "Arithmetic.modPow");
+	ReductionManager.addReducer("Math.Arithmetic.ModularMultiplicativeInverse", Arithmetic.modInverse, "Arithmetic.modInverse");
 	
-	ReductionManager.addReducer("Math.Trascendental.NaturalLogarithm", Arithmetic.log);
-	ReductionManager.addReducer("Math.Trascendental.DecimalLogarithm", Arithmetic.log);
-	ReductionManager.addReducer("Math.Trascendental.BinaryLogarithm",  Arithmetic.log);
-	ReductionManager.addReducer("Math.Trascendental.Logarithm",        Arithmetic.log);
+	ReductionManager.addReducer("Math.Trascendental.NaturalLogarithm", Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Trascendental.DecimalLogarithm", Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Trascendental.BinaryLogarithm",  Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Trascendental.Logarithm",        Arithmetic.log, "Arithmetic.log");
 	
-	ReductionManager.addReducer("Math.Arithmetic.SquareRoot", Arithmetic.sqrt);
+	ReductionManager.addReducer("Math.Arithmetic.SquareRoot", Arithmetic.sqrt, "Arithmetic.sqrt");
 	
-	ReductionManager.addReducer("Math.Trigonometric.Sine",         Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.Cosine",       Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.Tangent",      Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.Cotangent",    Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.Secant",       Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.Cosecant",     Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.ArcSine",      Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.ArcCosine",    Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.ArcTangent",   Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.ArcCotangent", Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.ArcSecant",    Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.ArcCosecant",  Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Trigonometric.ArcTangent2",  Arithmetic.atan2);
+	ReductionManager.addReducer("Math.Trigonometric.Sine",         Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Cosine",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Tangent",      Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Cotangent",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Secant",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Cosecant",     Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcSine",      Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcCosine",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcTangent",   Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcCotangent", Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcSecant",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcCosecant",  Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcTangent2",  Arithmetic.atan2,     "Arithmetic.atan2");
 	
-	ReductionManager.addReducer("Math.Hyperbolic.Sine",            Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.Cosine",          Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.Tangent",         Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.Cotangent",       Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.Secant",          Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.Cosecant",        Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.ArcSine",         Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.ArcCosine",       Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.ArcTangent",      Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.ArcCotangent",    Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.ArcSecant",       Arithmetic.trigHyper);
-	ReductionManager.addReducer("Math.Hyperbolic.ArcCosecant",     Arithmetic.trigHyper);
+	ReductionManager.addReducer("Math.Hyperbolic.Sine",            Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Cosine",          Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Tangent",         Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Cotangent",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Secant",          Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Cosecant",        Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcSine",         Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcCosine",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcTangent",      Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcCotangent",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcSecant",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcCosecant",     Arithmetic.trigHyper, "Arithmetic.trigHyper");
 	
-	ReductionManager.addReducer("Math.Arithmetic.IntegerPart",    Arithmetic.integerPart);
-	ReductionManager.addReducer("Math.Arithmetic.FractionalPart", Arithmetic.fractionalPart);
-	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces",  Arithmetic.decimalPlaces);
+	ReductionManager.addReducer("Math.Arithmetic.IntegerPart",    Arithmetic.integerPart,    "Arithmetic.integerPart");
+	ReductionManager.addReducer("Math.Arithmetic.FractionalPart", Arithmetic.fractionalPart, "Arithmetic.fractionalPart");
+	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces",  Arithmetic.decimalPlaces,  "Arithmetic.decimalPlaces");
 	
-	ReductionManager.addReducer("Math.Arithmetic.IsRealNumber",     Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsRationalNumber", Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsNumeric",        Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsIntegerValue",   Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsInteger",        Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsDecimal",        Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsNegativeNumber", Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsPositiveNumber", Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsNumberZero",     Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsEven",           Arithmetic.isX);
-	ReductionManager.addReducer("Math.Arithmetic.IsOdd",            Arithmetic.isX);
+	ReductionManager.addReducer("Math.Arithmetic.IsRealNumber",     Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsRationalNumber", Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsNumeric",        Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsIntegerValue",   Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsInteger",        Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsDecimal",        Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsNegativeNumber", Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsPositiveNumber", Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsNumberZero",     Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsEven",           Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsOdd",            Arithmetic.isX, "Arithmetic.isX");
 	
-	ReductionManager.addReducer("Math.Arithmetic.ToInteger",   Arithmetic.toX);
-	ReductionManager.addReducer("Math.Arithmetic.ToIfInteger", Arithmetic.toX);
-	ReductionManager.addReducer("Math.Arithmetic.ToDecimal",   Arithmetic.toX);
-	ReductionManager.addReducer("Math.Arithmetic.ToNumber",    Arithmetic.toNumber);
+	ReductionManager.addReducer("Math.Arithmetic.ToInteger",   Arithmetic.toX,      "Arithmetic.toX");
+	ReductionManager.addReducer("Math.Arithmetic.ToIfInteger", Arithmetic.toX,      "Arithmetic.toX");
+	ReductionManager.addReducer("Math.Arithmetic.ToDecimal",   Arithmetic.toX,      "Arithmetic.toX");
+	ReductionManager.addReducer("Math.Arithmetic.ToNumber",    Arithmetic.toNumber, "Arithmetic.toNumber");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Factorial", Arithmetic.factorial);
+	ReductionManager.addReducer("Math.Arithmetic.Factorial", Arithmetic.factorial, "Arithmetic.factorial");
 	
-	ReductionManager.addReducer("String.ToString", Arithmetic.toString);
-	ReductionManager.addReducer("Time.ToTime",     Arithmetic.toTime);
+	ReductionManager.addReducer("String.ToString", Arithmetic.toString, "Arithmetic.toString");
+	ReductionManager.addReducer("Time.ToTime",     Arithmetic.toTime,   "Arithmetic.toTime");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Digits", Arithmetic.digits);
+	ReductionManager.addReducer("Math.Arithmetic.Digits", Arithmetic.digits, "Arithmetic.digits");
 	
-	ReductionManager.addReducer("Math.Arithmetic.GreatestCommonDivisor", Arithmetic.gcdLcm);
-	ReductionManager.addReducer("Math.Arithmetic.LeastCommonMultiple",   Arithmetic.gcdLcm);
+	ReductionManager.addReducer("Math.Arithmetic.GreatestCommonDivisor", Arithmetic.gcdLcm, "Arithmetic.gcdLcm");
+	ReductionManager.addReducer("Math.Arithmetic.LeastCommonMultiple",   Arithmetic.gcdLcm, "Arithmetic.gcdLcm");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Factors", Arithmetic.factors);
+	ReductionManager.addReducer("Math.Arithmetic.Factors", Arithmetic.factors, "Arithmetic.factors");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Divides",       Arithmetic.divisionTest);
-	ReductionManager.addReducer("Math.Arithmetic.DoesNotDivide", Arithmetic.divisionTest);
+	ReductionManager.addReducer("Math.Arithmetic.Divides",       Arithmetic.divisionTest, "Arithmetic.divisionTest");
+	ReductionManager.addReducer("Math.Arithmetic.DoesNotDivide", Arithmetic.divisionTest, "Arithmetic.divisionTest");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Random",        Arithmetic.random);
-	ReductionManager.addReducer("Math.Arithmetic.RandomInRange", Arithmetic.randomInRange);
+	ReductionManager.addReducer("Math.Arithmetic.Random",        Arithmetic.random,        "Arithmetic.random");
+	ReductionManager.addReducer("Math.Arithmetic.RandomInRange", Arithmetic.randomInRange, "Arithmetic.randomInRange");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Piecewise", Arithmetic.piecewise);
+	ReductionManager.addReducer("Math.Arithmetic.Piecewise", Arithmetic.piecewise, "Arithmetic.piecewise");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductReducer,     { special: true });
-	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductListReducer, { special: true });
-	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductReducer    , { special: true });
-	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductListReducer, { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductReducer,     "Arithmetic.summationProductReducer", { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductListReducer, "Arithmetic.summationProductListReducer", { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductReducer    , "Arithmetic.summationProductReducer", { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductListReducer, "Arithmetic.summationProductListReducer", { special: true });
 	
-	ReductionManager.addReducer("Math.Arithmetic.IsPrime", Arithmetic.isPrime);
+	ReductionManager.addReducer("Math.Arithmetic.IsPrime", Arithmetic.isPrime, "Arithmetic.isPrime");
 };
