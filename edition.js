@@ -153,9 +153,10 @@ Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathExponentiation, null, this.messages.leafExponent, () => Expression.binaryEdition("Math.Arithmetic.Exponentiation", false));
 	Formulae.addEdition(this.messages.pathExponentiation, null, this.messages.leafBase,     () => Expression.binaryEdition("Math.Arithmetic.Exponentiation", true));
 
-	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafPrecision,       () => Expression.wrapperEdition("Math.Arithmetic.Precision"));
-	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSetMaxPrecision, () => Expression.wrapperEdition("Math.Arithmetic.SetMaxPrecision"));
-	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafGetMaxPrecision, () => Expression.replacingEdition("Math.Arithmetic.GetMaxPrecision"));
+	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSignificantDigits, () => Expression.wrapperEdition ("Math.Arithmetic.SignificantDigits"));
+	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSetPrecision,      () => Expression.wrapperEdition ("Math.Arithmetic.SetPrecision"));
+	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafGetPrecision,      () => Expression.replacingEdition("Math.Arithmetic.GetPrecision"));
+	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafWithPrecision,     () => Expression.binaryEdition("Math.Arithmetic.WithPrecision", false));
 	
 	// rounding modes
 	Formulae.addEdition(this.messages.PathRoundingMode, null, this.messages.leafSetRoundingMode, () => Expression.wrapperEdition("Math.Arithmetic.SetRoundingMode"));

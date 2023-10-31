@@ -27,26 +27,26 @@ Arithmetic.TAG_INFINITY = "Math.Infinity";
 // precision //
 ///////////////
 
-Arithmetic.precision = async (precision, session) => {
-	let canonicalNumber = CanonicalArithmetic.expr2CanonicalNumber(precision.children[0]);
+Arithmetic.significantDigits = async (significantDigits, session) => {
+	let canonicalNumber = CanonicalArithmetic.expr2CanonicalNumber(significantDigits.children[0]);
 	if (canonicalNumber === null) return false;
 	
 	if (canonicalNumber instanceof CanonicalArithmetic.Decimal) {
 		let d = canonicalNumber.decimal;
 		let p = d.isZero() ? 0 : d.precision();
-		precision.replaceBy(CanonicalArithmetic.number2Expr(p, false));
+		significantDigits.replaceBy(CanonicalArithmetic.number2Expr(p, false));
 	}
 	else {
 		let bi = canonicalNumber.integer;
 		if (bi < 0n) bi = -bi;
-		precision.replaceBy(CanonicalArithmetic.number2Expr(bi.toString().replace(/0+$/, "").length, false));
+		significantDigits.replaceBy(CanonicalArithmetic.number2Expr(bi.toString().replace(/0+$/, "").length, false));
 	}
 	
 	return true;
 };
 
-Arithmetic.setMaxPrecision = async (setMaxPrecision, session) => {
-	let precisionExpr = await session.reduceAndGet(setMaxPrecision.children[0], 0);
+Arithmetic.setPrecision = async (setPrecision, session) => {
+	let precisionExpr = await session.reduceAndGet(setPrecision.children[0], 0);
 	let precision = CanonicalArithmetic.getInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
 		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
@@ -57,8 +57,28 @@ Arithmetic.setMaxPrecision = async (setMaxPrecision, session) => {
 	return true;
 };
 
-Arithmetic.getMaxPrecision = async (getMaxPrecision, session) => {
-	getMaxPrecision.replaceBy(CanonicalArithmetic.number2Expr(session.Decimal.precision, false));
+Arithmetic.getPrecision = async (getPrecision, session) => {
+	getPrecision.replaceBy(CanonicalArithmetic.number2Expr(session.Decimal.precision, false));
+	return true;
+};
+
+Arithmetic.withPrecision = async (withPrecision, session) => {
+	let precisionExpr = await session.reduceAndGet(withPrecision.children[1], 1);
+	let precision = CanonicalArithmetic.getInteger(precisionExpr);
+	if (precision === undefined || precision < 1 || precision > 1e+9) {
+		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
+		throw new ReductionError();
+	}
+	
+	// Ok
+	let oldPrecision = session.Decimal.precision;
+	session.Decimal.set({ precision: precision });
+	
+	await session.reduce(withPrecision.children[0]);
+	
+	session.Decimal.set({ precision: oldPrecision });
+	
+	withPrecision.replaceBy(withPrecision.children[0]);
 	return true;
 };
 
@@ -136,7 +156,7 @@ Arithmetic.getEuclideanDivisionMode = async (getEuclideanDivisionMode, session) 
 
 // N(numeric)
 Arithmetic.nNumeric = async (n, session) => {
-	if (n.children.length != 1) return false; // forward to N(expr, precistion)
+	if (n.children.length != 1) return false; // forward to N(expr, precision)
 	
 	let number = CanonicalArithmetic.expr2CanonicalNumeric(n.children[0]);
 	if (number === null) return false;
@@ -2730,9 +2750,10 @@ Arithmetic.isPrime = async (isPrime, session) => {
 };
 
 Arithmetic.setReducers = () => {
-	ReductionManager.addReducer("Math.Arithmetic.Precision",       Arithmetic.precision,       "Arithmetic.precision");
-	ReductionManager.addReducer("Math.Arithmetic.SetMaxPrecision", Arithmetic.setMaxPrecision, "Arithmetic.setMaxPrecision");
-	ReductionManager.addReducer("Math.Arithmetic.GetMaxPrecision", Arithmetic.getMaxPrecision, "Arithmetic.getMaxPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.SignificantDigits", Arithmetic.significantDigits, "Arithmetic.significantDigits");
+	ReductionManager.addReducer("Math.Arithmetic.SetPrecision",      Arithmetic.setPrecision,      "Arithmetic.setPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.GetPrecision",      Arithmetic.getPrecision,      "Arithmetic.getPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.WithPrecision",     Arithmetic.withPrecision,     "Arithmetic.withPrecision", { special: true });
 	
 	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode", Arithmetic.setRoundingMode, "Arithmetic.setRoundingMode");
 	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode", Arithmetic.getRoundingMode, "Arithmetic.getRoundingMode");

@@ -14,17 +14,22 @@
 	
 	"pathPrecision" : "Math.Arithmetic.Precision",
 	
-	"mnemonicPrecision" : "Precision",
-	"namePrecision"     : "Precision",
-	"leafPrecision"     : "Precision of",
+	"mnemonicSignificantDigits" : "SignificantDigits",
+	"nameSignificantDigits"     : "Significant digits",
+	"leafSignificantDigits"     : "Significant digits",
 	
-	"mnemonicGetMaxPrecision" : "GetMaxPrecision",
-	"nameGetMaxPrecision"     : "Get max precision",
-	"leafGetMaxPrecision"     : "Get max precision",
+	"mnemonicGetPrecision" : "GetPrecision",
+	"nameGetPrecision"     : "Get precision",
+	"leafGetPrecision"     : "Get precision",
 	
-	"mnemonicSetMaxPrecision" : "SetMaxPrecision",
-	"nameSetMaxPrecision"     : "Set max precision",
-	"leafSetMaxPrecision"     : "Set max precision",
+	"mnemonicSetPrecision" : "SetPrecision",
+	"nameSetPrecision"     : "Set precision",
+	"leafSetPrecision"     : "Set precision",
+	
+	"mnemonicWithPrecision" : "WithPrecision",
+	"nameWithPrecision"     : "With precision",
+	"leafWithPrecision"     : "With precision",
+	"childrenWithPrecision" : [ "Argument", "Precision" ],
 	
 	"PathRoundingMode" : "Math.Arithmetic.Rounding mode",
 	

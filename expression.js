@@ -847,6 +847,7 @@ Arithmetic.setExpressions = function(module) {
 	}));
 	
 	// numeric
+	
 	Formulae.setExpression(module, "Math.Numeric", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Numeric",
@@ -854,6 +855,17 @@ Arithmetic.setExpressions = function(module) {
 		getName:      () => Arithmetic.messages.nameNumeric,
 		getChildName: index => Arithmetic.messages.childrenNumeric[index],
 		max:          2
+	});
+	
+	// With precision
+	
+	Formulae.setExpression(module, "Math.Arithmetic.WithPrecision", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.Arithmetic.WithPrecision",
+		getMnemonic:  () => Arithmetic.messages.mnemonicWithPrecision,
+		getName:      () => Arithmetic.messages.nameWithPrecision,
+		getChildName: index => Arithmetic.messages.childrenWithPrecision[index],
+		min: 2, max: 2
 	});
 	
 	// exponentiation
@@ -885,7 +897,7 @@ Arithmetic.setExpressions = function(module) {
 	});
 	
 	// 0-parameter function
-	[ "GetMaxPrecision", "GetRoundingMode", "GetEuclideanDivisionMode" /*, "Random" */  ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
+	[ "GetPrecision", "GetRoundingMode", "GetEuclideanDivisionMode" /*, "Random" */  ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:       Expression.Function,
 		getTag:      () => "Math.Arithmetic." + tag,
 		getMnemonic: () => Arithmetic.messages["mnemonic" + tag],
@@ -894,7 +906,7 @@ Arithmetic.setExpressions = function(module) {
 	}));
 	
 	[ // 1-parameter function, no child name
-		"Precision",    "SetMaxPrecision", "SetRoundingMode", "SetEuclideanDivisionMode",
+		"SignificantDigits",    "SetPrecision", "SetRoundingMode", "SetEuclideanDivisionMode",
 		"IntegerPart",  "FractionalPart", "DecimalPlaces",
 		"Sign",         "Factors",
 		"IsRealNumber", "IsRationalNumber", "IsNumeric", "IsIntegerValue", "IsInteger", "IsDecimal", "IsPositiveNumber", "IsNegativeNumber", "IsNumberZero",

@@ -14,17 +14,22 @@
 	
 	"pathPrecision" : "Matemáticas.Aritmética.Precisión",
 	
-	"mnemonicPrecision" : "Precisión",
-	"namePrecision"     : "Precisión",
-	"leafPrecision"     : "Precisión",
+	"mnemonicSignificantDigits" : "CifrasSignificativas",
+	"nameSignificantDigits"     : "Cifras significativas",
+	"leafSignificantDigits"     : "Cifras significativas",
 	
-	"mnemonicGetMaxPrecision" : "ObtenerPrecisiónMáxima",
-	"nameGetMaxPrecision"     : "Obtener precisión máxima",
-	"leafGetMaxPrecision"     : "Obtener precisión máxima",
+	"mnemonicGetPrecision" : "ObtenerPrecisión",
+	"nameGetPrecision"     : "Obtener precisión",
+	"leafGetPrecision"     : "Obtener precisión",
 	
-	"mnemonicSetMaxPrecision" : "FijarPrecisiónMáxima",
-	"nameSetMaxPrecision"     : "Fijar Precisión Máxima",
-	"leafSetMaxPrecision"     : "Fijar Precisión Máxima",
+	"mnemonicSetPrecision" : "FijarPrecisión",
+	"nameSetPrecision"     : "Fijar precisión",
+	"leafSetPrecision"     : "Fijar precisión",
+	
+	"mnemonicWithPrecision" : "ConPrecisión",
+	"nameWithPrecision"     : "Con precisión",
+	"leafWithPrecision"     : "Con precisión",
+	"childrenWithPrecision" : [ "Argumento", "Precisión" ],
 	
 	"PathRoundingMode" : "Matemáticas.Aritmética.Tipo de redondeo",
 	
