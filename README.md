@@ -2,7 +2,7 @@
 
 Arithmetic package for the [Fōrmulæ](https://formulae.org) web application.
 
-Fōrmulæ is a sftware framework for visualization, edition and manipulation of complex expressions, from many fields. The code for an specific field —i.e. arithmetics— is encapsulated in a single unit called a Fōrmulæ **package**.
+Fōrmulæ is a software framework for visualization, edition and manipulation of complex expressions, from many fields. The code for an specific field —i.e. arithmetics— is encapsulated in a single unit called a Fōrmulæ **package**.
 
 This repository contains the source code for the **arithmetic package**, in Javascript.
 
@@ -28,7 +28,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
   * Rounding modes. They can be set globally or by specific operation
     * Direct, away from zero
     * Direct, towards zero
-    * Direct, twards infinity
+    * Direct, towards infinity
     * Direct, towards minus infinity
     * To nearest, half away from zero
     * To nearest, half towards zero
