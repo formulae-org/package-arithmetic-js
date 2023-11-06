@@ -45,7 +45,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * List of prime factors of a integer number
 * List of digits of a integer number, in any integer positive base
 * Greatest common divisor, least common multiple of a list of integer numbers
-* Primality of an integer number
+* Primality test of an integer number
 * Pseudorandom number generation with uniform distribution
    * In the real interval [0, 1)
    * In a range of integer values
