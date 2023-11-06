@@ -58,7 +58,8 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
    * Using any roundig mode, or the euclidean mode
 * Modular exponentiation, modular multiplicative inverse
 * Piecewise definition
-* Summation, product
+* $\sum_{n=a}^{b} expr$
+* Product
 * Trascendental functions, with any precision and rounding mode
   * Decimal logarithm
   * Natural logarithm
