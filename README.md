@@ -45,3 +45,28 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * List of prime factors of a integer number
 * List of digits of a integer number, in any integer positive base
 * Greatest common divisor, least common multiple of a list of integer numbers
+* Primality of an integer number
+* Testing for a (integer, decimal, rational) to be a real number, a rational number, numeric, an integer, a decimal, positive, zero, negative, even, odd
+* Testing if a integer number divides or does nor divide another.
+* Conversion between integer, decimal or rational numbers.
+* Div, Mod and DivMod operations
+   * Between integer, decimal and rational number, even mixing them
+   * Using any precision
+   * Using any roundig mode, or the euclidean mode
+* Modular exponentiation, modular multiplicative inverse
+* Piecewise definition
+* Summation, product
+* Trascendental functions, with any precision and rounding mode
+  * Decimal logarithm
+  * Natural logarithm
+  * Binar logarithm
+  * Logarithm in specified base
+* Trigonometric functions, with any precision and rounding mode
+  * Sine, cosine, tangent, cotangent, secant, cosecant
+  * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
+  * atan2
+* Hyperbolic functions, with any precision and rounding mode
+  * Sine, cosine, tangent, cotangent, secant, cosecant
+  * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
+* Symbolic representation of π and e contants. Numeric form with any precision and roundig mode.
+* 
