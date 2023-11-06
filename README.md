@@ -47,7 +47,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Greatest common divisor, least common multiple of a list of integer numbers
 * Primality of an integer number
 * Pseudorandom number generation in uniform distribution
-   * In the real interval [0, 1>
+   * In the real interval [0, 1)
    * In a range of integer values
 * Testing for a (integer, decimal, rational) to be a real number, a rational number, numeric, an integer, a decimal, positive, zero, negative, even, odd
 * Testing if a integer number divides or does nor divide another.
