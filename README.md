@@ -37,11 +37,11 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
     * To nearest, half to even
 * "Numeric" operation, forces the operation to be performed with decimal arithmetic. Precision can be specified
 * Addition, multiplication, division and exponentiation of integer, decimal and rational numbers with arbitrary precision
-* Comparison of integer, decimal and rational numbers
-* Rationalization of decimal values. Rationalization specifying number of digits to repeat
+* Comparison between integer, decimal and rational numbers, even mixing them.
+* Rationalization of decimal values. Rationalization specifying number of repeating digits
 * Absolute value, sign, square root, factorial
-* Truncate, floor, ceiling and rounding of decimal an drational numbers to integer numbers
-* Separation of integer and decimal parts
+* Truncation, floor, ceiling and rounding of decimal and rational numbers to integer numbers
+* Separation of integer and decimal parts, retrieving the number of decimal places
 * List of prime factors of a integer number
 * List of digits of a integer number, in any integer positive base
 * Greatest common divisor, least common multiple of a list of integer numbers
