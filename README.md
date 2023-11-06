@@ -62,7 +62,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Trascendental functions, with any precision and rounding mode
   * Decimal logarithm
   * Natural logarithm
-  * Binar logarithm
+  * Binary logarithm
   * Logarithm in specified base
 * Trigonometric functions, with any precision and rounding mode
   * Sine, cosine, tangent, cotangent, secant, cosecant
