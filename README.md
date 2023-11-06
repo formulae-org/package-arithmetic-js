@@ -71,4 +71,4 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Hyperbolic functions, with any precision and rounding mode
   * Sine, cosine, tangent, cotangent, secant, cosecant
   * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
-* Symbolic representation of π and e contants. Numeric form with any precision and roundig mode.
+* Symbolic representation of π and e contants. Numeric conversion with any precision and roundig mode.
