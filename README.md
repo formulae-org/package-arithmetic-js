@@ -1,8 +1,8 @@
 # package-arithmetic-js
 
-Arithmetic package for the [Fōrmulæ](https://formulae.org) web application.
+Arithmetic package for the [Fōrmulæ](https://formulae.org) programming language.
 
-Fōrmulæ is a software framework for visualization, edition and manipulation of complex expressions, from many fields. The code for an specific field —i.e. arithmetics— is encapsulated in a single unit called a Fōrmulæ **package**.
+Fōrmulæ is also a software framework for visualization, edition and manipulation of complex expressions, from many fields. The code for an specific field —i.e. arithmetics— is encapsulated in a single unit called a Fōrmulæ **package**.
 
 This repository contains the source code for the **arithmetic package**, in Javascript.
 
