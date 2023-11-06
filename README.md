@@ -46,9 +46,12 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * List of digits of a integer number, in any integer positive base
 * Greatest common divisor, least common multiple of a list of integer numbers
 * Primality of an integer number
+* Pseudorandom number generation in uniform distribution
+   * In the real interval [0, 1>
+   * In a range of integer values
 * Testing for a (integer, decimal, rational) to be a real number, a rational number, numeric, an integer, a decimal, positive, zero, negative, even, odd
 * Testing if a integer number divides or does nor divide another.
-* Conversion between integer, decimal or rational numbers.
+* Conversion between integer, decimal or rational numbers
 * Div, Mod and DivMod operations
    * Between integer, decimal and rational number, even mixing them
    * Using any precision
@@ -69,4 +72,3 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
   * Sine, cosine, tangent, cotangent, secant, cosecant
   * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
 * Symbolic representation of π and e contants. Numeric form with any precision and roundig mode.
-* 
