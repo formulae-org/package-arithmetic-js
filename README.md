@@ -26,10 +26,10 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
     * Rounding to decimal places
     * Rounding to multiple
   * Rounding modes. They can be set globally or by specific operation
-    * Away from zero
-    * Towards zero
-    * Towards infinity
-    * Towards minus infinity
+    * Direct, away from zero
+    * Direct, towards zero
+    * Direct, twards infinity
+    * Direct, towards minus infinity
     * To nearest, half away from zero
     * To nearest, half towards zero
     * To nearest, half towards infinity
