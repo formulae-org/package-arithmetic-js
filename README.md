@@ -13,9 +13,9 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 ### Capabilities ###
 
 * Types of numbers
-    * [Integers](https://en.wikipedia.org/wiki/Integer) of arbitrary size
-    * [Decimal](https://en.wikipedia.org/wiki/Real_number), of arbitrary precision
-    * [Rational](https://en.wikipedia.org/wiki/Rational_number), of arbitrary size for numerator / denominator
+    * [Integer numbers](https://en.wikipedia.org/wiki/Integer) of arbitrary size
+    * [Decimal numbers](https://en.wikipedia.org/wiki/Real_number), of arbitrary precision
+    * [Rational numbers](https://en.wikipedia.org/wiki/Rational_number), of arbitrary size for numerator / denominator
 * Precision management
     * Based on [significant digits](https://en.wikipedia.org/wiki/Significant_digit)
     * It can be set globally or by specific operation
