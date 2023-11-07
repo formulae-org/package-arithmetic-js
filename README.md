@@ -58,8 +58,8 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
    * Using any roundig mode, or the euclidean mode
 * Modular exponentiation, modular multiplicative inverse
 * Piecewise definition
-* [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) $\sum$, of a finite number of terms
-* [Product of a sequence](https://en.wikipedia.org/wiki/Multiplication#Product_of_a_sequence) $\prod$, of a finite number of terms
+* [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) $\sum$, of a finite number of terms, visually using the [Capital pi notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation)
+* [Product of a sequence](https://en.wikipedia.org/wiki/Multiplication#Product_of_a_sequence) $\prod$, of a finite number of terms, visually using the [Capital sigma notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation)
 * Trascendental functions, with any precision and rounding mode
   * Decimal logarithm
   * Natural logarithm
