@@ -51,7 +51,8 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
    * In a range of integer values
 * Testing for a (integer, decimal, rational) to be a real number, a rational number, numeric, an integer, a decimal, positive, zero, negative, even, odd
 * Testing if a integer number divides or does nor divide another.
-* Conversion between integer, decimal or rational numbers
+* Conversion from/to other data types
+   * From strings expressing integer or decimal values, in decimal or bases between 2 and 36
 * Div, Mod and DivMod operations
    * Between integer, decimal and rational number, even mixing them
    * Using any precision
@@ -60,16 +61,16 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * [Piecewise-defined functions](https://en.wikipedia.org/wiki/Piecewise)
 * [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) of a finite number of terms, visually using the [Capital-pi notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\sum$
 * [Product of a sequence](https://en.wikipedia.org/wiki/Multiplication#Product_of_a_sequence) of a finite number of terms, visually using the [Capital-sigma notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\prod$
-* Trascendental functions, with any precision and rounding mode
+* Numerical calculation of the following [trascendental functions](https://en.wikipedia.org/wiki/Transcendental_function), for a decimal number, with any precision and rounding mode
   * Decimal logarithm
   * Natural logarithm
   * Binary logarithm
   * Logarithm in specified base
-* Trigonometric functions, with any precision and rounding mode
+* Numerical calculation of the following [trigonometric functions](https://en.wikipedia.org/wiki/Trigonometric_functions), for a decimal number, with any precision and rounding mode
   * Sine, cosine, tangent, cotangent, secant, cosecant
   * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
-  * [atan2](https://en.wikipedia.org/wiki/Atan2)
-* Hyperbolic functions, with any precision and rounding mode
+  * [2-argument arctangent](https://en.wikipedia.org/wiki/Atan2) (atan2)
+* Numerical calculation of the following [hyperbolic functions](https://en.wikipedia.org/wiki/Hyperbolic_functions), for a decimal number, with any precision and rounding mode
   * Sine, cosine, tangent, cotangent, secant, cosecant
   * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
 * Symbolic representation of π and e contants. Numeric conversion with any precision and roundig mode.
