@@ -44,7 +44,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Separation of integer and decimal parts, retrieving the number of decimal places
 * List of [prime factors](https://en.wikipedia.org/wiki/Integer_factorization) of a integer number
 * List of digits of a integer number, in any integer positive base
-* Greatest common divisor, least common multiple of a list of integer numbers
+* [Greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor), [least common multiple](https://en.wikipedia.org/wiki/Least_common_multiple) of a list of integer numbers
 * Primality test of an integer number
 * Pseudorandom number generation with uniform distribution
    * In the real interval [0, 1)
@@ -56,7 +56,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
    * Between integer, decimal and rational number, even mixing them
    * Using any precision
    * Using any roundig mode, or the euclidean mode
-* Modular exponentiation, modular multiplicative inverse
+* [Modular exponentiation](https://en.wikipedia.org/wiki/Modular_exponentiation), [modular multiplicative inverse](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
 * [Piecewise-defined functions](https://en.wikipedia.org/wiki/Piecewise)
 * [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) of a finite number of terms, visually using the [Capital-pi notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\sum$
 * [Product of a sequence](https://en.wikipedia.org/wiki/Multiplication#Product_of_a_sequence) of a finite number of terms, visually using the [Capital-sigma notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\prod$
