@@ -45,7 +45,9 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Truncation, floor, ceiling and rounding of decimal and rational numbers to integer numbers
 * Separation of integer and decimal parts, retrieving the number of decimal places
 * List of [prime factors](https://en.wikipedia.org/wiki/Integer_factorization) of a integer number
-* List of digits of a integer number, in any integer positive base
+* List of digits of a integer positive number
+     * In base 10 by default, but any integer positive number can be specified as the base
+     * A size (of list) can be specified. For numbers with less digits zero values are padded
 * [Greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor), [least common multiple](https://en.wikipedia.org/wiki/Least_common_multiple) of a list of integer numbers
 * Primality test of an integer number
 * Pseudorandom number generation with uniform distribution
