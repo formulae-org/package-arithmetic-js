@@ -58,7 +58,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Div, Mod and DivMod operations
    * Between integer, decimal and rational number, even mixing them
    * Using any precision
-   * Using any roundig mode, or the euclidean mode
+   * Using any of the 9 roundig modes, or the [euclidean division](https://en.wikipedia.org/wiki/Euclidean_division) mode
 * [Modular exponentiation](https://en.wikipedia.org/wiki/Modular_exponentiation), [modular multiplicative inverse](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
 * [Piecewise-defined functions](https://en.wikipedia.org/wiki/Piecewise)
 * [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) of a finite number of terms, visually using the [Capital-pi notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\sum$
