@@ -13,13 +13,13 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 ### Capabilities ###
 
 * Types of numbers
-    * Integers of arbitrary size
-    * Decimal, of arbitrary precision
-    * Rational, of arbitrary size for numerator / denominator
+    * [Integers](https://en.wikipedia.org/wiki/Integer) of arbitrary size
+    * [Decimal](https://en.wikipedia.org/wiki/Real_number), of arbitrary precision
+    * [Rational](https://en.wikipedia.org/wiki/Rational_number), of arbitrary size for numerator / denominator
 * Precision management
-    * Based on significant digits
+    * Based on [significant digits](https://en.wikipedia.org/wiki/Significant_digit)
     * It can be set globally or by specific operation
-* Rounding
+* [Rounding](https://en.wikipedia.org/wiki/Rounding)
   * Rounding operation
     * Rounding to precision. This mode is used by most operations
     * Rounding to integer. Truncation, floor, ceiling, round
