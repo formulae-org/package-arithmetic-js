@@ -42,7 +42,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Absolute value, sign, square root, factorial
 * Truncation, floor, ceiling and rounding of decimal and rational numbers to integer numbers
 * Separation of integer and decimal parts, retrieving the number of decimal places
-* List of prime factors of a integer number
+* List of [prime factors](https://en.wikipedia.org/wiki/Integer_factorization) of a integer number
 * List of digits of a integer number, in any integer positive base
 * Greatest common divisor, least common multiple of a list of integer numbers
 * Primality test of an integer number
