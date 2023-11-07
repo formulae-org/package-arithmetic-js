@@ -68,7 +68,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Trigonometric functions, with any precision and rounding mode
   * Sine, cosine, tangent, cotangent, secant, cosecant
   * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
-  * atan2
+  * [atan2](https://en.wikipedia.org/wiki/Atan2)
 * Hyperbolic functions, with any precision and rounding mode
   * Sine, cosine, tangent, cotangent, secant, cosecant
   * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
