@@ -37,7 +37,9 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
     * To nearest, half to even
 * "Numeric" operation, forces the operation to be performed with decimal arithmetic. Precision can be specified
 * Addition, multiplication, division and exponentiation of integer, decimal and rational numbers with arbitrary precision
-* Comparison between integer, decimal and rational numbers, even mixing them.
+* Comparison between integer, decimal and rational numbers, even mixing them
+  * Relational comparisons, visualization as $a = b$, $a \ne b$, $a > b$, $a < b$, $a \leq b$, $a \geq b$
+  * [Three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison) operator
 * Rationalization of decimal values. Rationalization specifying number of repeating digits
 * Absolute value, sign, square root, factorial
 * Truncation, floor, ceiling and rounding of decimal and rational numbers to integer numbers
