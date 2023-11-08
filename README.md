@@ -44,12 +44,9 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Absolute value, sign, square root, factorial
 * Truncation, floor, ceiling and rounding of decimal and rational numbers to integer numbers
 * Separation of integer and decimal parts, retrieving the number of decimal places
-* List of [prime factors](https://en.wikipedia.org/wiki/Integer_factorization) of a integer number
 * List of digits of a integer positive number
      * In base 10 by default, but any integer positive number can be specified as the base
      * A size (of list) can be specified. For numbers with less digits, zero values are padded
-* [Greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor), [least common multiple](https://en.wikipedia.org/wiki/Least_common_multiple) of a list of integer numbers
-* Primality test of an integer number
 * Pseudorandom number generation with uniform distribution
    * In the real interval [0, 1)
    * In a range of integer values
@@ -61,7 +58,13 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
    * Between integer, decimal and rational number, even mixing them
    * Using any precision
    * Using any of the 9 roundig modes, or the [euclidean division](https://en.wikipedia.org/wiki/Euclidean_division) mode
-* [Modular exponentiation](https://en.wikipedia.org/wiki/Modular_exponentiation), [modular multiplicative inverse](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
+* Related to [number theory](https://en.wikipedia.org/wiki/Number_theory)
+   * [Primality test](https://en.wikipedia.org/wiki/Primality_test) of a positive integer number
+   * List of [prime factors](https://en.wikipedia.org/wiki/Integer_factorization) of a integer number
+   * [Greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor)
+   * [Least common multiple](https://en.wikipedia.org/wiki/Least_common_multiple) of a list of integer numbers
+   * [Modular exponentiation](https://en.wikipedia.org/wiki/Modular_exponentiation) of a list of integer numbers
+   * [Modular multiplicative inverse](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
 * [Piecewise-defined functions](https://en.wikipedia.org/wiki/Piecewise)
 * [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) of a finite number of terms, visually using the [Capital-pi notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\sum$
 * [Product of a sequence](https://en.wikipedia.org/wiki/Multiplication#Product_of_a_sequence) of a finite number of terms, visually using the [Capital-sigma notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\prod$
