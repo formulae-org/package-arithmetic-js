@@ -50,8 +50,20 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * [Pseudorandom number](https://en.wikipedia.org/wiki/Pseudorandom_number_generator) generation with uniform distribution
    * In the real interval [0, 1)
    * In a range of integer values
-* Testing for a (integer, decimal, rational) to be a real number, a rational number, numeric, an integer, a decimal, positive, zero, negative, even, odd
-* Testing if a integer number divides or does nor divide another.
+* Testing operation
+     * Expression being a real number (integer or decimal)
+     * Expression being a rational number
+     * Expression being numeric (a integer, decimal or rational number)
+     * Expression beig an integer number (an integer, or decimal number with no fractional part)
+     * Expression being an integer number
+     * Expression being a decimal number
+     * Expression beign a positive number, either integer, decimal or rational
+     * Expression beign a negative number, either integer, decimal or rational
+     * Expression being a zero number, either integer or decimal
+     * Expression being an even number (either integer or decimal with no fractional part)
+     * Expression being an odd number (either integer or decimal with no fractional part)
+     * Whether an integer number [divides](https://en.wikipedia.org/wiki/Divisor#Definition) other, visualization as $a \mid b$
+     * Whether an integer number does not [divide](https://en.wikipedia.org/wiki/Divisor#Definition) other, visualization as $a \nmid b$
 * Conversion from/to other data types
    * From strings expressing integer or decimal values, in decimal or bases between 2 and 36
 * Div, Mod and DivMod operations
