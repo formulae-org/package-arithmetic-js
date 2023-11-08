@@ -91,7 +91,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
   * [Common (base 10) logarithm](https://en.wikipedia.org/wiki/Common_logarithm)
   * [Natural logarithm](https://en.wikipedia.org/wiki/Natural_logarithm)
   * [Binary logarithm](https://en.wikipedia.org/wiki/Binary_logarithm)
-  * [Logarithm in specified base](https://en.wikipedia.org/wiki/Logarithm)
+  * [Logarithm in specific base](https://en.wikipedia.org/wiki/Logarithm)
 * Numerical calculation of the following [trigonometric functions](https://en.wikipedia.org/wiki/Trigonometric_functions), for a decimal number, with any precision and rounding mode
   * Sine, cosine, tangent, cotangent, secant, cosecant
   * Arc sine, arc cosine, arc tangent, arc cotangent, arc secant, arc cosecant
