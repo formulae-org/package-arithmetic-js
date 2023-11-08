@@ -45,7 +45,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
   * [Relational operators](https://en.wikipedia.org/wiki/Relational_operator), visualization as $a = b$, $a \ne b$, $a > b$, $a < b$, $a \leq b$, $a \geq b$
   * [Three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison) operator
 * Rationalization of decimal values. Rationalization specifying number of repeating digits
-* [Absolute value](https://en.wikipedia.org/wiki/Absolute_value), visalized as $|a|$
+* [Absolute value](https://en.wikipedia.org/wiki/Absolute_value), visualized as $|a|$
 * [Sign function](https://en.wikipedia.org/wiki/Sign_function)
 * [Square root](https://en.wikipedia.org/wiki/Square_root), visualized as $\sqrt a$
 * [Factorial](https://en.wikipedia.org/wiki/Factorial), visualized as $n!$
