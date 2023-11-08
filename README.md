@@ -36,12 +36,19 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
     * To nearest, half towards minus infinity
     * To nearest, half to even
 * "Numeric" operation, forces the operation to be performed with decimal arithmetic. Precision can be specified
-* Addition, multiplication, division and exponentiation of integer, decimal and rational numbers with arbitrary precision
+* Basic arithmetic operations: addition, multiplication, division and exponentiation
+   * Integer, decimal and rational numbers, even mixing them
+   * With any precision and rounding mode
+   * Division is visualized as fraction $\frac{a}{b}$
+   * Exponentiation is visualized as $a^b$
 * Comparison between integer, decimal and rational numbers, even mixing them
   * [Relational operators](https://en.wikipedia.org/wiki/Relational_operator), visualization as $a = b$, $a \ne b$, $a > b$, $a < b$, $a \leq b$, $a \geq b$
   * [Three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison) operator
 * Rationalization of decimal values. Rationalization specifying number of repeating digits
-* Absolute value, sign, square root, factorial
+* [Absolute value](https://en.wikipedia.org/wiki/Absolute_value), visalized as $|a|$
+* [Sign function](https://en.wikipedia.org/wiki/Sign_function)
+* [Square root](https://en.wikipedia.org/wiki/Square_root), visualized as $\sqrt a$
+* [Factorial](https://en.wikipedia.org/wiki/Factorial), visualized as $n!$
 * Truncation, floor, ceiling and rounding of decimal and rational numbers to integer numbers
 * Separation of integer and decimal parts, retrieving the number of decimal places
 * List of digits of a integer positive number
