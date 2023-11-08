@@ -47,7 +47,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * List of digits of a integer positive number
      * In base 10 by default, but any integer positive number can be specified as the base
      * A size (of list) can be specified. For numbers with less digits, zero values are padded
-* Pseudorandom number generation with uniform distribution
+* [Pseudorandom number](https://en.wikipedia.org/wiki/Pseudorandom_number_generator) generation with uniform distribution
    * In the real interval [0, 1)
    * In a range of integer values
 * Testing for a (integer, decimal, rational) to be a real number, a rational number, numeric, an integer, a decimal, positive, zero, negative, even, odd
