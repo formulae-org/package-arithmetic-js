@@ -75,7 +75,8 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
      * Whether an integer number [divides](https://en.wikipedia.org/wiki/Divisor#Definition) other, visualization as $a \mid b$
      * Whether an integer number does not [divide](https://en.wikipedia.org/wiki/Divisor#Definition) other, visualization as $a \nmid b$
 * Conversion from/to other data types
-   * From strings expressing integer or decimal values, in decimal or bases between 2 and 36
+   * From string to integer or decimal values, in decimal or bases between 2 and 36
+   * From integer or decimal number to a string representation
 * Div, Mod and DivMod operations
    * Between integer, decimal and rational number, even mixing them
    * Using any precision
