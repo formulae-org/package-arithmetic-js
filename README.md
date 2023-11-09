@@ -83,9 +83,9 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Related to [number theory](https://en.wikipedia.org/wiki/Number_theory)
    * [Primality test](https://en.wikipedia.org/wiki/Primality_test) of a positive integer number
    * List of [prime factors](https://en.wikipedia.org/wiki/Integer_factorization) of a integer number
-   * [Greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor)
+   * [Greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor) of a list of integer numbers
    * [Least common multiple](https://en.wikipedia.org/wiki/Least_common_multiple) of a list of integer numbers
-   * [Modular exponentiation](https://en.wikipedia.org/wiki/Modular_exponentiation) of a list of integer numbers
+   * [Modular exponentiation](https://en.wikipedia.org/wiki/Modular_exponentiation)
    * [Modular multiplicative inverse](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
 * [Piecewise-defined functions](https://en.wikipedia.org/wiki/Piecewise)
 * [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) of a finite number of terms, visually using the [Capital-pi notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\sum$
