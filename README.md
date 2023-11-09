@@ -49,7 +49,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * Rounding decimal and rational numbers to integers
      * Truncation
      * Floor, visualized as $\lfloor x \rfloor$
-     * Ceiling, viuslized as $\lceil x \rceil$
+     * Ceiling, visualized as $\lceil x \rceil$
      * Any other rounding mode
 * Rounding decimal and rational numbers to decimal with decimal places
 * Rounding decimal and rational numbers to multiple values
