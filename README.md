@@ -22,9 +22,6 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * [Rounding](https://en.wikipedia.org/wiki/Rounding)
   * Rounding operation
     * Rounding to precision. This mode is used by most operations
-    * Rounding to integer. Truncation, floor, ceiling, round
-    * Rounding to decimal places
-    * Rounding to multiple
   * Rounding modes. They can be set globally or by specific operation
     * Direct, away from zero
     * Direct, towards zero
@@ -49,7 +46,13 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * [Sign function](https://en.wikipedia.org/wiki/Sign_function)
 * [Square root](https://en.wikipedia.org/wiki/Square_root), visualized as $\sqrt a$
 * [Factorial](https://en.wikipedia.org/wiki/Factorial), visualized as $n!$
-* Truncation, floor, ceiling and rounding of decimal and rational numbers to integer numbers
+* Rounding decimal and rational numbers to integers
+     * Truncation
+     * Floor, visualized as $\lfloor x \rfloor$
+     * Ceiling, viuslized as $\lceil x \rceil$
+     * Any other rounding mode
+* Rounding decimal and rational numbers to decimal with decimal places
+* Rounding decimal and rational numbers to multiple values
 * Separation of integer and decimal parts, retrieving the number of decimal places
 * List of digits of a integer positive number
      * In base 10 by default, but any integer positive number can be specified as the base
