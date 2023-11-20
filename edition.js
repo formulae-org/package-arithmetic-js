@@ -99,7 +99,7 @@ Arithmetic.editionNegative = function() {
 Arithmetic.operatorEdition = function(tag, next, forced, negative) {
 	let nullExpr = new Expression.Null();
 	let newExpr;
-
+	
 	if (negative) {
 		newExpr = Formulae.createExpression("Math.Arithmetic.Negative");
 		newExpr.addChild(nullExpr);
@@ -125,42 +125,47 @@ Arithmetic.operatorEdition = function(tag, next, forced, negative) {
 
 Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = Arithmetic.editionNumber);
-
+	
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumeric, () => Expression.wrapperEdition("Math.Numeric"));
-
+	
 	Formulae.addEdition(this.messages.pathMath, null, "∞", () => Expression.replacingEdition("Math.Infinity"));
-
+	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafNegative, Formulae.editionNegative = Arithmetic.editionNegative);
-
+	
 	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionAfter,        Formulae.editionAddition = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  false, false));
 	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionAfterForced,  () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  true,  false));
 	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionBefore,       Formulae.editionAdditionAlt = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, false, false));
 	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionBeforeForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, true,  false));
-
+	
 	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionAfter,        Formulae.editionSubtraction = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  false, true));
 	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionAfterForced,  () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  true,  true));
 	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionBefore,       Formulae.aditionSubtractionAlt = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, false, true));
 	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionBeforeForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, true,  true));
-
+	
 	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationAfter,       Formulae.editionMultiplication = () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", true,  false, false));
 	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationAfterForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", true,  true,  false));
 	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationBefore,      Formulae.editionMultiplicationAlt = () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", false, false, false));
 	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationBeforeForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", false, true,  false));
-
+	
 	Formulae.addEdition(this.messages.pathDivision, null, this.messages.leafDenominator, () => Expression.binaryEdition("Math.Arithmetic.Division", false));
 	Formulae.addEdition(this.messages.pathDivision, null, this.messages.leafNumerator,   () => Expression.binaryEdition("Math.Arithmetic.Division", true));
-
+	
 	Formulae.addEdition(this.messages.pathExponentiation, null, this.messages.leafExponent, () => Expression.binaryEdition("Math.Arithmetic.Exponentiation", false));
 	Formulae.addEdition(this.messages.pathExponentiation, null, this.messages.leafBase,     () => Expression.binaryEdition("Math.Arithmetic.Exponentiation", true));
-
+	
+	// precision
+	
 	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSignificantDigits, () => Expression.wrapperEdition ("Math.Arithmetic.SignificantDigits"));
 	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSetPrecision,      () => Expression.wrapperEdition ("Math.Arithmetic.SetPrecision"));
 	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafGetPrecision,      () => Expression.replacingEdition("Math.Arithmetic.GetPrecision"));
 	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafWithPrecision,     () => Expression.binaryEdition("Math.Arithmetic.WithPrecision", false));
 	
+	// rounding mode
+	
+	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafSetRoundingMode, () => Expression.wrapperEdition("Math.Arithmetic.SetRoundingMode"));
+	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafGetRoundingMode, () => Expression.replacingEdition("Math.Arithmetic.GetRoundingMode"));
+	
 	// rounding modes
-	Formulae.addEdition(this.messages.PathRoundingMode, null, this.messages.leafSetRoundingMode, () => Expression.wrapperEdition("Math.Arithmetic.SetRoundingMode"));
-	Formulae.addEdition(this.messages.PathRoundingMode, null, this.messages.leafGetRoundingMode, () => Expression.replacingEdition("Math.Arithmetic.GetRoundingMode"));
 	
 	[
 		            "TowardsZero",             "AwayFromZero",             "TowardsMinusInfinity",             "TowardsInfinity",
@@ -168,22 +173,28 @@ Arithmetic.setEditions = function() {
 		"Nearest.HalfEven"
 	].forEach(tag => {
 		Formulae.addEdition(
-			Arithmetic.messages.PathRoundingModes,
+			Arithmetic.messages.pathRoundingModes,
 			null,
 			Arithmetic.messages["labelRoundingMode" + tag],
 			() => Expression.replacingEdition("Math.Arithmetic.RoundingMode." + tag)
 		)
 	});
 	
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRationalize,   () => Expression.wrapperEdition("Math.Arithmetic.Rationalize"));
+	// rounding
+	
+	Formulae.addEdition(this.messages.pathRounding, null, this.messages.leafRoundToPrecision,     () => Expression.multipleEdition("Math.Arithmetic.RoundToPrecision",     2, 0));
+	Formulae.addEdition(this.messages.pathRounding, null, this.messages.leafRoundToInteger,       () => Expression.wrapperEdition ("Math.Arithmetic.RoundToInteger"));
+	Formulae.addEdition(this.messages.pathRounding, null, this.messages.leafRoundToDecimalPlaces, () => Expression.multipleEdition("Math.Arithmetic.RoundToDecimalPlaces", 2, 0));
+	Formulae.addEdition(this.messages.pathRounding, null, this.messages.leafRoundToMultiple,      () => Expression.multipleEdition("Math.Arithmetic.RoundToMultiple",      2, 0));
+	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSquareRoot,    () => Expression.wrapperEdition("Math.Arithmetic.SquareRoot"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactorial,     () => Expression.wrapperEdition("Math.Arithmetic.Factorial"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafAbsoluteValue, () => Expression.wrapperEdition("Math.Arithmetic.AbsoluteValue"));
 	
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafTruncate,      () => Expression.wrapperEdition("Math.Arithmetic.Truncate"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRound   ,      () => Expression.wrapperEdition("Math.Arithmetic.Round"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFloor,         () => Expression.wrapperEdition("Math.Arithmetic.Floor"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafCeiling,       () => Expression.wrapperEdition("Math.Arithmetic.Ceiling"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafTruncate,      () => Expression.wrapperEdition("Math.Arithmetic.Truncate"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRound   ,      () => Expression.wrapperEdition("Math.Arithmetic.Round"));
 	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSign,           () => Expression.wrapperEdition("Math.Arithmetic.Sign"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafIntegerPart,    () => Expression.wrapperEdition("Math.Arithmetic.IntegerPart"));
@@ -196,10 +207,10 @@ Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafLeastCommonMultiple,   () => Expression.wrapperEdition("Math.Arithmetic.LeastCommonMultiple"));
 	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRandom,          () => Expression.replacingEdition("Math.Arithmetic.Random"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRandomPrecision, () => Expression.wrapperEdition("Math.Arithmetic.Random"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRandomPrecision, () => Expression.wrapperEdition  ("Math.Arithmetic.Random"));
 	
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRandomInRange,  () => Expression.binaryEdition   ("Math.Arithmetic.RandomInRange", false));
-
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRandomInRange,  () => Expression.binaryEdition("Math.Arithmetic.RandomInRange", false));
+	
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsRealNumber,     () => Expression.wrapperEdition("Math.Arithmetic.IsRealNumber"));
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsRationalNumber, () => Expression.wrapperEdition("Math.Arithmetic.IsRationalNumber"));
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsNumeric,        () => Expression.wrapperEdition("Math.Arithmetic.IsNumeric"));
@@ -212,17 +223,17 @@ Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsEven,           () => Expression.wrapperEdition("Math.Arithmetic.IsEven"));
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsOdd,            () => Expression.wrapperEdition("Math.Arithmetic.IsOdd"));
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsPrime,          () => Expression.wrapperEdition("Math.Arithmetic.IsPrime"));
-
+	
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafDivides,          () => Expression.binaryEdition("Math.Arithmetic.Divides",       false));
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafDoesNotDivide,    () => Expression.binaryEdition("Math.Arithmetic.DoesNotDivide", false));
-
+	
 	Formulae.addEdition(this.messages.pathConversion, null, this.messages.leafToInteger,     () => Expression.wrapperEdition("Math.Arithmetic.ToInteger"));
 	Formulae.addEdition(this.messages.pathConversion, null, this.messages.leafToIfInteger,   () => Expression.wrapperEdition("Math.Arithmetic.ToIfInteger"));
 	Formulae.addEdition(this.messages.pathConversion, null, this.messages.leafToDecimal,     () => Expression.wrapperEdition("Math.Arithmetic.ToDecimal"));
 	Formulae.addEdition(this.messages.pathConversion, null, this.messages.leafToNumber,      () => Expression.wrapperEdition("Math.Arithmetic.ToNumber"));
-
-	Formulae.addEdition(this.messages.pathEuclideanDivision, null, this.messages.leafDiv,    () => Expression.binaryEdition("Math.Arithmetic.Div", false));
-	Formulae.addEdition(this.messages.pathEuclideanDivision, null, this.messages.leafMod,    () => Expression.binaryEdition("Math.Arithmetic.Mod", false));
+	
+	Formulae.addEdition(this.messages.pathEuclideanDivision, null, this.messages.leafDiv,    () => Expression.binaryEdition("Math.Arithmetic.Div",    false));
+	Formulae.addEdition(this.messages.pathEuclideanDivision, null, this.messages.leafMod,    () => Expression.binaryEdition("Math.Arithmetic.Mod",    false));
 	Formulae.addEdition(this.messages.pathEuclideanDivision, null, this.messages.leafDivMod, () => Expression.binaryEdition("Math.Arithmetic.DivMod", false));
 	
 	Formulae.addEdition(this.messages.PathEuclideanDivisionMode, null, this.messages.leafSetEuclideanDivisionMode, () => Expression.wrapperEdition("Math.Arithmetic.SetEuclideanDivisionMode"));
@@ -232,7 +243,7 @@ Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafModularExponentiation,        () => Expression.multipleEdition("Math.Arithmetic.ModularExponentiation", 3, 0));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafModularMultiplicativeInverse, () => Expression.multipleEdition("Math.Arithmetic.ModularMultiplicativeInverse", 2, 0));
 	Formulae.addEdition(this.messages.pathArithmetic, null, "Piecewise", () => Expression.multipleEdition("Math.Arithmetic.Piecewise", 2, 0));
-
+	
 	[ 4, 5, 3, 2 ].forEach(type => {
 		Formulae.addEdition(
 			Arithmetic.messages.pathSummation, "packages/org.formulae.math.arithmetic/img/summation" + type + ".png", null,
@@ -243,23 +254,28 @@ Arithmetic.setEditions = function() {
 			() => Expression.multipleEdition("Math.Arithmetic.Product", type, 0)
 		);
 	});
-
+	
 	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafDecimalLogarithm, () => Expression.wrapperEdition("Math.Trascendental.DecimalLogarithm"));
 	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafNaturalLogarithm, () => Expression.wrapperEdition("Math.Trascendental.NaturalLogarithm"));
 	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafBinaryLogarithm,  () => Expression.wrapperEdition("Math.Trascendental.BinaryLogarithm"));
-
+	
 	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafLogarithm,        () => Expression.binaryEdition("Math.Trascendental.Logarithm", false));
-
-	[ "Sine", "Cosine", "Tangent", "Cotangent", "Secant", "Cosecant", "ArcSine", "ArcCosine", "ArcTangent", "ArcCotangent", "ArcSecant", "ArcCosecant" ].forEach(tag => {
+	
+	[
+		"Sine",         "Cosine",    "Tangent",
+		"Cotangent",    "Secant",    "Cosecant",
+		"ArcSine",      "ArcCosine", "ArcTangent",
+		"ArcCotangent", "ArcSecant", "ArcCosecant"
+	].forEach(tag => {
 		Formulae.addEdition(this.messages.pathTrigonometric, null, Arithmetic.messages["leaf" + tag], () => Expression.wrapperEdition("Math.Trigonometric." + tag));
 		Formulae.addEdition(this.messages.pathHyperbolic,    null, Arithmetic.messages["leaf" + tag], () => Expression.wrapperEdition("Math.Hyperbolic." + tag));
 	});
 	
 	Formulae.addEdition(this.messages.pathTrigonometric, null, Arithmetic.messages.leafArcTangent2, () => Expression.binaryEdition("Math.Trigonometric.ArcTangent2"));
-
+	
 	Formulae.addEdition(this.messages.pathConstant, null, "π", () => Expression.replacingEdition("Math.Constant.Pi"));
 	Formulae.addEdition(this.messages.pathConstant, null, "e", () => Expression.replacingEdition("Math.Constant.Euler"));
-
+	
 	Formulae.addEdition(this.messages.pathComplex, null, "ℹ",                         () => Expression.replacingEdition("Math.Complex.Imaginary"));
 	Formulae.addEdition(this.messages.pathComplex, null, this.messages.leafConjugate, () => Expression.wrapperEdition("Math.Complex.Conjugate"));
 };

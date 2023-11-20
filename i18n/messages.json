@@ -31,7 +31,7 @@
 	"leafWithPrecision"     : "With precision",
 	"childrenWithPrecision" : [ "Argument", "Precision" ],
 	
-	"PathRoundingMode" : "Math.Arithmetic.Rounding mode",
+	"pathRoundingMode" : "Math.Arithmetic.Rounding mode",
 	
 	"mnemonicGetRoundingMode" : "GetRoundingMode",
 	"nameGetRoundingMode"     : "Get rounding mode",
@@ -41,7 +41,7 @@
 	"nameSetRoundingMode"     : "Set rounding mode",
 	"leafSetRoundingMode"     : "Set rounding mode",
 	
-	"PathRoundingModes" : "Math.Arithmetic.Rounding mode.Modes",
+	"pathRoundingModes" : "Math.Arithmetic.Rounding mode.Modes",
 	
 	"labelRoundingModeTowardsZero"                      : "Towards 0 / Truncate",
 	"labelRoundingModeAwayFromZero"                     : "Away from 0",
@@ -52,6 +52,28 @@
 	"labelRoundingModeNearest.HalfTowardsMinusInfinity" : "Nearest, ½ towards -∞",
 	"labelRoundingModeNearest.HalfTowardsInfinity"      : "Nearest, ½ towards ∞",
 	"labelRoundingModeNearest.HalfEven"                 : "Nearest, ½ to even",
+	
+	"pathRounding" : "Math.Arithmetic.Rounding",
+	
+	"mnemonicRoundToPrecision" : "RoundToPrecision",
+	"nameRoundToPrecision"     : "Round to precision",
+	"leafRoundToPrecision"     : "Round to precision",
+	"childrenRoundToPrecision" : [ "Argument", "Precision", "Rounding mode" ],
+	
+	"mnemonicRoundToInteger" : "RoundToInteger",
+	"nameRoundToInteger"     : "Round to integer",
+	"leafRoundToInteger"     : "Round to integer",
+	"childrenRoundToInteger" : [ "Argument", "Rounding mode" ],
+	
+	"mnemonicRoundToDecimalPlaces" : "RoundToDecimalPlaces",
+	"nameRoundToDecimalPlaces"     : "Round to decimal places",
+	"leafRoundToDecimalPlaces"     : "Round to decimal places",
+	"childrenRoundToDecimalPlaces" : [ "Argument", "Places", "Rounding mode" ],
+	
+	"mnemonicRoundToMultiple" : "RoundToMultiple",
+	"nameRoundToMultiple"     : "Round to multiple",
+	"leafRoundToMultiple"     : "Round to multiple",
+	"childrenRoundToMultiple" : [ "Argument", "Multiple", "Rounding mode" ],
 	
 	"nameInfinity" : "Infinity",
 	

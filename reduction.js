@@ -1335,11 +1335,34 @@ Arithmetic.movePointToRight = (session, decimal, n) => {
 	return session.Decimal.mul(decimal, session.Decimal.pow(10, n));
 };
 
+Arithmetic.decimalToCanonicalRationalOrInteger = (session, decimal) => {
+	let decimalPlaces = decimal.decimalPlaces();
+	
+	if (decimalPlaces === 0) {
+		return new CanonicalArithmetic.Integer(BigInt(decimal.toFixed()));
+	}
+	else {
+		let tenPow = session.Decimal.pow(10, decimalPlaces);
+		
+		let bkpPrecision = session.Decimal.precision;
+		session.Decimal.precision = decimal.precision();
+		let numerator = session.Decimal.mul(decimal, tenPow);
+		session.Decimal.precision = bkpPrecision;
+		
+		let rational = new CanonicalArithmetic.Rational(
+			BigInt(numerator.toFixed()),
+			BigInt(tenPow.toFixed())
+		);
+		raional.minimize(session);
+		return rational;
+	}
+}
+
 Arithmetic.rationalize = async (rationalize, session) => {
 	let canonicalNumber = CanonicalArithmetic.expr2CanonicalNumber(rationalize.children[0]);
 	if (canonicalNumber === null) return false;
 	
-	// integer or rational
+	// it is integer or rational
 	if (!(canonicalNumber instanceof CanonicalArithmetic.Decimal)) {
 		rationalize.replaceBy(rationalize.children[0]);
 		return true;
@@ -1418,6 +1441,156 @@ Arithmetic.signNumeric = async (sign, session) => {
 	
 	let value = numeric.isZero() ? 0n : (numeric.isNegative() ? -1n : 1n);
 	sign.replaceBy(CanonicalArithmetic.bigInt2Expr(value));
+	return true;
+};
+
+//////////////
+// Rounding //
+//////////////
+
+Arithmetic.roundToPrecision = async (roundToPrecision, session) => {
+	let canonical = CanonicalArithmetic.expr2CanonicalNumeric(roundToPrecision.children[0]);
+	if (canonical === null) return false;
+	
+	let precision = CanonicalArithmetic.getInteger(roundToPrecision.children[1]);
+	if (precision === undefined || precision <= 0n) return false;
+	
+	let rm = session.Decimal.rounding;
+	if (roundToPrecision.children.length >= 3) {
+		let tag = roundToPrecision.children[2].getTag();
+		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
+		rm = Arithmetic.mapRoundingModes.get(tag);
+	}
+	
+	if (canonical instanceof CanonicalArithmetic.Integer) {
+		let decimal = (new session.Decimal(canonical.integer.toString())).toSignificantDigits(precision, rm);
+		let result = Formulae.createExpression("Math.Number");
+		result.set("Value", BigInt(decimal.toFixed()));
+		roundToPrecision.replaceBy(result);
+	}
+	else if (canonical instanceof CanonicalArithmetic.Decimal) {
+		let decimal = canonical.decimal.toSignificantDigits(precision, rm);
+		let result = Formulae.createExpression("Math.Number");
+		result.set("Value", decimal);
+		roundToPrecision.replaceBy(result);
+	}
+	else { // rational
+		let n = new session.Decimal(canonical.numerator.toString());
+		let d = new session.Decimal(canonical.denominator.toString());
+		
+		let oldPrecision = session.Decimal.precision;
+		let oldRounding  = session.Decimal.rounding;
+		
+		session.Decimal.set({ precision: precision, rounding: rm });
+		let r = session.Decimal.div(n, d)
+		session.Decimal.set({ precision: oldPrecision, rounding: oldRounding });
+		
+		let result = Formulae.createExpression("Math.Number");
+		result.set("Value", r);
+		roundToPrecision.replaceBy(result);
+	}
+	
+	return true;
+};
+
+Arithmetic.roundToInteger = async (roundToInteger, session) => {
+	let canonical = CanonicalArithmetic.expr2CanonicalNumeric(roundToInteger.children[0]);
+	if (canonical === null) return false;
+	
+	let rm = session.Decimal.rounding;
+	if (roundToInteger.children.length >= 2) {
+		let tag = roundToInteger.children[1].getTag();
+		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
+		rm = Arithmetic.mapRoundingModes.get(tag);
+	}
+	
+	if (canonical instanceof CanonicalArithmetic.Integer) {
+		roundToInteger.replaceBy(roundToInteger.children[0]);
+	}
+	else if (canonical instanceof CanonicalArithmetic.Decimal) {
+		let oldRounding  = session.Decimal.rounding;
+		
+		session.Decimal.set({ rounding: rm });
+		let r = session.Decimal.round(canonical.decimal);
+		session.Decimal.set({ rounding: oldRounding });
+		
+		let result = Formulae.createExpression("Math.Number");
+		result.set("Value", BigInt(r.toFixed()));
+		roundToInteger.replaceBy(result);
+	}
+	else { // rational
+		let oldRounding  = session.Decimal.rounding;
+		
+		session.Decimal.set({ rounding: rm });
+		let i = CanonicalArithmetic.integerDivision(canonical.numerator, canonical.denominator, session);
+		session.Decimal.set({ rounding: oldRounding });
+		
+		let result = Formulae.createExpression("Math.Number");
+		result.set("Value", i);
+		roundToInteger.replaceBy(result);
+	}
+	
+	return true;
+};
+
+Arithmetic.roundToDecimalPlaces = async (roundToDecimalPlaces, session) => {
+	let canonicalValue = CanonicalArithmetic.expr2CanonicalNumeric(roundToDecimalPlaces.children[0]);
+	if (canonicalValue === null) return false;
+	
+	let place = CanonicalArithmetic.getBigInt(roundToDecimalPlaces.children[1]);
+	if (place === undefined) return false;
+	
+	let rm = session.Decimal.rounding;
+	if (roundToDecimalPlaces.children.length >= 3) {
+		let tag = roundToDecimalPlaces.children[2].getTag();
+		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
+		rm = Arithmetic.mapRoundingModes.get(tag);
+	}
+	
+	let canonicalMultiple;
+	if (place >= 0n) {
+		canonicalMultiple = new CanonicalArithmetic.Rational(1n, 10n ** place);
+	}
+	else {
+		canonicalMultiple = new CanonicalArithmetic.Integer(10n ** -place);
+	}
+	
+	let oldRounding  = session.Decimal.rounding;
+	session.Decimal.set({ rounding: rm });
+	
+	let div =canonicalValue.divMod(canonicalMultiple, true, false, session)[0];
+	if (canonicalValue instanceof CanonicalArithmetic.Decimal) {
+		div = new CanonicalArithmetic.Decimal(div.integer.toString(), session);
+	} 
+	let r = div.multiplication(canonicalMultiple, session);
+	session.Decimal.set({ rounding: oldRounding });
+	
+	let result = CanonicalArithmetic.canonicalNumeric2Expr(r);
+	roundToDecimalPlaces.replaceBy(result);
+	return true;
+};
+
+Arithmetic.roundToMultiple = async (roundToMultiple, session) => {
+	let canonicalValue = CanonicalArithmetic.expr2CanonicalNumeric(roundToMultiple.children[0]);
+	if (canonicalValue === null) return false;
+	
+	let canonicalMultiple = CanonicalArithmetic.expr2CanonicalNumeric(roundToMultiple.children[1]);
+	if (canonicalMultiple === null) return false;
+	
+	let rm = session.Decimal.rounding;
+	if (roundToMultiple.children.length >= 3) {
+		let tag = roundToMultiple.children[2].getTag();
+		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
+		rm = Arithmetic.mapRoundingModes.get(tag);
+	}
+	
+	let oldRounding  = session.Decimal.rounding;
+	session.Decimal.set({ rounding: rm });
+	let r = canonicalValue.divMod(canonicalMultiple, true, false, session)[0].multiplication(canonicalMultiple, session);
+	session.Decimal.set({ rounding: oldRounding });
+	
+	let result = CanonicalArithmetic.canonicalNumeric2Expr(r);
+	roundToMultiple.replaceBy(result);
 	return true;
 };
 
@@ -2750,10 +2923,18 @@ Arithmetic.isPrime = async (isPrime, session) => {
 };
 
 Arithmetic.setReducers = () => {
+	// precision
+	
 	ReductionManager.addReducer("Math.Arithmetic.SignificantDigits", Arithmetic.significantDigits, "Arithmetic.significantDigits");
 	ReductionManager.addReducer("Math.Arithmetic.SetPrecision",      Arithmetic.setPrecision,      "Arithmetic.setPrecision");
 	ReductionManager.addReducer("Math.Arithmetic.GetPrecision",      Arithmetic.getPrecision,      "Arithmetic.getPrecision");
 	ReductionManager.addReducer("Math.Arithmetic.WithPrecision",     Arithmetic.withPrecision,     "Arithmetic.withPrecision", { special: true });
+	
+	// rounding
+	
+	
+	
+	// rounding mode
 	
 	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode", Arithmetic.setRoundingMode, "Arithmetic.setRoundingMode");
 	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode", Arithmetic.getRoundingMode, "Arithmetic.getRoundingMode");
@@ -2796,6 +2977,13 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.Rationalize",   Arithmetic.rationalize, "Arithmetic.rationalize");
 	ReductionManager.addReducer("Math.Arithmetic.AbsoluteValue", Arithmetic.absNumeric,  "Arithmetic.absNumeric");
 	ReductionManager.addReducer("Math.Arithmetic.Sign",          Arithmetic.signNumeric, "Arithmetic.signNumeric");
+	
+	// rounding
+	
+	ReductionManager.addReducer("Math.Arithmetic.RoundToPrecision",     Arithmetic.roundToPrecision,     "Arithmetic.roundToPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.RoundToInteger",       Arithmetic.roundToInteger,       "Arithmetic.roundToInteger");
+	ReductionManager.addReducer("Math.Arithmetic.RoundToDecimalPlaces", Arithmetic.roundToDecimalPlaces, "Arithmetic.roundToDecimalPlaces");
+	ReductionManager.addReducer("Math.Arithmetic.RoundToMultiple",      Arithmetic.roundToMultiple,      "Arithmetic.roundToMultiple");
 	
 	ReductionManager.addReducer("Math.Arithmetic.Truncate", Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
 	ReductionManager.addReducer("Math.Arithmetic.Ceiling",  Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");

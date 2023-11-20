@@ -713,97 +713,97 @@ Arithmetic.Piecewise = class extends Expression {
 	getTag() { return "Math.Arithmetic.Piecewise"; }
 	getName() { return "Piecewise"; }
 	canHaveChildren(count) { return count >= 2; }
-
+	
 	prepareDisplay(context) {
 		let child;
 		let indent = 0;
 		let child1, child2;
-
+		
 		this.width = 0;
 		this.height = 0;
-
+		
 		let otherwise = null;
-
+		
 		if ((this.children.length % 2) != 0) {
 			(otherwise = this.children[this.children.length - 1]).prepareDisplay(context);
 			indent = otherwise.width;
 		}
-
+		
 		// cases
-
+		
 		let cases = Math.floor(this.children.length / 2);
-
+		
 		for (let c = 0; c < cases; ++c) {
 			(child1 = this.children[2 * c    ]).prepareDisplay(context);
 			(child2 = this.children[2 * c + 1]).prepareDisplay(context);
-
+		
 			child1.x = 14;
-
+		
 			if (c > 0) this.height += 10;
 			this.height += Math.max(child1.horzBaseline, child2.horzBaseline);
 			child1.y = this.height - child1.horzBaseline;
 			child2.y = this.height - child2.horzBaseline;
 			this.height += Math.max(child1.height - child1.horzBaseline, child2.height - child2.horzBaseline);
-
+		
 			if (child1.width > indent) indent = child1.width;
 		}
-
+	
 		indent = 14 + indent + 10 + Math.round(context.measureText("if").width) + 10;
-
+		
 		for (let c = 0; c < cases; ++c) {
 			child2 = this.children[2 * c + 1];
-
+		
 			child2.x = indent;
 			if (child2.x + child2.width > this.width) this.width = child2.x + child2.width;
 		}
-
+		
 		// otherwise (if any)
-
+		
 		if (otherwise != null) {
 			otherwise.x = 14;
-
+		
 			this.height += 10;
 			otherwise.y = this.height;
 			this.height += otherwise.height;
-
+		
 			let i = this.children[1].x - 10 - Math.round(context.measureText("if").width);
 			let w = Math.round(context.measureText("otherwise").width);
 			if (i + w > this.width) this.width = i + w;
 		}
-
+		
 		// end
-
+		
 		this.horzBaseline = Math.round(this.height / 2);
 		this.vertBaseline = Math.round(this.width / 2);
 	}
 	
 	display(context, x, y) {
 		// cases
-
+		
 		let child;
 		let cases = Math.floor(this.children.length / 2);
-
+		
 		let indent = this.children[1].x - 10 - context.measureText("if").width;
-
+		
 		for (let c = 0; c < cases; ++c) {
 			child = this.children[2 * c + 1];
 			super.drawText(context, "if", x + indent, y + child.y + child.horzBaseline + context.fontInfo.semiHeight);
 		}
-
+		
 		// otherwise (if any)
-
+		
 		if ((this.children.length % 2) != 0) {
 			child = this.children[this.children.length - 1];
 			super.drawText(context, "otherwise", x + indent, y + child.y + child.horzBaseline + context.fontInfo.semiHeight);
 		}
-
+		
 		// subexpressions
-
+		
 		for (let i = 0, n = this.children.length; i < n; ++i) {
 			child = this.children[i];
 			child.display(context, x + child.x, y + child.y);
 		}
-
+		
 		context.beginPath();
 		context.moveTo (x + 4, y               );          //    . // preventing obfuscation
 		context.lineTo (x + 2, y + 2           );          //   /  // preventing obfuscation
@@ -828,23 +828,51 @@ Arithmetic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Arithmetic.Product",        Arithmetic.Product);
 	Formulae.setExpression(module, "Math.Arithmetic.Piecewise",      Arithmetic.Piecewise);
 	
+	// rounding operations
+	
+	Formulae.setExpression(module, "Math.Arithmetic.RoundToInteger", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.Arithmetic.RoundToInteger",
+		getMnemonic:  () => Arithmetic.messages.mnemonicRoundToInteger,
+		getName:      () => Arithmetic.messages.nameRoundToInteger,
+		getChildName: index => Arithmetic.messages.childrenRoundToInteger[index],
+		max:          2
+	});
+	
+	[ "RoundToPrecision", "RoundToDecimalPlaces", "RoundToMultiple"].forEach(tag =>
+		Formulae.setExpression(module, "Math.Arithmetic." + tag, {
+			clazz:        Expression.Function,
+			getTag:       () => "Math.Arithmetic." + tag,
+			getMnemonic:  () => Arithmetic.messages["mnemonic" + tag],
+			getName:      () => Arithmetic.messages["name" + tag],
+			getChildName: index => Arithmetic.messages["children" + tag][index],
+			min: 2, max: 3
+		}
+	));
+	
 	// rounding modes
+	
 	[
 		            "TowardsZero",             "AwayFromZero",             "TowardsMinusInfinity",             "TowardsInfinity",
 		"Nearest.HalfTowardsZero", "Nearest.HalfAwayFromZero", "Nearest.HalfTowardsMinusInfinity", "Nearest.HalfTowardsInfinity",
 		"Nearest.HalfEven"
-	].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic.RoundingMode." + tag, {
-		clazz   : Expression.LabelExpression,
-		getTag  : () => "Math.Arithmetic.RoundingMode." + tag,
-		getLabel: () => Arithmetic.messages["labelRoundingMode" + tag],
-		getName : () => "Rounding mode " + Arithmetic.messages["labelRoundingMode" + tag]
-	}));
+	].forEach(
+		tag => Formulae.setExpression(module, "Math.Arithmetic.RoundingMode." + tag, {
+			clazz   : Expression.LabelExpression,
+			getTag  : () => "Math.Arithmetic.RoundingMode." + tag,
+			getLabel: () => Arithmetic.messages["labelRoundingMode" + tag],
+			getName : () => "Rounding mode " + Arithmetic.messages["labelRoundingMode" + tag]
+		}
+	));
 	
 	// absolute value, floor, ceiling
-	[ "AbsoluteValue", "Floor", "Ceiling" ].forEach((tag, type) => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
-		clazz: Arithmetic.AbsFloorCeiling,
-		type:  type
-	}));
+	
+	[ "AbsoluteValue", "Floor", "Ceiling" ].forEach((tag, type) =>
+		Formulae.setExpression(module, "Math.Arithmetic." + tag, {
+			clazz: Arithmetic.AbsFloorCeiling,
+			type:  type
+		}
+	));
 	
 	// numeric
 	
@@ -880,13 +908,14 @@ Arithmetic.setExpressions = function(module) {
 		[ "Math",          "Infinity",  "∞" ],
 		[ "Math.Constant", "Pi",        "π" ],
 		[ "Math.Constant", "Euler",     "e" ],
-		[ "Math.Complex",  "Imaginary", "ℹ" ]
-	].forEach(row => Formulae.setExpression(module, row[0] + "." + row[1], {
-		clazz:      Expression.Literal,
-		getTag:     () => row[0] + "." + row[1],
-		getLiteral: () => row[2],
-		getName:    () => Arithmetic.messages["name" + row[1]],
-	}));
+		[ "Math.Complex",  "Imaginary", "ℹ" ]].forEach(row =>
+		Formulae.setExpression(module, row[0] + "." + row[1], {
+			clazz:      Expression.Literal,
+			getTag:     () => row[0] + "." + row[1],
+			getLiteral: () => row[2],
+			getName:    () => Arithmetic.messages["name" + row[1]],
+		}
+	));
 	
 	// superscripted literals
 	Formulae.setExpression(module, "Math.Complex.Conjugate", {
@@ -1001,7 +1030,7 @@ Arithmetic.setExpressions = function(module) {
 		getChildName: index => Arithmetic.messages.childrenLogarithm[index],
 		min: 2, max: 2
 	});
-
+	
 	// trigonometric & hyperbolic functions
 	[ "Trigonometric", "Hyperbolic" ].forEach(type => {
 		[

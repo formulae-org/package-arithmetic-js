@@ -31,17 +31,17 @@
 	"leafWithPrecision"     : "Con precisión",
 	"childrenWithPrecision" : [ "Argumento", "Precisión" ],
 	
-	"PathRoundingMode" : "Matemáticas.Aritmética.Tipo de redondeo",
+	"pathRoundingMode" : "Matemáticas.Aritmética.Modo de redondeo",
 	
-	"mnemonicGetRoundingMode" : "ObtenerTipoRedondeo",
-	"nameGetRoundingMode"     : "Obtener tipo de redondeo",
-	"leafGetRoundingMode"     : "Obtener tipo de redondeo",
+	"mnemonicGetRoundingMode" : "ObtenerModoRedondeo",
+	"nameGetRoundingMode"     : "Obtener modo de redondeo",
+	"leafGetRoundingMode"     : "Obtener modo de redondeo",
 	
-	"mnemonicSetRoundingMode" : "FijarTipoRedondeo",
-	"nameSetRoundingMode"     : "Fijar tipo de redondeo",
-	"leafSetRoundingMode"     : "Fijar tipo de redondeo",
+	"mnemonicSetRoundingMode" : "FijarModoRedondeo",
+	"nameSetRoundingMode"     : "Fijar modo de redondeo",
+	"leafSetRoundingMode"     : "Fijar modo de redondeo",
 	
-	"PathRoundingModes" : "Matemáticas.Aritmética.Tipo de redondeo.Tipos",
+	"pathRoundingModes" : "Matemáticas.Aritmética.Modo de redondeo.Modos",
 	
 	"labelRoundingModeTowardsZero"                      : "Hacia 0 / Truncación",
 	"labelRoundingModeAwayFromZero"                     : "Alejado de  0",
@@ -52,6 +52,28 @@
 	"labelRoundingModeNearest.HalfTowardsMinusInfinity" : "Hacia cercano, ½ hacia -∞",
 	"labelRoundingModeNearest.HalfTowardsInfinity"      : "Hacia cercano, ½ hacia ∞",
 	"labelRoundingModeNearest.HalfEven"                 : "Hacia cercano, ½ a par",
+	
+	"pathRounding" : "Matemáticas.Aritmética.Redondeo",
+	
+	"mnemonicRoundToPrecision" : "RedondearAPrecisión",
+	"nameRoundToPrecision"     : "Redondear a precisión",
+	"leafRoundToPrecision"     : "Redondear a precisión",
+	"childrenRoundToPrecision" : [ "Argumento", "Precisión", "Modo de redondeo" ],
+	
+	"mnemonicRoundToInteger" : "RedondearAEntero",
+	"nameRoundToInteger"     : "Redondear a entero",
+	"leafRoundToInteger"     : "Redondear a entero",
+	"childrenRoundToInteger" : [ "Argumento", "Modo de redondeo" ],
+	
+	"mnemonicRoundToDecimalPlaces" : "RedondearACifrasDecimales",
+	"nameRoundToDecimalPlaces"     : "Redondeara cifras decimales",
+	"leafRoundToDecimalPlaces"     : "Redondeara cifras decimales",
+	"childrenRoundToDecimalPlaces" : [ "Argumento", "Cifras decimales", "Modo de redondo" ],
+	
+	"mnemonicRoundToMultiple" : "RedondearAMúltiplo",
+	"nameRoundToMultiple"     : "Redondear a múltiplo",
+	"leafRoundToMultiple"     : "Redondear a múltiplo",
+	"childrenRoundToMultiple" : [ "Argumento", "Múltiplo", "Modo de redondeo" ],
 	
 	"nameInfinity" : "Infinito",
 	
