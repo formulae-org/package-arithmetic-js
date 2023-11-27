@@ -187,6 +187,7 @@ Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathRounding, null, this.messages.leafRoundToDecimalPlaces, () => Expression.multipleEdition("Math.Arithmetic.RoundToDecimalPlaces", 2, 0));
 	Formulae.addEdition(this.messages.pathRounding, null, this.messages.leafRoundToMultiple,      () => Expression.multipleEdition("Math.Arithmetic.RoundToMultiple",      2, 0));
 	
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRationalize,   () => Expression.wrapperEdition("Math.Arithmetic.Rationalize"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSquareRoot,    () => Expression.wrapperEdition("Math.Arithmetic.SquareRoot"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactorial,     () => Expression.wrapperEdition("Math.Arithmetic.Factorial"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafAbsoluteValue, () => Expression.wrapperEdition("Math.Arithmetic.AbsoluteValue"));
