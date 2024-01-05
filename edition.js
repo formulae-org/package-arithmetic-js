@@ -276,9 +276,6 @@ Arithmetic.setEditions = function() {
 	
 	Formulae.addEdition(this.messages.pathConstant, null, "π", () => Expression.replacingEdition("Math.Constant.Pi"));
 	Formulae.addEdition(this.messages.pathConstant, null, "e", () => Expression.replacingEdition("Math.Constant.Euler"));
-	
-	Formulae.addEdition(this.messages.pathComplex, null, "ℹ",                         () => Expression.replacingEdition("Math.Complex.Imaginary"));
-	Formulae.addEdition(this.messages.pathComplex, null, this.messages.leafConjugate, () => Expression.wrapperEdition("Math.Complex.Conjugate"));
 };
 
 Arithmetic.setActions = function() {

@@ -396,12 +396,6 @@
 	"pathConstant" : "Math.Constant",
 	
 	"namePi" : "π number",
-	"nameE" : "Euler number",
-	
-	"pathComplex" : "Math.Complex",
-	
-	"nameImaginary" : "Imaginary unit",
-	"nameConjugate" : "Complex conjugate",
-	"leafConjugate" : "Conjugate"
+	"nameE" : "Euler number"
 }
 

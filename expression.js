@@ -15,12 +15,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-  
+
 'use strict';
 
 export class Arithmetic extends Formulae.ExpressionPackage {};
 
-Arithmetic.TAG_NUMBER   = "Math.Number";
+Arithmetic.TAG_NUMBER = "Math.Number";
 
 Arithmetic.decimalIntegerZero = true; // true -> 5.0    false -> 5.
 
@@ -908,7 +908,7 @@ Arithmetic.setExpressions = function(module) {
 		[ "Math",          "Infinity",  "∞" ],
 		[ "Math.Constant", "Pi",        "π" ],
 		[ "Math.Constant", "Euler",     "e" ],
-		[ "Math.Complex",  "Imaginary", "ℹ" ]].forEach(row =>
+	].forEach(row =>
 		Formulae.setExpression(module, row[0] + "." + row[1], {
 			clazz:      Expression.Literal,
 			getTag:     () => row[0] + "." + row[1],
@@ -916,14 +916,6 @@ Arithmetic.setExpressions = function(module) {
 			getName:    () => Arithmetic.messages["name" + row[1]],
 		}
 	));
-	
-	// superscripted literals
-	Formulae.setExpression(module, "Math.Complex.Conjugate", {
-		clazz:      Expression.SuperscriptedLiteral,
-		getTag:     () => "Math.Complex.Conjugate",
-		getLiteral: () => "*",
-		getName:    () => Arithmetic.messages.nameConjugate
-	});
 	
 	// 0-parameter function
 	[ "GetPrecision", "GetRoundingMode", "GetEuclideanDivisionMode" /*, "Random" */  ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
