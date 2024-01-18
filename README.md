@@ -91,7 +91,7 @@ Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic
 * [Piecewise-defined functions](https://en.wikipedia.org/wiki/Piecewise)
 * [Summation of a sequence](https://en.wikipedia.org/wiki/Summation) of a finite number of terms, visually using the [Capital-pi notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\sum$
 * [Product of a sequence](https://en.wikipedia.org/wiki/Multiplication#Product_of_a_sequence) of a finite number of terms, visually using the [Capital-sigma notation](https://en.wikipedia.org/wiki/Iterated_binary_operation#Notation) $\prod$
-* Numerical calculation of the following [trascendental functions](https://en.wikipedia.org/wiki/Transcendental_function), for a decimal number, with any precision and rounding mode
+* Numerical calculation of the following [transcendental functions](https://en.wikipedia.org/wiki/Transcendental_function), for a decimal number, with any precision and rounding mode
   * [Common (base 10) logarithm](https://en.wikipedia.org/wiki/Common_logarithm)
   * [Natural logarithm](https://en.wikipedia.org/wiki/Natural_logarithm)
   * [Binary logarithm](https://en.wikipedia.org/wiki/Binary_logarithm)
