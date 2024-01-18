@@ -1779,9 +1779,9 @@ Arithmetic.modInverse = async (modInverse, session) => {
 };
 
 Arithmetic.mapLogs = new Map();
-Arithmetic.mapLogs.set("Math.Trascendental.NaturalLogarithm", null);
-Arithmetic.mapLogs.set("Math.Trascendental.DecimalLogarithm", 10);
-Arithmetic.mapLogs.set("Math.Trascendental.BinaryLogarithm",  2);
+Arithmetic.mapLogs.set("Math.Transcendental.NaturalLogarithm", null);
+Arithmetic.mapLogs.set("Math.Transcendental.DecimalLogarithm", 10);
+Arithmetic.mapLogs.set("Math.Transcendental.BinaryLogarithm",  2);
 
 Arithmetic.log = async (log, session) => {
 	let x = CanonicalArithmetic.expr2CanonicalNumber(log.children[0]);
@@ -3027,10 +3027,10 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.ModularExponentiation"       , Arithmetic.modPow,     "Arithmetic.modPow");
 	ReductionManager.addReducer("Math.Arithmetic.ModularMultiplicativeInverse", Arithmetic.modInverse, "Arithmetic.modInverse");
 	
-	ReductionManager.addReducer("Math.Trascendental.NaturalLogarithm", Arithmetic.log, "Arithmetic.log");
-	ReductionManager.addReducer("Math.Trascendental.DecimalLogarithm", Arithmetic.log, "Arithmetic.log");
-	ReductionManager.addReducer("Math.Trascendental.BinaryLogarithm",  Arithmetic.log, "Arithmetic.log");
-	ReductionManager.addReducer("Math.Trascendental.Logarithm",        Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Transcendental.NaturalLogarithm", Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Transcendental.DecimalLogarithm", Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Transcendental.BinaryLogarithm",  Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Transcendental.Logarithm",        Arithmetic.log, "Arithmetic.log");
 	
 	ReductionManager.addReducer("Math.Arithmetic.SquareRoot", Arithmetic.sqrt, "Arithmetic.sqrt");
 	

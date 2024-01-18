@@ -324,7 +324,7 @@
 	"childSummationproduct3"  : "Valor final de la iteración",
 	"childSummationproduct4"  : "Incremento de la iteración",
 	
-	"pathTrascendental" : "Matemáticas.Funciones trascendentales",
+	"pathTranscendental" : "Matemáticas.Funciones trascendentales",
 	
 	"nameDecimalLogarithm"     : "logaritmo decimal",
 	"mnemonicDecimalLogarithm" : "log₁₀",

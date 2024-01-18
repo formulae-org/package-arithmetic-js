@@ -256,11 +256,11 @@ Arithmetic.setEditions = function() {
 		);
 	});
 	
-	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafDecimalLogarithm, () => Expression.wrapperEdition("Math.Trascendental.DecimalLogarithm"));
-	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafNaturalLogarithm, () => Expression.wrapperEdition("Math.Trascendental.NaturalLogarithm"));
-	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafBinaryLogarithm,  () => Expression.wrapperEdition("Math.Trascendental.BinaryLogarithm"));
+	Formulae.addEdition(this.messages.pathTranscendental, null, this.messages.leafDecimalLogarithm, () => Expression.wrapperEdition("Math.Transcendental.DecimalLogarithm"));
+	Formulae.addEdition(this.messages.pathTranscendental, null, this.messages.leafNaturalLogarithm, () => Expression.wrapperEdition("Math.Transcendental.NaturalLogarithm"));
+	Formulae.addEdition(this.messages.pathTranscendental, null, this.messages.leafBinaryLogarithm,  () => Expression.wrapperEdition("Math.Transcendental.BinaryLogarithm"));
 	
-	Formulae.addEdition(this.messages.pathTrascendental, null, this.messages.leafLogarithm,        () => Expression.binaryEdition("Math.Trascendental.Logarithm", false));
+	Formulae.addEdition(this.messages.pathTranscendental, null, this.messages.leafLogarithm,        () => Expression.binaryEdition("Math.Transcendental.Logarithm", false));
 	
 	[
 		"Sine",         "Cosine",    "Tangent",

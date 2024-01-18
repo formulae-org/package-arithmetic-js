@@ -1005,18 +1005,18 @@ Arithmetic.setExpressions = function(module) {
 		getName:    () => Arithmetic.messages["name" + tag]
 	}));
 	
-	// trascendental functions
-	[ "DecimalLogarithm", "NaturalLogarithm", "BinaryLogarithm" ].forEach(tag => Formulae.setExpression(module, "Math.Trascendental." + tag, {
+	// transcendental functions
+	[ "DecimalLogarithm", "NaturalLogarithm", "BinaryLogarithm" ].forEach(tag => Formulae.setExpression(module, "Math.Transcendental." + tag, {
 		clazz:        Expression.Function,
-		getTag:       () => "Math.Trascendental." + tag,
+		getTag:       () => "Math.Transcendental." + tag,
 		getMnemonic:  () => Arithmetic.messages["mnemonic" + tag],
 		getName:      () => Arithmetic.messages["name" + tag]
 	}));
 	
 	// general logarithm
-	Formulae.setExpression(module, "Math.Trascendental.Logarithm", {
+	Formulae.setExpression(module, "Math.Transcendental.Logarithm", {
 		clazz:        Expression.Function,
-		getTag:       () => "Math.Trascendental.Logarithm",
+		getTag:       () => "Math.Transcendental.Logarithm",
 		getMnemonic:  () => Arithmetic.messages.mnemonicLogarithm,
 		getName:      () => Arithmetic.messages.nameLogarithm,
 		getChildName: index => Arithmetic.messages.childrenLogarithm[index],
