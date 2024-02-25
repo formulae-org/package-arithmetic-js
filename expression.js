@@ -161,6 +161,77 @@ Arithmetic.Number = class extends Expression.NullaryExpression {
 	}
 }
 
+Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
+	getTag() { return "Math.InternalNumber"; }
+	getName() { return "Internal number"; }
+	isInternalNumber() { return true; }
+	isReduced() { return true; }
+	
+	set(name, value) {
+		if (name === "Value") {
+			this.number = value;
+			return;
+		}
+		
+		super.set(name, value);
+	}
+	
+	get(name) {
+		if (name === "Value") {
+			return this.number;
+		}
+		
+		return super.get(name);
+	}
+	
+	setSerializationStrings(strings, promises) {
+		throw "Internal number";
+	}
+	
+	getSerializationNames() {
+		throw "Internal number";
+	}
+	
+	getSerializationStrings() {
+		throw "Internal number";
+	}
+	
+	prepareDisplay(context) {
+		console.log(this.number);
+		if (this.number instanceof CanonicalArithmetic.Integer) {
+			this.s = this.number.integer.toString()
+		}
+		else if (this.number instanceof CanonicalArithmetic.Decimal) {
+			this.s = this.number.decimal.toFixed() + "."
+		}
+		else {
+			this.s = this.number.numerator.toString() + "/" + this.number.denominator.toString(); 
+		}
+		
+		this.width = Math.ceil(context.measureText(this.s).width);
+		this.height = context.fontInfo.size;
+		this.vertBaseline = Math.round(this.width / 2);
+		this.horzBaseline = Math.round(this.height / 2);
+	}
+	
+	display(context, x, y) {
+		context.strokeRect(x, y, this.width, this.height);
+		super.drawText(context, this.s, x, y + this.height);
+	}
+	
+	evaluate() {
+		if (this.number instanceof CanonicalArithmetic.Integer) {
+			return Number(this.number.integer);
+		}
+		if (this.number instanceof CanonicalArithmetic.Decimal) {
+			return this.number.decimal.toNumber();
+		}
+		else { // rational
+			return Number(this.number.numerator) / Number(this.number.denominator);
+		}
+	}
+}
+
 Arithmetic.Negative = class extends Expression.UnaryExpression {
 	getTag() { return "Math.Arithmetic.Negative"; }
 	getName() { return Arithmetic.messages.nameNegative; }
@@ -352,14 +423,18 @@ Arithmetic.Multiplication = class extends Expression.OperatorExpression {
 		this.symbolWidth = Math.round(context.measureText("×").width);
 
 		let maxSemiHeight = 0;
-		let isNumber, wasNumber;
+		let isNumber, wasNumber = false;
 		
 		let i, child, parentheses;
 		for (i = 0; i < this.children.length; ++i) {
 			child = this.children[i];
 			isNumber = child.getTag() === "Math.Number";
 
-			parentheses = child.parenthesesAsOperator() || child.getTag() == "Math.Arithmetic.Multiplication";
+			parentheses =
+				child.parenthesesAsOperator() ||
+				child.getTag() == "Math.Arithmetic.Multiplication" ||
+				child.getTag() == "Math.Arithmetic.Negative"
+			;
 
 			if (parentheses) {
 				this.width += 4;
@@ -400,13 +475,17 @@ Arithmetic.Multiplication = class extends Expression.OperatorExpression {
 	
 	display(context, x, y) {
 		let i, child, pos, parentheses;
-		let isNumber, wasNumber;
+		let isNumber, wasNumber = false;
 
 		for (i = 0; i < this.children.length; ++i) {
 			child = this.children[i];
 			isNumber = child.getTag() == "Math.Number";
 
-			parentheses = child.parenthesesAsOperator() || child.getTag() == "Math.Arithmetic.Multiplication";
+			parentheses =
+				child.parenthesesAsOperator() ||
+				child.getTag() == "Math.Arithmetic.Multiplication" ||
+				child.getTag() == "Math.Arithmetic.Negative"
+			;
 
 			pos = x + child.x;
 			child.display(context, pos, y + child.y);
@@ -818,6 +897,7 @@ Arithmetic.Piecewise = class extends Expression {
 
 Arithmetic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Number",                    Arithmetic.Number);
+	Formulae.setExpression(module, "Math.InternalNumber",            Arithmetic.InternalNumber); /////
 	Formulae.setExpression(module, "Math.Arithmetic.Negative",       Arithmetic.Negative);
 	Formulae.setExpression(module, "Math.Arithmetic.Addition",       Arithmetic.Addition);
 	Formulae.setExpression(module, "Math.Arithmetic.Multiplication", Arithmetic.Multiplication);
