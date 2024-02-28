@@ -288,7 +288,7 @@ Arithmetic.additionNumeric = async (addition, session) => {
 			
 			default:
 				addition.removeChildAt(pos);
-				return true;
+				return false;
 		}
 	}
 	
