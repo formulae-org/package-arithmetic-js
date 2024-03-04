@@ -1465,6 +1465,57 @@ Arithmetic.trigHyper = async (f, session) => {
 	if (!arg.isInternalNumber()) return false;
 	let number = arg.get("Value");
 	
+	//////////////////
+	// integer zero //
+	//////////////////
+	
+	integerZero: if (number instanceof CanonicalArithmetic.Integer && number.isZero()) {
+		let expr;
+		
+		switch (f.getTag()) {
+			case "Math.Trigonometric.Sine":
+			case "Math.Trigonometric.Tangent":
+			case "Math.Trigonometric.ArcSine":
+			case "Math.Trigonometric.ArcTangent":
+			case "Math.Hyperbolic.Sine":
+			case "Math.Hyperbolic.Tangent":
+			case "Math.Hyperbolic.ArcSine":
+			case "Math.Hyperbolic.ArcTangent":
+				expr = CanonicalArithmetic.number2InternalNumber(0);
+				break;
+			
+			case "Math.Trigonometric.Cosine":
+			case "Math.Trigonometric.Secant":
+			case "Math.Hyperbolic.Cosine":
+			case "Math.Hyperbolic.Secant":
+				expr = CanonicalArithmetic.number2InternalNumber(1);
+				break;
+			
+			case "Math.Trigonometric.Cotangent":
+			case "Math.Trigonometric.Cosecant":
+			case "Math.Trigonometric.ArcCotangent":
+			case "Math.Trigonometric.ArcCosecant":
+			case "Math.Hyperbolic.Cotangent":
+			case "Math.Hyperbolic.Cosecant":
+			case "Math.Hyperbolic.ArcCosine":
+			case "Math.Hyperbolic.ArcCotangent":
+			case "Math.Hyperbolic.ArcSecant":
+			case "Math.Hyperbolic.ArcCosecant":
+				expr = Formulae.createExpression("Math.Infinity");
+				break;
+			
+			default:
+				break integerZero;
+		}
+		
+		f.replaceBy(expr);
+		return true;
+	}
+	
+	//////////////////////
+	// A decimal number //
+	//////////////////////
+	
 	if (!(number instanceof CanonicalArithmetic.Decimal)) return false;   // to forward to another forms
 	
 	let result;
