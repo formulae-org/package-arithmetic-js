@@ -544,7 +544,16 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 				}
 			}
 			else { // exponent is 0.0
-				exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
+				if (base.isZero()) {
+					exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
+				}
+				else { // base is non-zero
+					exponentiation.replaceBy(
+						CanonicalArithmetic.canonical2InternalNumber(
+							new CanonicalArithmetic.Decimal(1, session)
+						)
+					);
+				}
 			}
 			
 			return true;
@@ -1469,47 +1478,107 @@ Arithmetic.trigHyper = async (f, session) => {
 	// integer zero //
 	//////////////////
 	
-	integerZero: if (number instanceof CanonicalArithmetic.Integer && number.isZero()) {
-		let expr;
+	integer: if (number instanceof CanonicalArithmetic.Integer) {
+		let n = CanonicalArithmetic.getInteger(arg)
 		
-		switch (f.getTag()) {
-			case "Math.Trigonometric.Sine":
-			case "Math.Trigonometric.Tangent":
-			case "Math.Trigonometric.ArcSine":
-			case "Math.Trigonometric.ArcTangent":
-			case "Math.Hyperbolic.Sine":
-			case "Math.Hyperbolic.Tangent":
-			case "Math.Hyperbolic.ArcSine":
-			case "Math.Hyperbolic.ArcTangent":
-				expr = CanonicalArithmetic.number2InternalNumber(0);
-				break;
+		if (n === 0) {
+			let expr;
 			
-			case "Math.Trigonometric.Cosine":
-			case "Math.Trigonometric.Secant":
-			case "Math.Hyperbolic.Cosine":
-			case "Math.Hyperbolic.Secant":
-				expr = CanonicalArithmetic.number2InternalNumber(1);
-				break;
+			switch (f.getTag()) {
+				case "Math.Trigonometric.Sine":
+				case "Math.Trigonometric.Tangent":
+				case "Math.Trigonometric.ArcSine":
+				case "Math.Trigonometric.ArcTangent":
+				case "Math.Hyperbolic.Sine":
+				case "Math.Hyperbolic.Tangent":
+				case "Math.Hyperbolic.ArcSine":
+				case "Math.Hyperbolic.ArcTangent":
+				case "Math.Hyperbolic.ArcSecant":
+					expr = CanonicalArithmetic.number2InternalNumber(0);
+					break;
+				
+				case "Math.Trigonometric.Cosine":
+				case "Math.Trigonometric.Secant":
+				case "Math.Hyperbolic.Cosine":
+				case "Math.Hyperbolic.Secant":
+					expr = CanonicalArithmetic.number2InternalNumber(1);
+					break;
+				
+				case "Math.Trigonometric.Cotangent":
+				case "Math.Trigonometric.Cosecant":
+				case "Math.Trigonometric.ArcCotangent":
+				case "Math.Trigonometric.ArcCosecant":
+				case "Math.Hyperbolic.Cotangent":
+				case "Math.Hyperbolic.Cosecant":
+				case "Math.Hyperbolic.ArcCosine":
+				case "Math.Hyperbolic.ArcCotangent":
+				case "Math.Hyperbolic.ArcSecant":
+				case "Math.Hyperbolic.ArcCosecant":
+					expr = Formulae.createExpression("Math.Infinity");
+					break;
+				
+				default:
+					break integer;
+			}
 			
-			case "Math.Trigonometric.Cotangent":
-			case "Math.Trigonometric.Cosecant":
-			case "Math.Trigonometric.ArcCotangent":
-			case "Math.Trigonometric.ArcCosecant":
-			case "Math.Hyperbolic.Cotangent":
-			case "Math.Hyperbolic.Cosecant":
-			case "Math.Hyperbolic.ArcCosine":
-			case "Math.Hyperbolic.ArcCotangent":
-			case "Math.Hyperbolic.ArcSecant":
-			case "Math.Hyperbolic.ArcCosecant":
-				expr = Formulae.createExpression("Math.Infinity");
-				break;
-			
-			default:
-				break integerZero;
+			f.replaceBy(expr);
+			return true;
 		}
 		
-		f.replaceBy(expr);
-		return true;
+		if (n === 1) {
+			let expr;
+			
+			switch (f.getTag()) {
+				case "Math.Trigonometric.ArcCosine":
+				case "Math.Hyperbolic.ArcCosine":
+				case "Math.Hyperbolic.ArcCotangent":
+					expr = CanonicalArithmetic.number2InternalNumber(0);
+					break;
+				
+				case "Math.Trigonometric.ArcSecant":
+				case "Math.Hyperbolic.ArcTangent":
+				case "Math.Hyperbolic.ArcSecant":
+					expr = Formulae.createExpression("Math.Infinity");
+					break;
+				
+				default:
+					break integer;
+			}
+			
+			f.replaceBy(expr);
+			return true;
+		}
+		
+		if (n === -1) {
+			let expr;
+			
+			switch (f.getTag()) {
+				case "Math.Hyperbolic.ArcCotangent":
+					expr = CanonicalArithmetic.number2InternalNumber(0);
+					break;
+				
+				case "Math.Hyperbolic.ArcCosine":
+				case "Math.Hyperbolic.ArcSecant":
+					expr = Formulae.createExpression("Math.Infinity");
+					break;
+				
+				case "Math.Hyperbolic.ArcTangent":
+					expr = Formulae.createExpression(
+							"Math.Arithmetic.Negative",
+							Formulae.createExpression(
+								"Math.Infinity"
+							)
+						)
+					;
+					break;
+				
+				default:
+					break integer;
+			}
+			
+			f.replaceBy(expr);
+			return true;
+		}
 	}
 	
 	//////////////////////
@@ -1646,8 +1715,50 @@ Arithmetic.atan2 = async (atan2, session) => {
 	if (!atan2.children[1].isInternalNumber()) return false;
 	let numberx = atan2.children[1].get("Value");
 	
-	if (numberx.isZero() && numbery.isZero()) {
-		atan2.replaceBy(Formulae.createExpression("Math.Infinity"));
+	if (numbery.isZero()) {
+		if (numberx.isPositive()) {
+			atan2.replaceBy(
+				CanonicalArithmetic.number2InternalNumber(0)
+			);
+		}
+		else if (numberx.isNegative()) {
+			atan2.replaceBy(
+				Formulae.createExpression("Math.Constant.Pi")
+			);
+		}
+		else { // zero
+			atan2.replaceBy(
+				Formulae.createExpression("Math.Infinity")
+			);
+		}
+		
+		return true;
+	}
+	
+	if (numberx.isZero()) {
+		if (numbery.isPositive()) {
+			atan2.replaceBy(
+				Formulae.createExpression(
+					"Math.Arithmetic.Multiplication",
+					CanonicalArithmetic.canonical2InternalNumber(
+						new CanonicalArithmetic.Rational(1n, 2n)
+					),
+					Formulae.createExpression("Math.Constant.Pi")
+				)
+			);
+		}
+		else { // negative
+			atan2.replaceBy(
+				Formulae.createExpression(
+					"Math.Arithmetic.Multiplication",
+					CanonicalArithmetic.canonical2InternalNumber(
+						new CanonicalArithmetic.Rational(-1n, 2n)
+					),
+					Formulae.createExpression("Math.Constant.Pi")
+				)
+			);
+		}
+		
 		return true;
 	}
 	
