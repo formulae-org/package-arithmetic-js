@@ -283,11 +283,13 @@ Arithmetic.additionNumeric = async (addition, session) => {
 				return true;
 			
 			case 2:
-				addition.replaceBy(addition.children[1 - pos]);
+				//addition.replaceBy(addition.children[1 - pos]);
+				addition.replaceBy(addition.children[1]);
 				return true;
 			
 			default:
-				addition.removeChildAt(pos);
+				//addition.removeChildAt(pos);
+				addition.removeChildAt(0);
 				return false;
 		}
 	}
@@ -368,11 +370,13 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 				return true;
 			
 			case 2:
-				multiplication.replaceBy(multiplication.children[1 - pos]);
+				//multiplication.replaceBy(multiplication.children[1 - pos]);
+				multiplication.replaceBy(multiplication.children[1]);
 				return true;
 			
 			default:
-				multiplication.removeChildAt(pos);
+				//multiplication.removeChildAt(pos);
+				multiplication.removeChildAt(0);
 				return true;
 		}
 	}
