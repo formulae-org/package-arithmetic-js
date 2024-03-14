@@ -1497,7 +1497,6 @@ Arithmetic.trigHyper = async (f, session) => {
 				case "Math.Hyperbolic.Tangent":
 				case "Math.Hyperbolic.ArcSine":
 				case "Math.Hyperbolic.ArcTangent":
-				case "Math.Hyperbolic.ArcSecant":
 					expr = CanonicalArithmetic.number2InternalNumber(0);
 					break;
 				
