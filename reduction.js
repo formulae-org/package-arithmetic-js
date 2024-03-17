@@ -2325,13 +2325,21 @@ Arithmetic.factors = async (factors, session) => {
 
 Arithmetic.divisionTest = async (divisionTest, session) => {
 	let divisor = CanonicalArithmetic.getBigInt(divisionTest.children[0]);
-	if (divisor === undefined || divisor == 0n) return false;
+	if (divisor === undefined || divisor === 0n) return false;
 	
 	let multiple = CanonicalArithmetic.getBigInt(divisionTest.children[1]);
 	if (multiple === undefined) return false;
-
-	let divides = (multiple % divisor) == 0n;	
-	if (divisionTest.getTag() === "Math.Arithmetic.DoesNotDivide") divides = !divides;
+	
+	// DO NOT remove the part
+	// + 0n
+	// It causes closure compiler to behaves bad !!! 
+	
+	let rem = (multiple % divisor) + 0n;
+	let divides = rem == 0n;
+	
+	if (divisionTest.getTag() === "Math.Arithmetic.DoesNotDivide") {
+		divides = !divides;
+	}
 	
 	divisionTest.replaceBy(Formulae.createExpression(divides ? "Logic.True" : "Logic.False"));
 	return true;
