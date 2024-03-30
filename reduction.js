@@ -1278,6 +1278,19 @@ Arithmetic.mapLogs.set("Math.Transcendental.BinaryLogarithm",  2);
 Arithmetic.log = async (log, session) => {
 	if (!log.children[0].isInternalNumber()) return false;
 	let x = log.children[0].get("Value");
+	
+	// Logarith of one is zero
+	if (x.isOne()) {
+		log.replaceBy(
+			CanonicalArithmetic.number2InternalNumber(
+				0,
+				x instanceof CanonicalArithmetic.Decimal,
+				session
+			)
+		);
+		return true;
+	}
+	
 	if (!(x instanceof CanonicalArithmetic.Decimal)) return false; // forward to other forms of log()
 	x = x.decimal;
 	
