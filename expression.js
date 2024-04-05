@@ -197,7 +197,6 @@ Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
 	}
 	
 	prepareDisplay(context) {
-		console.log(this.number);
 		if (this.number instanceof CanonicalArithmetic.Integer) {
 			this.s = this.number.integer.toString()
 		}
