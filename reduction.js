@@ -1918,6 +1918,11 @@ Arithmetic.decimalPlaces = async (f, session) => {
 	return false;
 };
 
+Arithmetic.isNumeric = async (isNumeric, session) => {
+	isNumeric.replaceBy(Formulae.createExpression(isNumeric.children[0].isInternalNumber() ? "Logic.True" : "Logic.False"));
+	return true;
+};
+
 Arithmetic.isX = async (is, session) => {
 	if (!is.children[0].isInternalNumber()) return false;
 	let numeric = is.children[0].get("Value");
@@ -1931,10 +1936,6 @@ Arithmetic.isX = async (is, session) => {
 			
 		case "Math.Arithmetic.IsRationalNumber":
 			result = numeric instanceof CanonicalArithmetic.Rational;
-			break;
-			
-		case "Math.Arithmetic.IsNumeric":
-			result = true;
 			break;
 			
 		case "Math.Arithmetic.IsIntegerValue":
@@ -2857,6 +2858,8 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.IntegerPart",    Arithmetic.integerPart,    "Arithmetic.integerPart");
 	ReductionManager.addReducer("Math.Arithmetic.FractionalPart", Arithmetic.fractionalPart, "Arithmetic.fractionalPart");
 	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces",  Arithmetic.decimalPlaces,  "Arithmetic.decimalPlaces");
+	
+	ReductionManager.addReducer("Math.Arithmetic.IsNumeric",        Arithmetic.isNumeric, "Arithmetic.isNumeric");
 	
 	ReductionManager.addReducer("Math.Arithmetic.IsRealNumber",     Arithmetic.isX, "Arithmetic.isX");
 	ReductionManager.addReducer("Math.Arithmetic.IsRationalNumber", Arithmetic.isX, "Arithmetic.isX");
