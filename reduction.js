@@ -2301,7 +2301,7 @@ Arithmetic.factors = async (factors, session) => {
 
 	let list = Formulae.createExpression("List.List");
 	
-	while ((n % 2n) == 0n) {
+	while (((n % 2n) + 0n) == 0n) {
 		list.addChild(
 			CanonicalArithmetic.canonical2InternalNumber(
 				new CanonicalArithmetic.Integer(2n)
@@ -2313,7 +2313,7 @@ Arithmetic.factors = async (factors, session) => {
 	if (n > 1n) {
 		let f = 3n;
 		while ((f * f) <= n) {
-			if ((n % f) == 0n) {
+			if (((n % f) + 0n) == 0n) {
 				list.addChild(
 					CanonicalArithmetic.canonical2InternalNumber(
 						new CanonicalArithmetic.Integer(f)
