@@ -92,24 +92,11 @@ Arithmetic.Number = class extends Expression.NullaryExpression {
 		return super.get(name);
 	}
 	
-	setSerializationStrings(strings, promises) {
-		if (!/^\d+(\.\d*)?$/.test(strings[0])) {
-			throw "Invalid number";
-		}
-		
-		if (strings[0].includes(".")) {
-			this.set("Value", new Decimal(strings[0]));
-		}
-		else {
-			this.set("Value", BigInt(strings[0]));
-		}
-	}
-	
 	getSerializationNames() {
 		return [ "Value" ];
 	}
 	
-	getSerializationStrings() {
+	async getSerializationStrings() {
 		if (typeof this.number === "bigint") {
 			return [ this.number.toString() ];
 		}
@@ -120,6 +107,19 @@ Arithmetic.Number = class extends Expression.NullaryExpression {
 			else {
 				return [ this.number.toFixed() ];
 			}
+		}
+	}
+	
+	setSerializationStrings(strings, promises) {
+		if (!/^\d+(\.\d*)?$/.test(strings[0])) {
+			throw "Invalid number";
+		}
+		
+		if (strings[0].includes(".")) {
+			this.set("Value", new Decimal(strings[0]));
+		}
+		else {
+			this.set("Value", BigInt(strings[0]));
 		}
 	}
 	
@@ -184,15 +184,15 @@ Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
 		return super.get(name);
 	}
 	
-	setSerializationStrings(strings, promises) {
-		throw "Internal number";
-	}
-	
 	getSerializationNames() {
 		throw "Internal number";
 	}
 	
-	getSerializationStrings() {
+	async getSerializationStrings() {
+		throw "Internal number";
+	}
+	
+	setSerializationStrings(strings, promises) {
 		throw "Internal number";
 	}
 	
