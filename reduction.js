@@ -453,6 +453,7 @@ Arithmetic.divisionNumerics = async (division, session) => {
 // negative //
 //////////////
 
+/*
 Arithmetic.negativeNumeric = async (negative, session) => {
 	if (negative.children[0].isInternalNumber()) {
 		let canonicalNumber = negative.children[0].get("Value");
@@ -472,6 +473,7 @@ Arithmetic.negativeNumeric = async (negative, session) => {
 	
 	return false;
 };
+*/
 
 ////////////////////
 // exponentiation //
@@ -2790,7 +2792,9 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Numeric", Arithmetic.nE,                     "Arithmetic.nE");
 	ReductionManager.addReducer("Math.Numeric", ReductionManager.expansionReducer, "ReductionManager.expansionReducer", { precedence: ReductionManager.PRECEDENCE_LOW});
 	
-	ReductionManager.addReducer("Math.Arithmetic.Negative",       Arithmetic.negativeNumeric,        "Arithmetic.negativeNumeric");
+	// internal representation
+	//ReductionManager.addReducer("Math.Arithmetic.Negative",       Arithmetic.negativeNumeric,        "Arithmetic.negativeNumeric");
+	
 	ReductionManager.addReducer("Math.Arithmetic.Addition",       Arithmetic.additionNumeric,        "Arithmetic.additionNumeric");
 	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumeric,  "Arithmetic.multiplicationNumeric");
 	ReductionManager.addReducer("Math.Arithmetic.Division",       Arithmetic.divisionNumerics,       "Arithmetic.divisionNumerics");
