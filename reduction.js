@@ -427,9 +427,13 @@ Arithmetic.divisionNumerics = async (division, session) => {
 			
 			// negative numerator
 			if (n.isNegative()) {
-				let negative = Formulae.createExpression("Math.Arithmetic.Negative");
-				negative.addChild(infinity);
-				division.replaceBy(negative);
+				division.replaceBy(
+					Formulae.createExpression(
+						"Math.Arithmetic.Multiplication",
+						CanonicalArithmetic.number2InternalNumber(-1),
+						infinity
+					)
+				);
 				return true;
 			}
 			
@@ -440,8 +444,6 @@ Arithmetic.divisionNumerics = async (division, session) => {
 		let result = n.division(d, session);
 		if (result != null) {
 			division.replaceBy(CanonicalArithmetic.canonical2InternalNumber(result));
-			//session.log("Division between numeric elements");
-			//division.setReduced(); // to prevent further reduction
 			return true;
 		}
 	}
