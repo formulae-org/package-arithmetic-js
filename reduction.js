@@ -536,7 +536,7 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 	if (exponent !== null) {
 		if (exponent.isZero()) {
 			if (exponent instanceof CanonicalArithmetic.Integer) { // exponent is integer 0
-				if (base === null || base instanceof CanonicalArithmetic.Integer) {  // base is not numeric or it is integer
+				if (base === null || !(base instanceof CanonicalArithmetic.Decimal)) {  // base is not numeric or it is no decimal
 					exponentiation.replaceBy(
 						CanonicalArithmetic.canonical2InternalNumber(
 							new CanonicalArithmetic.Integer(1n)
