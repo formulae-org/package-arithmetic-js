@@ -529,6 +529,28 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 	 
 	if (base === null || exponent === null) return false; // numeric values only
 	
+	// at least one decimal, having both integral values
+	if (
+		base.hasIntegerValue() &&
+		exponent.hasIntegerValue() &&
+		(base instanceof CanonicalArithmetic.Decimal || exponent instanceof CanonicalArithmetic.Decimal)
+	) {
+		if (base instanceof CanonicalArithmetic.Decimal) {
+			base = new CanonicalArithmetic.Integer(base.decimal.toFixed());
+		}
+		
+		if (exponent instanceof CanonicalArithmetic.Decimal) {
+			exponent = new CanonicalArithmetic.Integer(exponent.decimal.toFixed());
+		}
+		
+		exponentiation.replaceBy(
+			CanonicalArithmetic.canonical2InternalNumber(
+				base.exponentiation(exponent, session).toDecimal(session)
+			)
+		);
+		return true;
+	}
+	
 	///////////////////
 	// special cases //
 	///////////////////
