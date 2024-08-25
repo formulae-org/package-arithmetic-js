@@ -715,7 +715,7 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 	///////////////////
 	
 	if (exponent instanceof CanonicalArithmetic.Rational) {
-		if (base instanceof CanonicalArithmetic.Integer) {
+		if (base instanceof CanonicalArithmetic.Integer) { // integer ^ rational
 			let b;
 			let e = new CanonicalArithmetic.Rational(1n, exponent.denominator);
 			if (exponent.isPositive()) {
@@ -732,18 +732,29 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 			exponentiation.replaceBy(expr);
 			return true;
 		}
-		else if (base instanceof CanonicalArithmetic.Rational) {
+		else if (base instanceof CanonicalArithmetic.Rational) { // rational ^ rational
 			let b;
 			let e = new CanonicalArithmetic.Rational(1n, exponent.denominator);
 			
 			if (exponent.isPositive()) {
-				b = new CanonicalArithmetic.Rational(base.numerator ** exponent.numerator , base.denominator ** exponent.numerator);
+				b = CanonicalArithmetic.createRational(
+					base.numerator   ** exponent.numerator,
+					base.denominator ** exponent.numerator
+				);
+				
+				//b = new CanonicalArithmetic.Rational(base.numerator ** exponent.numerator , base.denominator ** exponent.numerator);
 			}
 			else { // exponent is negative
-				b = new CanonicalArithmetic.Rational(base.denominator ** -exponent.numerator , base.numerator ** -exponent.numerator);
+				b = CanonicalArithmetic.createRational(
+					base.denominator ** -exponent.numerator,
+					base.numerator   ** -exponent.numerator
+				);
+				
+				//b = new CanonicalArithmetic.Rational(base.denominator ** -exponent.numerator , base.numerator ** -exponent.numerator);
 			}
-			b.normalize();
-			b.minimize();
+			
+			//b.normalize();
+			//b.minimize();
 			
 			let expr = Formulae.createExpression("Math.Arithmetic.Exponentiation");
 			expr.addChild(CanonicalArithmetic.canonical2InternalNumber(b));
@@ -1410,7 +1421,7 @@ Arithmetic.sqrt = async (sqrt, session) => {
 	if (negative = numeric.isNegative()) {
 		numeric = numeric.negate();
 	}
-
+	
 	let expr;
 		
 	if (numeric instanceof CanonicalArithmetic.Decimal) {
@@ -1442,15 +1453,23 @@ Arithmetic.sqrt = async (sqrt, session) => {
 	else { // rational
 		let n = session.Decimal.sqrt(numeric.numerator.toString());
 		let d = session.Decimal.sqrt(numeric.denominator.toString());
+		
 		let ni = n.isInteger();
 		let di = d.isInteger();
+		
 		if (ni && di) {
-			let rational = new CanonicalArithmetic.Rational(
+			let rational = CanonicalArithmetic.createRational(
 				BigInt(n.toFixed()),
 				BigInt(d.toFixed())
 			);
-			rational.normalize();
-			rational.minimize();
+			
+			//let rational = new CanonicalArithmetic.Rational(
+			//	BigInt(n.toFixed()),
+			//	BigInt(d.toFixed())
+			//);
+			//rational.normalize();
+			//rational.minimize();
+			
 			expr = CanonicalArithmetic.canonical2InternalNumber(rational);
 		}
 		else if (ni !== di) {
