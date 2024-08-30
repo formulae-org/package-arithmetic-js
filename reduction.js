@@ -529,7 +529,114 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 	 
 	if (base === null || exponent === null) return false; // numeric values only
 	
-	// at least one decimal, having both integral values
+	///////////////////
+	// special cases //
+	///////////////////
+	
+	if (exponent.isZero()) {
+		if (exponent instanceof CanonicalArithmetic.Integer) { // exponent is integer 0
+			if (!(base instanceof CanonicalArithmetic.Decimal)) {  // integer ^ 0   or   rational ^ 0}
+				exponentiation.replaceBy(
+					CanonicalArithmetic.canonical2InternalNumber(
+						new CanonicalArithmetic.Integer(1n)
+					)
+				);
+			}
+			else { // base is decimal
+				if (base.isZero()) { // 0.0 ^ 0
+					exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
+				}
+				else { // (non-zero decimal) ^ 0
+					exponentiation.replaceBy(
+						CanonicalArithmetic.canonical2InternalNumber(
+							new CanonicalArithmetic.Decimal(1.0, session)
+						)
+					);
+				}
+			}
+		}
+		else { // exponent is 0.0
+			if (base.isZero()) { // 0 ^ 0.0   or   0.0 ^ 0.0
+				exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
+			}
+			else { // (non-zero) ^ 0.0
+				exponentiation.replaceBy(
+					CanonicalArithmetic.canonical2InternalNumber(
+						new CanonicalArithmetic.Decimal(1.0, session)
+					)
+				);
+			}
+		}
+		
+		return true;
+	}
+	
+	if (exponent.isOne()) {
+		if (
+			base     instanceof CanonicalArithmetic.Decimal ||
+			exponent instanceof CanonicalArithmetic.Decimal
+		) { // 5 ^ 1.0   ->   5.0
+			exponentiation.replaceBy(
+				CanonicalArithmetic.canonical2InternalNumber(base.toDecimal(session))
+			);
+		}
+		else { // x ^ 1   ->   x
+			exponentiation.replaceBy(exponentiation.children[0]);
+		}
+		
+		return true;
+	}
+	
+	if (base.isZero()) {
+		if (exponent.isNegative()) { // 0 ^ (negative number)   ->   Infinity
+			exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
+		}
+		else {
+			if ( // 0 ^ (positive integer)   ->   0
+				base     instanceof CanonicalArithmetic.Integer &&
+				exponent instanceof CanonicalArithmetic.Integer
+			) {
+				exponentiation.replaceBy(
+					CanonicalArithmetic.canonical2InternalNumber(
+						new CanonicalArithmetic.Integer(0n)
+					)
+				);
+			}
+			else {
+				exponentiation.replaceBy(
+					CanonicalArithmetic.canonical2InternalNumber(
+						new CanonicalArithmetic.Decimal(0.0, session)
+					)
+				);
+			}
+		}
+		
+		return true;
+	}
+	
+	if (base.isOne()) {
+		if (base instanceof CanonicalArithmetic.Decimal || exponent instanceof CanonicalArithmetic.Decimal) {
+			exponentiation.replaceBy(
+				CanonicalArithmetic.canonical2InternalNumber(
+					new CanonicalArithmetic.Decimal(1.0, session)
+				)
+			);
+		}
+		else {
+			exponentiation.replaceBy(
+				CanonicalArithmetic.canonical2InternalNumber(
+					new CanonicalArithmetic.Integer(1n)
+				)
+			);
+		}
+		
+		return true;
+	}
+	
+	///////////////////////////////////////////////////////
+	// at least one decimal, having both integral values //
+	///////////////////////////////////////////////////////
+	
 	if (
 		base.hasIntegerValue() &&
 		exponent.hasIntegerValue() &&
@@ -549,110 +656,6 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 			)
 		);
 		return true;
-	}
-	
-	///////////////////
-	// special cases //
-	///////////////////
-	
-	if (exponent !== null) {
-		if (exponent.isZero()) {
-			if (exponent instanceof CanonicalArithmetic.Integer) { // exponent is integer 0
-				if (base === null || !(base instanceof CanonicalArithmetic.Decimal)) {  // base is not numeric or it is no decimal
-					exponentiation.replaceBy(
-						CanonicalArithmetic.canonical2InternalNumber(
-							new CanonicalArithmetic.Integer(1n)
-						)
-					);
-				}
-				else { // base is decimal
-					exponentiation.replaceBy(
-						CanonicalArithmetic.canonical2InternalNumber(
-							new CanonicalArithmetic.Decimal(1.0, session)
-						)
-					);
-				}
-			}
-			else { // exponent is 0.0
-				if (base.isZero()) {
-					exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
-				}
-				else { // base is non-zero
-					exponentiation.replaceBy(
-						CanonicalArithmetic.canonical2InternalNumber(
-							new CanonicalArithmetic.Decimal(1, session)
-						)
-					);
-				}
-			}
-			
-			return true;
-		}
-		
-		if (exponent.isOne()) {
-			if (
-				base     instanceof CanonicalArithmetic.Decimal ||
-				exponent instanceof CanonicalArithmetic.Decimal
-			) { // 5 ^ 1.0   ->   5.0
-				exponentiation.replaceBy(
-					CanonicalArithmetic.canonical2InternalNumber(base.toDecimal(session))
-				);
-			}
-			else { // x ^ 1   ->   x
-				exponentiation.replaceBy(exponentiation.children[0]);
-			}
-			
-			return true;
-		}
-	}
-	
-	if (base !== null) {
-		// 0 ^ x   ->   0 or infinity (if x is negative)
-		if (base.isZero() && exponent !== null) {
-			if (exponent.isNegative()) { // 0 ^ (negative number)   ->   Infinity
-				exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
-			}
-			else {
-				if ( // 0 ^ (positive integer)   ->   0
-					base     instanceof CanonicalArithmetic.Integer &&
-					exponent instanceof CanonicalArithmetic.Integer
-				) {
-					exponentiation.replaceBy(
-						CanonicalArithmetic.canonical2InternalNumber(
-							new CanonicalArithmetic.Integer(0n)
-						)
-					);
-				}
-				else {
-					exponentiation.replaceBy(
-						CanonicalArithmetic.canonical2InternalNumber(
-							new CanonicalArithmetic.Decimal(0.0, session)
-						)
-					);
-				}
-			}
-			
-			return true;
-		}
-		
-		if (base.isOne() && exponent !== null) {
-			if (base instanceof CanonicalArithmetic.Decimal || exponent instanceof CanonicalArithmetic.Decimal) {
-				exponentiation.replaceBy(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Decimal(1.0, session)
-					)
-				);
-			}
-			else {
-				exponentiation.replaceBy(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(1n)
-					)
-				);
-			}
-			
-			return true;
-		}
 	}
 	
 	//////////////////
