@@ -729,7 +729,12 @@ Arithmetic.Factorial = class extends Expression.UnaryExpression {
 	}
 }
 
-Arithmetic.Summation = class extends Expression.SummationLike {
+Arithmetic.Summation = class extends Expression.SummationLikeSymbol {
+	constructor() {
+		super();
+		this.symbol = "Σ";
+	}
+	
 	getTag() { return "Math.Arithmetic.Summation"; }
 	getName() { return Arithmetic.messages.nameSummation; }
 
@@ -742,28 +747,17 @@ Arithmetic.Summation = class extends Expression.SummationLike {
 			case 4: return Arithmetic.messages.childSummationProduct4;
 		}
 	}
-
-	display(context, x, y) {
-		let w = this.children[0].x - 5;
-		let h = (this.bottom - this.top) / 2;
-		let d = Math.min(h, w / 2);
-
-		context.beginPath();
-		context.moveTo (x + w, y + this.top    ); // preventing obfuscation
-		context.lineTo (x,     y + this.top    ); // preventing obfuscation
-		context.lineTo (x + d, y + this.top + h); // preventing obfuscation
-		context.lineTo (x,     y + this.bottom ); // preventing obfuscation
-		context.lineTo (x + w, y + this.bottom ); // preventing obfuscation
-		context.stroke();
-		
-		super.display(context, x, y);
-	}
 }
 
-Arithmetic.Product = class extends Expression.SummationLike {
+Arithmetic.Product = class extends Expression.SummationLikeSymbol {
+	constructor() {
+		super();
+		this.symbol = "Π";
+	}
+	
 	getTag() { return "Math.Arithmetic.Product"; }
 	getName() { return Arithmetic.messages.nameProduct; }
-
+	
 	getChildName(index) {
 		switch (index) {
 			case 0: return Arithmetic.messages.childProduct0;
@@ -772,18 +766,6 @@ Arithmetic.Product = class extends Expression.SummationLike {
 			case 3: return Arithmetic.messages.childSummationProduct3;
 			case 4: return Arithmetic.messages.childSummationProduct4;
 		}
-	}
-
-	display(context, x, y) {
-		let w = this.children[0].x - 5;
-		
-		context.beginPath();
-		context.moveTo (x,         y + this.top); context.lineTo(x + w,     y + this.top   ); // preventing obfuscation
-		context.moveTo (x + 5,     y + this.top); context.lineTo(x + 5,     y + this.bottom); // preventing obfuscation
-		context.moveTo (x + w - 5, y + this.top); context.lineTo(x + w - 5, y + this.bottom); // preventing obfuscation
-		context.stroke();
-
-		super.display(context, x, y);
 	}
 }
 
