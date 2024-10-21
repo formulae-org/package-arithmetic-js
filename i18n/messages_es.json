@@ -275,17 +275,17 @@
 	
 	"pathEuclideanDivision" : "Matemáticas.Aritmética.Divison entera",
 	
-	"operatorDivMod" : "DivMod",
-	"operatorDiv"    : "Div",
-	"operatorMod"    : "Mod",
+	"operatorDivMod" : "divmod",
+	"operatorDiv"    : "div",
+	"operatorMod"    : "mod",
 	
 	"nameDivMod" : "Cociente y residuo de division entera",
 	"nameDiv"    : "Cociente de division entera",
 	"nameMod"    : "Residuo y residuo de division entera",
 	
-	"leafDivMod" : "DivMod",
-	"leafDiv"    : "Div",
-	"leafMod"    : "Mod",
+	"leafDivMod" : "divmod",
+	"leafDiv"    : "div",
+	"leafMod"    : "mod",
 	
 	"PathEuclideanDivisionMode" : "Matemáticas.Aritmética.Divison entera.Tipo",
 	

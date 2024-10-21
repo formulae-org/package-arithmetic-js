@@ -275,17 +275,17 @@
 	
 	"pathEuclideanDivision" : "Math.Arithmetic.Euclidean division",
 	
-	"operatorDivMod" : "DivMod",
-	"operatorDiv"    : "Div",
-	"operatorMod"    : "Mod",
+	"operatorDivMod" : "divmod",
+	"operatorDiv"    : "div",
+	"operatorMod"    : "mod",
 	
 	"nameDivMod" : "Quotient and remainder of euclidean division",
 	"nameDiv"    : "Quotient of euclidean division",
 	"nameMod"    : "Remainder of euclidean division",
 	
-	"leafDivMod" : "DivMod",
-	"leafDiv"    : "Div",
-	"leafMod"    : "Mod",
+	"leafDivMod" : "divmod",
+	"leafDiv"    : "div",
+	"leafMod"    : "mod",
 	
 	"PathEuclideanDivisionMode" : "Math.Arithmetic.Euclidean division.Mode",
 	
