@@ -127,6 +127,7 @@ Arithmetic.setEditions = function() {
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = Arithmetic.editionNumber);
 	
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumeric, () => Expression.wrapperEdition("Math.Numeric"));
+	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafSetNoSymbolic, () => Expression.replacingEdition("Math.SetNoSymbolic"));
 	
 	Formulae.addEdition(this.messages.pathMath, null, "∞", () => Expression.replacingEdition("Math.Infinity"));
 	

@@ -165,7 +165,7 @@ Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
 	getTag() { return "Math.InternalNumber"; }
 	getName() { return "Internal number"; }
 	isInternalNumber() { return true; }
-	isReduced() { return true; }
+	isReduced() { return this.reduced; }
 	
 	set(name, value) {
 		if (name === "Value") {
@@ -197,15 +197,17 @@ Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
 	}
 	
 	prepareDisplay(context) {
-		if (this.number instanceof CanonicalArithmetic.Integer) {
-			this.s = this.number.integer.toString()
-		}
-		else if (this.number instanceof CanonicalArithmetic.Decimal) {
-			this.s = this.number.decimal.toFixed() + "."
-		}
-		else {
-			this.s = this.number.numerator.toString() + "/" + this.number.denominator.toString(); 
-		}
+		this.s = this.number.toInternalText();
+		
+		//if (this.number instanceof CanonicalArithmetic.Integer) {
+		//	this.s = this.number.integer.toString()
+		//}
+		//else if (this.number instanceof CanonicalArithmetic.Decimal) {
+		//	this.s = this.number.decimal.toFixed() + "."
+		//}
+		//else {
+		//	this.s = this.number.numerator.toString() + "/" + this.number.denominator.toString(); 
+		//}
 		
 		this.width = Math.ceil(context.measureText(this.s).width);
 		this.height = context.fontInfo.size;
@@ -219,15 +221,7 @@ Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
 	}
 	
 	evaluate() {
-		if (this.number instanceof CanonicalArithmetic.Integer) {
-			return Number(this.number.integer);
-		}
-		if (this.number instanceof CanonicalArithmetic.Decimal) {
-			return this.number.decimal.toNumber();
-		}
-		else { // rational
-			return Number(this.number.numerator) / Number(this.number.denominator);
-		}
+		return this.number.toNative();
 	}
 }
 
@@ -946,6 +940,14 @@ Arithmetic.setExpressions = function(module) {
 		max:          2
 	});
 	
+	Formulae.setExpression(module, "Math.SetNoSymbolic", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.SetNoSymbolic",
+		getMnemonic:  () => Arithmetic.messages.mnemonicSetNoSymbolic,
+		getName:      () => Arithmetic.messages.nameSetNoSymbolic,
+		min: 0, max: 0
+	});
+	
 	// With precision
 	
 	Formulae.setExpression(module, "Math.Arithmetic.WithPrecision", {
@@ -966,7 +968,17 @@ Arithmetic.setExpressions = function(module) {
 	});
 	
 	[ // literals
-		[ "Math",          "Infinity",  "∞" ],
+		[ "Math", "Infinity",  "∞" ],
+	].forEach(row =>
+		Formulae.setExpression(module, row[0] + "." + row[1], {
+			clazz:      Expression.Literal,
+			getTag:     () => row[0] + "." + row[1],
+			getLiteral: () => row[2],
+			getName:    () => Arithmetic.messages["name" + row[1]],
+		}
+	));
+	
+	[ // constants
 		[ "Math.Constant", "Pi",        "π" ],
 		[ "Math.Constant", "Euler",     "e" ],
 	].forEach(row =>
@@ -975,6 +987,8 @@ Arithmetic.setExpressions = function(module) {
 			getTag:     () => row[0] + "." + row[1],
 			getLiteral: () => row[2],
 			getName:    () => Arithmetic.messages["name" + row[1]],
+			isReduced   () { return this.reduced; }
+
 		}
 	));
 	

@@ -7,10 +7,14 @@
 	"updateNumber" : "Actualice número",
 	"actionNumber" : "Actualizar número...",
 	
-	"mnemonicNumeric" : "N",
+	"mnemonicNumeric" : "Numérico",
 	"nameNumeric"     : "Numérico",
 	"leafNumeric"     : "Numérico",
 	"childrenNumeric" : [ "Argumento", "Precisión" ],
+	
+	"mnemonicSetNoSymbolic" : "No simbólico",
+	"nameSetNoSymbolic"     : "Fijar como no simbólico",
+	"leafSetNoSymbolic"     : "Fijar como no simbólico",
 	
 	"pathPrecision" : "Matemáticas.Aritmética.Precisión",
 	

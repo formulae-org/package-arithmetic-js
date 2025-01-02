@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
 'use strict';
@@ -23,6 +23,28 @@ export class Arithmetic extends Formulae.ReductionPackage {};
 Arithmetic.TAG_NUMBER   = "Math.Number";
 Arithmetic.TAG_INFINITY = "Math.Infinity";
 
+/////////////////////
+// internal number //
+/////////////////////
+
+Arithmetic.internalNumber = async (internalNumber, session) => {
+	if (session.numeric || session.noSymbolic) {
+		let number = internalNumber.get("Value");
+		
+		if (session.numeric && number.type !== 1) { // integer, rational or complex
+			internalNumber.set("Value", number.toDecimal(session));
+			return true;
+		}
+		
+		if (session.noSymbolic && number.type === 2) { // rational
+			internalNumber.set("Value", number.toDecimal(session));
+			return true;
+		}
+	}
+	
+	return true;
+};
+
 ///////////////
 // precision //
 ///////////////
@@ -30,37 +52,24 @@ Arithmetic.TAG_INFINITY = "Math.Infinity";
 Arithmetic.significantDigits = async (significantDigits, session) => {
 	if (!significantDigits.children[0].isInternalNumber()) return false;
 	
-	let canonicalNumber = significantDigits.children[0].get("Value");
+	let number = significantDigits.children[0].get("Value");
 	
-	if (canonicalNumber instanceof CanonicalArithmetic.Decimal) {
-		let d = canonicalNumber.decimal;
-		let p = d.isZero() ? 0 : d.precision();
+	try {
 		significantDigits.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(BigInt(p))
+			CanonicalArithmetic.createInternalNumber(
+				number.significantDigits()
 			)
 		);
 		return true;
 	}
-	else if (canonicalNumber instanceof CanonicalArithmetic.Integer) {
-		let bi = canonicalNumber.integer;
-		if (bi < 0n) bi = -bi;
-		significantDigits.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(
-					BigInt(bi.toString().replace(/0+$/, "").length)
-				)
-			)
-		);
-		return true;
+	catch (error) {
+		return false;
 	}
-	
-	return false;
 };
 
 Arithmetic.setPrecision = async (setPrecision, session) => {
 	let precisionExpr = await session.reduceAndGet(setPrecision.children[0], 0);
-	let precision = CanonicalArithmetic.getInteger(precisionExpr);
+	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
 		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
 		throw new ReductionError();
@@ -72,8 +81,8 @@ Arithmetic.setPrecision = async (setPrecision, session) => {
 
 Arithmetic.getPrecision = async (getPrecision, session) => {
 	getPrecision.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(session.Decimal.precision)
+		CanonicalArithmetic.createInternalNumber(
+			CanonicalArithmetic.createInteger(session.Decimal.precision, session)
 		)
 	);
 	return true;
@@ -81,7 +90,7 @@ Arithmetic.getPrecision = async (getPrecision, session) => {
 
 Arithmetic.withPrecision = async (withPrecision, session) => {
 	let precisionExpr = await session.reduceAndGet(withPrecision.children[1], 1);
-	let precision = CanonicalArithmetic.getInteger(precisionExpr);
+	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
 		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
 		throw new ReductionError();
@@ -96,6 +105,21 @@ Arithmetic.withPrecision = async (withPrecision, session) => {
 	session.Decimal.set({ precision: oldPrecision });
 	
 	withPrecision.replaceBy(withPrecision.children[0]);
+	return true;
+};
+
+Arithmetic.decimalPlaces = async (decimalPlaces, session) => {
+	if (!decimalPlaces.children[0].isInternalNumber()) return false;
+	
+	let number = decimalPlaces.children[0].get("Value");
+	if (CanonicalArithmetic.isRational(number) || CanonicalArithmetic.isComplex(number)) return false;
+	
+	decimalPlaces.replaceBy(
+		CanonicalArithmetic.createInternalNumber(
+			CanonicalArithmetic.createInteger(number.decimalPlaces(), session)
+		)
+	);
+	
 	return true;
 };
 
@@ -167,11 +191,59 @@ Arithmetic.getEuclideanDivisionMode = async (getEuclideanDivisionMode, session) 
 	return true;
 };
 
-///////
-// N //
-///////
+/////////////
+// Numeric //
+/////////////
 
+// Numeric(expression, [precision])
+
+Arithmetic.numeric = async (numeric, session) => {
+	let precision = undefined;
+	
+	if (numeric.children.length >= 2) {
+		let precisionExpr = await session.reduceAndGet(numeric.children[1], 1);
+		precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
+		if (precision === undefined || precision <= 0) {
+			ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
+			throw new ReductionError();
+		}
+	}
+	
+	let bkpNumeric = session.numeric;
+	session.numeric = true;
+	
+	let bkpPrecision;
+	if (precision !== undefined) {
+		bkpPrecision = session.Decimal.precision;
+		session.Decimal.set({ precision: precision });
+	}
+	
+	await session.reduce(numeric.children[0]);
+	
+	if (precision !== undefined) {
+		session.Decimal.set({ precision: bkpPrecision });
+	}
+	
+	session.numeric = bkpNumeric;
+	
+	numeric.replaceBy(numeric.children[0]);
+	return true;
+};
+
+////////////////////////
+// Set as no symbolic //
+////////////////////////
+
+// SetNoSymbolic
+
+Arithmetic.setNoSymbolic = async (setNoSymbolic, session) => {
+	session.noSymbolic = true;
+	return true;
+};
+
+/*
 // N(numeric)
+
 Arithmetic.nNumeric = async (n, session) => {
 	if (n.children.length != 1) return false; // forward to N(expr, precision)
 	
@@ -179,35 +251,26 @@ Arithmetic.nNumeric = async (n, session) => {
 	
 	let number = n.children[0].get("Value");
 	
-	if (number instanceof CanonicalArithmetic.Integer) {
+	if (CanonicalArithmetic.isInteger(number)) {
 		n.replaceBy(
 			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(
-					new Decimal(number.integer.toString(), session)
-				)
+				CanonicalArithmetic.ToDecimal(number, session)
 			)
 		);
-		
 		return true;
 	}
 	
-	if (number instanceof CanonicalArithmetic.Decimal) {
+	if (CanonicalArithmetic.isDecimal(number)) {
 		n.replaceBy(n.children[0]);
 		return true;
 	}
 	
-	if (number instanceof CanonicalArithmetic.Rational) {
+	if (CanonicalArithmetic.isRational(number)) {
 		n.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(
-					session.Decimal.div(
-						number.numerator.toString(),
-						number.denominator.toString()
-					)
-				)
+			CanonicalArithmetic.createInternalNumber(
+				number.toDecimal(session)
 			)
 		);
-		
 		return true;
 	}
 	
@@ -220,7 +283,7 @@ Arithmetic.nPrecision = async (n, session) => {
 	if (n.children.length < 2) return false; // forward to N(expr)
 	
 	let precisionExpr = await session.reduceAndGet(n.children[1], 1);
-	let precision = CanonicalArithmetic.getInteger(precisionExpr);
+	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
 		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
 		throw new ReductionError();
@@ -236,6 +299,7 @@ Arithmetic.nPrecision = async (n, session) => {
 	session.Decimal.set({ precision: oldPrecision });
 	return true;
 };
+*/
 
 //////////////
 // addition //
@@ -243,11 +307,11 @@ Arithmetic.nPrecision = async (n, session) => {
 
 Arithmetic.additionNumeric = async (addition, session) => {
 	let pos, n = addition.children.length;
-	let canonicalNumber = null;
+	let number = null;
 	
 	for (pos = 0; pos < n; ++pos) {
 		if (addition.children[pos].isInternalNumber()) {
-			canonicalNumber = addition.children[pos].get("Value");
+			number = addition.children[pos].get("Value");
 			break;
 		}
 	}
@@ -270,16 +334,16 @@ Arithmetic.additionNumeric = async (addition, session) => {
 	
 	for (let i = n - 1; i > pos; --i) {
 		if (addition.children[i].isInternalNumber()) {
-			canonicalNumber = canonicalNumber.addition(addition.children[i].get("Value"), session);
+			number = CanonicalArithmetic.addition(number, addition.children[i].get("Value"), session);
 			addition.removeChildAt(i);
 			performed = true;
 		}
 	}
 	
-	if (canonicalNumber.isZero()) {
+	if (number.isZero()) {
 		switch (addition.children.length) {
 			case 1:
-				addition.replaceBy(CanonicalArithmetic.canonical2InternalNumber(canonicalNumber));
+				addition.replaceBy(CanonicalArithmetic.createInternalNumber(number));
 				return true;
 			
 			case 2:
@@ -296,7 +360,7 @@ Arithmetic.additionNumeric = async (addition, session) => {
 	
 	if (!performed) return false; // forward to other forms of Addition(...)
 	
-	let internalNumber = CanonicalArithmetic.canonical2InternalNumber(canonicalNumber);
+	let internalNumber = CanonicalArithmetic.createInternalNumber(number);
 	
 	if (addition.children.length == 1) { // just one child
 		addition.replaceBy(internalNumber);
@@ -321,11 +385,11 @@ Arithmetic.additionNumeric = async (addition, session) => {
 
 Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 	let pos, n = multiplication.children.length;
-	let canonicalNumber = null;
+	let number = null;
 	
 	for (pos = 0; pos < n; ++pos) {
 		if (multiplication.children[pos].isInternalNumber()) {
-			canonicalNumber = multiplication.children[pos].get("Value");
+			number = multiplication.children[pos].get("Value");
 			break;
 		}
 	}
@@ -348,7 +412,7 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 	
 	for (let i = n - 1; i > pos; --i) {
 		if (multiplication.children[i].isInternalNumber()) {
-			canonicalNumber = canonicalNumber.multiplication(multiplication.children[i].get("Value"), session);
+			number = CanonicalArithmetic.multiplication(number, multiplication.children[i].get("Value"), session);
 			multiplication.removeChildAt(i);
 			performed = true;
 		}
@@ -356,17 +420,17 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 	
 	// Numeric result was zero
 	
-	if (canonicalNumber.isZero()) {
-		multiplication.replaceBy(CanonicalArithmetic.canonical2InternalNumber(canonicalNumber));
+	if (number.isZero()) {
+		multiplication.replaceBy(CanonicalArithmetic.createInternalNumber(number));
 		return true;
 	}
 	
 	// Numeric result was one
 	
-	if (canonicalNumber.isOne()) {
+	if (number.isOne()) {
 		switch (multiplication.children.length) {
 			case 1:
-				multiplication.replaceBy(CanonicalArithmetic.canonical2InternalNumber(canonicalNumber));
+				multiplication.replaceBy(CanonicalArithmetic.createInternalNumber(number));
 				return true;
 			
 			case 2:
@@ -385,7 +449,7 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 	
 	// numerical result is neither zero nor one
 	
-	let internalNumber = CanonicalArithmetic.canonical2InternalNumber(canonicalNumber);
+	let internalNumber = CanonicalArithmetic.createInternalNumber(number);
 	
 	if (multiplication.children.length == 1) { // just one child
 		multiplication.replaceBy(internalNumber);
@@ -412,8 +476,6 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 // numeric / numeric   =>   numeric
 
 Arithmetic.divisionNumerics = async (division, session) => {
-	let n, d;
-	
 	if (
 		division.children[0].isInternalNumber() &&
 		division.children[1].isInternalNumber()
@@ -430,7 +492,9 @@ Arithmetic.divisionNumerics = async (division, session) => {
 				division.replaceBy(
 					Formulae.createExpression(
 						"Math.Arithmetic.Multiplication",
-						CanonicalArithmetic.number2InternalNumber(-1),
+						CanonicalArithmetic.createInternalNumber(
+							CanonicalArithmetic.createInteger(-1, session)
+						),
 						infinity
 					)
 				);
@@ -441,466 +505,263 @@ Arithmetic.divisionNumerics = async (division, session) => {
 			return true;
 		}
 		
-		let result = n.division(d, session);
-		if (result != null) {
-			division.replaceBy(CanonicalArithmetic.canonical2InternalNumber(result));
-			return true;
-		}
+		division.replaceBy(
+			CanonicalArithmetic.createInternalNumber(
+				CanonicalArithmetic.division(n, d, session)
+			)
+		);
+		return true;
 	}
 	
 	return false; // Ok, forward to other forms of Division
 };
 
-//////////////
-// negative //
-//////////////
-
-/*
-Arithmetic.negativeNumeric = async (negative, session) => {
-	if (negative.children[0].isInternalNumber()) {
-		let canonicalNumber = negative.children[0].get("Value");
-		
-		if (canonicalNumber.isZero()) {
-			negative.replaceBy(negative.children[0]);
-			return true;
-		}
-		
-		negative.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				canonicalNumber.negate()
-			)
-		);
-		return true;
-	}
-	
-	return false;
-};
-*/
-
 ////////////////////
 // exponentiation //
 ////////////////////
 
-/**
-	inputs:
-		base:     A Decimal
-		exponent: A Decimal
-		session:  A session
-	output:
-		A complex number expression
- */
-
-Arithmetic.complex = (base, exponent, session) => {
-	let arg = session.Decimal.atan2(0, base);
-	let loh = session.Decimal.ln(base.abs());
-	
-	let a = session.Decimal.exp(session.Decimal.mul(exponent, loh));
-	let b = session.Decimal.mul(exponent, arg);
-	
-	let complex = Formulae.createExpression("Math.Arithmetic.Addition");
-	complex.addChild(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Decimal(
-				session.Decimal.mul(a, session.Decimal.cos(b))
-			)
-		)
-	);
-	
-	let multiplication = Formulae.createExpression("Math.Arithmetic.Multiplication");
-	multiplication.addChild(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Decimal(
-				session.Decimal.mul(a, session.Decimal.sin(b))
-			)
-		)
-	);
-	multiplication.addChild(Formulae.createExpression("Math.Complex.Imaginary"));
-	
-	complex.addChild(multiplication);
-	
-	return complex;
-};
-
 // number ^ number
 
 Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
-	let base = exponentiation.children[0].isInternalNumber() ? exponentiation.children[0].get("Value") : null 
-	let exponent = exponentiation.children[1].isInternalNumber() ? exponentiation.children[1].get("Value") : null
-	 
-	if (base === null || exponent === null) return false; // numeric values only
-	
-	///////////////////
-	// special cases //
-	///////////////////
-	
-	if (exponent.isZero()) {
-		if (exponent instanceof CanonicalArithmetic.Integer) { // exponent is integer 0
-			if (!(base instanceof CanonicalArithmetic.Decimal)) {  // integer ^ 0   or   rational ^ 0}
-				exponentiation.replaceBy(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(1n)
-					)
-				);
-			}
-			else { // base is decimal
-				if (base.isZero()) { // 0.0 ^ 0
-					exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
-				}
-				else { // (non-zero decimal) ^ 0
-					exponentiation.replaceBy(
-						CanonicalArithmetic.canonical2InternalNumber(
-							new CanonicalArithmetic.Decimal(1.0, session)
-						)
+	if (
+		exponentiation.children[0].isInternalNumber() &&
+		exponentiation.children[1].isInternalNumber()
+	) {
+		let b = exponentiation.children[0].get("Value");
+		let e = exponentiation.children[1].get("Value");
+		
+		let result;
+		
+		// 0 base
+		
+		if (b.isZero()) {
+			if (e.isZero()) {
+				if (CanonicalArithmetic.isInteger(b) && CanonicalArithmetic.isInteger(e)) { // 0 ^ 0
+					result = CanonicalArithmetic.createInternalNumber(
+						CanonicalArithmetic.isDecimal(b) || CanonicalArithmetic.isDecimal(e) ?
+						CanonicalArithmetic.getDecimalOne(session) :
+						CanonicalArithmetic.getIntegerOne(session)
 					);
 				}
-			}
-		}
-		else { // exponent is 0.0
-			if (base.isZero()) { // 0 ^ 0.0   or   0.0 ^ 0.0
-				exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
-			}
-			else { // (non-zero) ^ 0.0
-				exponentiation.replaceBy(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Decimal(1.0, session)
-					)
-				);
-			}
-		}
-		
-		return true;
-	}
-	
-	if (exponent.isOne()) {
-		if (
-			base     instanceof CanonicalArithmetic.Decimal ||
-			exponent instanceof CanonicalArithmetic.Decimal
-		) { // 5 ^ 1.0   ->   5.0
-			exponentiation.replaceBy(
-				CanonicalArithmetic.canonical2InternalNumber(base.toDecimal(session))
-			);
-		}
-		else { // x ^ 1   ->   x
-			exponentiation.replaceBy(exponentiation.children[0]);
-		}
-		
-		return true;
-	}
-	
-	if (base.isZero()) {
-		if (exponent.isNegative()) { // 0 ^ (negative number)   ->   Infinity
-			exponentiation.replaceBy(Formulae.createExpression(Arithmetic.TAG_INFINITY));
-		}
-		else {
-			if ( // 0 ^ (positive integer)   ->   0
-				base     instanceof CanonicalArithmetic.Integer &&
-				exponent instanceof CanonicalArithmetic.Integer
-			) {
-				exponentiation.replaceBy(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(0n)
-					)
-				);
+				else { // 0 ^ 0.0,   0.0 ^ 0,    0.0 ^ 0.0
+					result = Formulae.createExpression("Undefined");
+				}
 			}
 			else {
-				exponentiation.replaceBy(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Decimal(0.0, session)
-					)
-				);
-			}
-		}
-		
-		return true;
-	}
-	
-	if (base.isOne()) {
-		if (base instanceof CanonicalArithmetic.Decimal || exponent instanceof CanonicalArithmetic.Decimal) {
-			exponentiation.replaceBy(
-				CanonicalArithmetic.canonical2InternalNumber(
-					new CanonicalArithmetic.Decimal(1.0, session)
-				)
-			);
-		}
-		else {
-			exponentiation.replaceBy(
-				CanonicalArithmetic.canonical2InternalNumber(
-					new CanonicalArithmetic.Integer(1n)
-				)
-			);
-		}
-		
-		return true;
-	}
-	
-	///////////////////////////////////////////////////////
-	// at least one decimal, having both integral values //
-	///////////////////////////////////////////////////////
-	
-	if (
-		base.hasIntegerValue() &&
-		exponent.hasIntegerValue() &&
-		(base instanceof CanonicalArithmetic.Decimal || exponent instanceof CanonicalArithmetic.Decimal)
-	) {
-		if (base instanceof CanonicalArithmetic.Decimal) {
-			base = new CanonicalArithmetic.Integer(base.decimal.toFixed());
-		}
-		
-		if (exponent instanceof CanonicalArithmetic.Decimal) {
-			exponent = new CanonicalArithmetic.Integer(exponent.decimal.toFixed());
-		}
-		
-		exponentiation.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				base.exponentiation(exponent, session).toDecimal(session)
-			)
-		);
-		return true;
-	}
-	
-	//////////////////
-	// complex case //
-	//////////////////
-	
-	if (base.isNegative()) {
-		if (base instanceof CanonicalArithmetic.Integer) {
-			if (exponent instanceof CanonicalArithmetic.Decimal) {
-				exponentiation.replaceBy(
-					Arithmetic.complex(
-						new session.Decimal(base.integer.toString()),
-						exponent.decimal,
-						session
-					)
-				);
-				return true;
-			}
-		}
-		else if (base instanceof CanonicalArithmetic.Decimal) {
-			if (exponent instanceof CanonicalArithmetic.Decimal) {
-				exponentiation.replaceBy(
-					Arithmetic.complex(base.decimal, exponent.decimal, session)
-				);
-				return true;
-			}
-			else if (exponent instanceof CanonicalArithmetic.Rational) {
-				exponentiation.replaceBy(
-					Arithmetic.complex(
-						base.decimal,
-						session.Decimal.div(
-							new session.Decimal(exponent.numerator.toString()),
-							new session.Decimal(exponent.denominator.toString())
-						),
-						session
-					)
-				);
-				return true;
-			}
-		}
-		else { // base is rational
-			if (exponent instanceof CanonicalArithmetic.Decimal) {
-				exponentiation.replaceBy(
-					Arithmetic.complex(
-						session.Decimal.div(
-							new session.Decimal(base.numerator.toString()),
-							new session.Decimal(base.denominator.toString())
-						),
-						exponent.decimal,
-						session
-					)
-				);
-				return true;
-			}
-		}
-	}
-	
-	///////////////////
-	// symbolic case //
-	///////////////////
-	
-	if (exponent instanceof CanonicalArithmetic.Rational) {
-		if (base instanceof CanonicalArithmetic.Integer) { // integer ^ rational
-			let b;
-			let e = new CanonicalArithmetic.Rational(1n, exponent.denominator);
-			if (exponent.isPositive()) {
-				b = base.integer ** exponent.numerator;
-			}
-			else { // exponent is negative
-				e = e.negate();
-				b = base.integer ** -exponent.numerator;
+				if (CanonicalArithmetic.isComplex(e)) { // exponent is complex
+					result = exponentiation.children[0];
+				}
+				else if (e.isPositive()) { // exponent is positive
+					result = CanonicalArithmetic.createInternalNumber(
+						CanonicalArithmetic.isDecimal(b) || CanonicalArithmetic.isDecimal(e) ?
+						CanonicalArithmetic.getDecimalZero(session) :
+						CanonicalArithmetic.getIntegerZero(session)
+					);
+				}
+				else { // exponent is negative
+					result = Formulae.createExpression("Undefined");
+				}
 			}
 			
-			let expr = Formulae.createExpression("Math.Arithmetic.Exponentiation");
-			expr.addChild(CanonicalArithmetic.canonical2InternalNumber(new CanonicalArithmetic.Integer(b)));
-			expr.addChild(CanonicalArithmetic.canonical2InternalNumber(e));
-			exponentiation.replaceBy(expr);
+			exponentiation.replaceBy(result);
 			return true;
 		}
-		else if (base instanceof CanonicalArithmetic.Rational) { // rational ^ rational
-			let b;
-			let e = new CanonicalArithmetic.Rational(1n, exponent.denominator);
-			
-			if (exponent.isPositive()) {
-				b = CanonicalArithmetic.createRational(
-					base.numerator   ** exponent.numerator,
-					base.denominator ** exponent.numerator
-				);
-				
-				//b = new CanonicalArithmetic.Rational(base.numerator ** exponent.numerator , base.denominator ** exponent.numerator);
-			}
-			else { // exponent is negative
-				b = CanonicalArithmetic.createRational(
-					base.denominator ** -exponent.numerator,
-					base.numerator   ** -exponent.numerator
-				);
-				
-				//b = new CanonicalArithmetic.Rational(base.denominator ** -exponent.numerator , base.numerator ** -exponent.numerator);
-			}
-			
-			//b.normalize();
-			//b.minimize();
-			
-			let expr = Formulae.createExpression("Math.Arithmetic.Exponentiation");
-			expr.addChild(CanonicalArithmetic.canonical2InternalNumber(b));
-			expr.addChild(CanonicalArithmetic.canonical2InternalNumber(e));
-			exponentiation.replaceBy(expr);
-			return true;
+		
+		// 1 base
+		
+		//if (b.isOne) {
+		//}
+		
+		// everything else
+		
+		try {
+			result = CanonicalArithmetic.createInternalNumber(
+				CanonicalArithmetic.exponentiation(b, e, session)
+			);
 		}
+		catch (e) {
+			if (e instanceof CanonicalArithmetic.NonNumericError) {
+				return false;
+			}
+			
+			throw e;
+		}
+		
+		exponentiation.replaceBy(result);
+		return true;
 	}
 	
-	exponentiation.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			base.exponentiation(exponent, session)
-		)
-	);
-	return true;
+	return false; // Ok, forward to other forms of Division
 };
 
 Arithmetic.comparisonNumerics = async (comparisonExpression, session) => {
-	if (!comparisonExpression.children[0].isInternalNumber() || !comparisonExpression.children[1].isInternalNumber()) {
+	if (
+		!comparisonExpression.children[0].isInternalNumber() ||
+		!comparisonExpression.children[1].isInternalNumber()
+	) {
 		return false;
 	}
 	
-	let result = comparisonExpression.children[0].get("Value").comparison(
-		comparisonExpression.children[1].get("Value"),
+	try {
+		let result = CanonicalArithmetic.comparison(
+			comparisonExpression.children[0].get("Value"),
+			comparisonExpression.children[1].get("Value"),
+			session
+		);
+		
+		let tag;
+		switch (result) {
+			case -1: tag = "Relation.Comparison.Less"; break;
+			case  0: tag = "Relation.Comparison.Equals"; break;
+			case  1: tag = "Relation.Comparison.Greater"; break;
+			default: tag = "Relation.Comparison.Different"; break;
+		}
+		
+		comparisonExpression.replaceBy(Formulae.createExpression(tag));
+		return true;
+	}
+	catch (error) {
+		return false;
+	}
+};
+
+// number : canonical number
+// n      : native Naumber
+
+const movePointToRight = (number, n, session) => {
+	return CanonicalArithmetic.multiplication(
+		number,
+		CanonicalArithmetic.exponentiation(
+			CanonicalArithmetic.createInteger(10, session),
+			CanonicalArithmetic.createInteger(n, session),
+			session
+		),
 		session
 	);
-	
-	comparisonExpression.replaceBy(Formulae.createExpression(
-		result == 0 ?
-		"Relation.Comparison.Equals" :
-		(
-			result < 0 ?
-			"Relation.Comparison.Less" :
-			"Relation.Comparison.Greater"
-		)
-	));
-	
-	return true;
 };
 
-Arithmetic.movePointToRight = (session, decimal, n) => {
-	return session.Decimal.mul(decimal, session.Decimal.pow(10, n));
-};
-
-Arithmetic.decimalToCanonicalRationalOrInteger = (session, decimal) => {
-	let decimalPlaces = decimal.decimalPlaces();
+const rationalizeDecimal = (number, repeating, session) => {
+	let decimalPlaces = number.decimalPlaces();
+	let significantDigits = number.significantDigits();
 	
-	if (decimalPlaces === 0) {
-		return new CanonicalArithmetic.Integer(BigInt(decimal.toFixed()));
-	}
-	else {
-		let tenPow = session.Decimal.pow(10, decimalPlaces);
-		
+	if (repeating === 0) {
 		let bkpPrecision = session.Decimal.precision;
-		session.Decimal.precision = decimal.precision();
-		let numerator = session.Decimal.mul(decimal, tenPow);
+		session.Decimal.precision = significantDigits;
+		
+		let tenPow = CanonicalArithmetic.exponentiation(
+			CanonicalArithmetic.createInteger(10, session),
+			CanonicalArithmetic.createInteger(decimalPlaces, session),
+			session
+		);
+		
+		let rational = CanonicalArithmetic.createRational(
+			CanonicalArithmetic.multiplication(number, tenPow, session).toInteger(session),
+			tenPow
+		);
+		
 		session.Decimal.precision = bkpPrecision;
 		
-		let rational = new CanonicalArithmetic.Rational(
-			BigInt(numerator.toFixed()),
-			BigInt(tenPow.toFixed())
-		);
-		rational.minimize(session);
 		return rational;
 	}
-}
+	else { // with repeating
+		if (repeating > decimalPlaces) return null;
+		
+		let offset = decimalPlaces - repeating;
+		
+		let bkpPrecision = session.Decimal.precision;
+		session.Decimal.precision = significantDigits;
+		
+		number = movePointToRight(number, offset, session);
+		let integralPart = number.floor();
+		let fractionalPart = movePointToRight(
+			CanonicalArithmetic.addition(number, integralPart.negation(), session),
+			repeating,
+			session
+		);
+		let divisor1 = movePointToRight(
+			CanonicalArithmetic.getIntegerOne(session),
+			offset,
+			session
+		);
+		let divisor2 = movePointToRight(
+			CanonicalArithmetic.addition(
+				movePointToRight(
+					CanonicalArithmetic.getIntegerOne(session),
+					repeating,
+					session
+				),
+				CanonicalArithmetic.createInteger(-1, session),
+				session
+			),
+			offset,
+			session,
+		);
+		
+		session.Decimal.precision = bkpPrecision;
+		
+		let rational1 = CanonicalArithmetic.createRational(
+			integralPart.toInteger(session),
+			divisor1
+		);
+		let rational2 = CanonicalArithmetic.createRational(
+			fractionalPart.toInteger(session),
+			divisor2
+		);
+		
+		return CanonicalArithmetic.addition(rational1, rational2, session);
+	}
+};
 
 Arithmetic.rationalize = async (rationalize, session) => {
 	if (!rationalize.children[0].isInternalNumber()) return false;
-	let canonicalNumber = rationalize.children[0].get("Value");
+	let number = rationalize.children[0].get("Value");
 	
-	if (canonicalNumber instanceof CanonicalArithmetic.Decimal) { // it is decimal
-		if (canonicalNumber.decimal.isInteger()) {
-			rationalize.replaceBy(
-				CanonicalArithmetic.canonical2InternalNumber(
-					new CanonicalArithmetic.Integer(
-						BigInt(canonicalNumber.decimal.toFixed())
-					)
-				)
-			);
+	switch (number.type) {
+		case 1: { // decimal
+			let repeating = 0;
+			if (rationalize.children.length >= 2) {
+				let repeating = CanonicalArithmetic.getNativeInteger(rationalize.children[1]);
+				if (repeating === undefined || repeating < 0) return false;
+			}
+			
+			let rational = rationalizeDecimal(number, repeating, session);
+			if (rational === null) return false;
+			
+			rationalize.replaceBy(CanonicalArithmetic.createInternalNumber(rational));
 			return true;
 		}
 		
-		if (rationalize.children.length == 1) {
-			let tenPow = session.Decimal.pow(10, canonicalNumber.decimal.decimalPlaces());
-			
-			let bkpPrecision = session.Decimal.precision;
-			session.Decimal.precision = canonicalNumber.decimal.precision();
-			let numerator = session.Decimal.mul(canonicalNumber.decimal, tenPow);
-			session.Decimal.precision = bkpPrecision;
-			
-			let rational = new CanonicalArithmetic.Rational(
-				BigInt(numerator.toFixed()),
-				BigInt(tenPow.toFixed())
-			);
-			rational.normalize();
-			rational.minimize();
-			rationalize.replaceBy(
-				CanonicalArithmetic.canonical2InternalNumber(rational)
-			);
-		}
-		else {
-			let repeating = CanonicalArithmetic.getInteger(rationalize.children[1]);
-			if (repeating === undefined || repeating < 1) return false;
-			
-			let places = canonicalNumber.decimal.decimalPlaces();
-			let offset = places - repeating;
-			
-			let bkpPrecision = session.Decimal.precision;
-			session.Decimal.precision = canonicalNumber.decimal.precision();
-			
-			canonicalNumber.decimal = Arithmetic.movePointToRight(session, canonicalNumber.decimal, offset);
-			let integralPart = canonicalNumber.decimal.floor();
-			let fractionalPart = Arithmetic.movePointToRight(session, Decimal.sub(canonicalNumber.decimal, integralPart), repeating);
-			let divisor1 = Arithmetic.movePointToRight(session, 1, offset);
-			let divisor2 = Arithmetic.movePointToRight(session, session.Decimal.sub(Arithmetic.movePointToRight(session, 1, repeating), 1), offset);
-			
-			session.Decimal.precision = bkpPrecision;
-			
-			let rational1 = new CanonicalArithmetic.Rational(BigInt(integralPart.toFixed()),   BigInt(divisor1.toFixed()));
-			let rational2 = new CanonicalArithmetic.Rational(BigInt(fractionalPart.toFixed()), BigInt(divisor2.toFixed()));
-			
-			let canonicalResult = rational1.addition(rational2, session);
-			rationalize.replaceBy(
-				CanonicalArithmetic.canonical2InternalNumber(canonicalResult)
-			);
-		}
+		case 0: // integer
+		case 2: // rational
+			rationalize.replaceBy(rationalize.children[0]);
+			return true;
 		
-		return true;
+		case 3: // complex
+			return false;
 	}
-	else { // integer or rational
-		rationalize.replaceBy(rationalize.children[0]);
-		return true;
-	}
+	
+	return false;
 };
 
 Arithmetic.absNumeric = async (abs, session) => {
 	if (!abs.children[0].isInternalNumber()) return false;
-	let numeric = abs.children[0].get("Value");
+	let number = abs.children[0].get("Value");
 	
-	if (numeric.isNegative()) {
+	if (CanonicalArithmetic.isComplex(number)) {
+		let result = CanonicalArithmetic.createInternalNumber(
+			CanonicalArithmetic.addition(
+				number.real.multiplication(number.real, session),
+				number.imaginary.multiplication(number.imaginary, session),
+				session
+			).squareRoot(session)
+		);
+		abs.replaceBy(result);
+		return true;
+	}
+	
+	if (number.isNegative()) {
 		abs.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(numeric.negate())
+			CanonicalArithmetic.createInternalNumber(number.negation())
 		);
 	}
 	else {
@@ -912,12 +773,15 @@ Arithmetic.absNumeric = async (abs, session) => {
 
 Arithmetic.signNumeric = async (sign, session) => {
 	if (!sign.children[0].isInternalNumber()) return false;
-	let numeric = sign.children[0].get("Value");
+	let number = sign.children[0].get("Value");
+	
+	if (CanonicalArithmetic.isComplex(number)) return false;
 	
 	sign.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(
-				numeric.isZero() ? 0n : (numeric.isNegative() ? -1n : 1n)
+		CanonicalArithmetic.createInternalNumber(
+			CanonicalArithmetic.createInteger(
+				number.isZero() ? 0 : (number.isNegative() ? -1 : 1),
+				session
 			)
 		)
 	);
@@ -930,185 +794,140 @@ Arithmetic.signNumeric = async (sign, session) => {
 //////////////
 
 Arithmetic.roundToPrecision = async (roundToPrecision, session) => {
-	if (!roundToPrecision.children[0].isInternalNumber()) return false;
-	let canonical = roundToPrecision.children[0].get("Value");
+	let expr = roundToPrecision.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	let precision = CanonicalArithmetic.getInteger(roundToPrecision.children[1]);
+	let precision = CanonicalArithmetic.getNativeInteger(roundToPrecision.children[1]);
 	if (precision === undefined || precision <= 0n) return false;
 	
-	let rm = session.Decimal.rounding;
+	let roundingMode, bkpRoundingMode;
 	if (roundToPrecision.children.length >= 3) {
 		let tag = roundToPrecision.children[2].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		rm = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = Arithmetic.mapRoundingModes.get(tag);
 	}
 	
-	if (canonical instanceof CanonicalArithmetic.Integer) {
-		let decimal = (new session.Decimal(canonical.integer.toString())).toSignificantDigits(precision, rm);
-		roundToPrecision.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(
-					BigInt(decimal.toFixed())
-				)
-			)
-		);
-	}
-	else if (canonical instanceof CanonicalArithmetic.Decimal) {
-		roundToPrecision.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(
-					canonical.decimal.toSignificantDigits(precision, rm)
-				)
-			)
-		);
-	}
-	else { // rational
-		let n = new session.Decimal(canonical.numerator.toString());
-		let d = new session.Decimal(canonical.denominator.toString());
-		
-		let oldPrecision = session.Decimal.precision;
-		let oldRounding  = session.Decimal.rounding;
-		
-		session.Decimal.set({ precision: precision, rounding: rm });
-		let r = session.Decimal.div(n, d)
-		session.Decimal.set({ precision: oldPrecision, rounding: oldRounding });
-		
-		roundToPrecision.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(r)
-			)
-		)
+	if (roundingMode !== undefined) {
+		bkpRoundingMode = session.Decimal.rounding;
+		session.Decimal.set({ rounding: roundingMode });
 	}
 	
+	expr.set("Value", n.roundToPrecision(precision, session));
+	
+	if (roundingMode !== undefined) {
+		session.Decimal.set({ rounding: bkpRoundingMode });
+	}
+	
+	roundToPrecision.replaceBy(expr);
 	return true;
 };
 
 Arithmetic.roundToInteger = async (roundToInteger, session) => {
-	if (!roundToInteger.children[0].isInternalNumber()) return false;
-	let canonical = roundToInteger.children[0].get("Value");
+	let expr = roundToInteger.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	let rm = session.Decimal.rounding;
+	let roundingMode, bkpRoundingMode;
 	if (roundToInteger.children.length >= 2) {
 		let tag = roundToInteger.children[1].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		rm = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = Arithmetic.mapRoundingModes.get(tag);
 	}
 	
-	if (canonical instanceof CanonicalArithmetic.Integer) {
-		roundToInteger.replaceBy(roundToInteger.children[0]);
-	}
-	else if (canonical instanceof CanonicalArithmetic.Decimal) {
-		let oldRounding  = session.Decimal.rounding;
-		
-		session.Decimal.set({ rounding: rm });
-		let r = session.Decimal.round(canonical.decimal);
-		session.Decimal.set({ rounding: oldRounding });
-		
-		roundToInteger.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(BigInt(r.toFixed()))
-			)
-		);
-	}
-	else { // rational
-		let oldRounding  = session.Decimal.rounding;
-		session.Decimal.set({ rounding: rm });
-		let i = CanonicalArithmetic.integerDivision(canonical.numerator, canonical.denominator, session);
-		session.Decimal.set({ rounding: oldRounding });
-		
-		roundToInteger.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(i)
-			)
-		);
+	if (roundingMode !== undefined) {
+		bkpRoundingMode = session.Decimal.rounding;
+		session.Decimal.set({ rounding: roundingMode });
 	}
 	
+	expr.set("Value", n.roundToInteger(session));
+	
+	if (roundingMode !== undefined) {
+		session.Decimal.set({ rounding: bkpRoundingMode });
+	}
+	
+	roundToInteger.replaceBy(expr);
 	return true;
 };
 
 Arithmetic.roundToDecimalPlaces = async (roundToDecimalPlaces, session) => {
-	if (!roundToDecimalPlaces.children[0].isInternalNumber()) return false;
-	let canonicalValue = roundToDecimalPlaces.children[0].get("Value");
+	let expr = roundToDecimalPlaces.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	let place = CanonicalArithmetic.getBigInt(roundToDecimalPlaces.children[1]);
-	if (place === undefined) return false;
+	let places = CanonicalArithmetic.getNativeInteger(roundToDecimalPlaces.children[1]);
+	if (places === undefined) return false;
 	
-	let rm = session.Decimal.rounding;
+	let roundingMode, bkpRoundingMode;
 	if (roundToDecimalPlaces.children.length >= 3) {
 		let tag = roundToDecimalPlaces.children[2].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		rm = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = Arithmetic.mapRoundingModes.get(tag);
 	}
 	
-	let canonicalMultiple;
-	if (place >= 0n) {
-		canonicalMultiple = new CanonicalArithmetic.Rational(1n, 10n ** place);
-	}
-	else {
-		canonicalMultiple = new CanonicalArithmetic.Integer(10n ** -place);
+	if (roundingMode !== undefined) {
+		bkpRoundingMode = session.Decimal.rounding;
+		session.Decimal.set({ rounding: roundingMode });
 	}
 	
-	let oldRounding  = session.Decimal.rounding;
-	session.Decimal.set({ rounding: rm });
+	expr.set("Value", n.roundToDecimalPlaces(places, session));
 	
-	let div =canonicalValue.divMod(canonicalMultiple, true, false, session)[0];
-	if (canonicalValue instanceof CanonicalArithmetic.Decimal) {
-		div = new CanonicalArithmetic.Decimal(div.integer.toString(), session);
-	} 
-	let r = div.multiplication(canonicalMultiple, session);
-	session.Decimal.set({ rounding: oldRounding });
+	if (roundingMode !== undefined) {
+		session.Decimal.set({ rounding: bkpRoundingMode });
+	}
 	
-	roundToDecimalPlaces.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(r)
-	);
-	
+	roundToDecimalPlaces.replaceBy(expr);
 	return true;
 };
 
 Arithmetic.roundToMultiple = async (roundToMultiple, session) => {
-	if (!roundToMultiple.children[0].isInternalNumber()) return false;
-	let canonicalValue = roundToMultiple.children[0].get("Value");
+	let expr = roundToMultiple.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	if (!roundToMultiple.children[1].isInternalNumber()) return false;
-	let canonicalMultiple = roundToMultiple.children[1].get("Value");
+	let multiple = roundToMultiple.children[1];
+	if (!multiple.isInternalNumber()) return false;
+	multiple = multiple.get("Value");
 	
-	let rm = session.Decimal.rounding;
+	if (CanonicalArithmetic.isComplex(n) || CanonicalArithmetic.isComplex(multiple)) return false;
+	
+	let roundingMode, bkpRoundingMode;
 	if (roundToMultiple.children.length >= 3) {
 		let tag = roundToMultiple.children[2].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		rm = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = Arithmetic.mapRoundingModes.get(tag);
 	}
 	
-	let oldRounding  = session.Decimal.rounding;
-	session.Decimal.set({ rounding: rm });
-	let r = canonicalValue.divMod(canonicalMultiple, true, false, session)[0].multiplication(canonicalMultiple, session);
-	session.Decimal.set({ rounding: oldRounding });
+	if (roundingMode !== undefined) {
+		bkpRoundingMode = session.Decimal.rounding;
+		session.Decimal.set({ rounding: roundingMode });
+	}
 	
-	roundToMultiple.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(r)
+	expr.set(
+		"Value",
+		CanonicalArithmetic.multiplication(CanonicalArithmetic.divMod(n, multiple, true, false, session), multiple, session)
 	);
 	
+	if (roundingMode !== undefined) {
+		session.Decimal.set({ rounding: bkpRoundingMode });
+	}
+	
+	roundToMultiple.replaceBy(expr);
 	return true;
 };
 
 Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
-	if (!fcrt.children[0].isInternalNumber()) return false;
-	let numeric = fcrt.children[0].get("Value");
+	let expr = fcrt.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
 	let places = 0;
 	
-	if (fcrt.children.length >= 2) { // there is scale
-		if ((places = CanonicalArithmetic.getInteger(fcrt.children[1])) == null) {
+	if (fcrt.children.length >= 2) { // there is decimal places
+		if ((places = CanonicalArithmetic.getNativeInteger(fcrt.children[1])) === undefined) {
 			ReductionManager.setInError(fcrt.children[1], "Expression must be an integer number");
 			throw new ReductionError();
 		}
-	}
-	
-	if (places < 0) {
-		// currently the Decimal.js library does not support the division operation
-		// giving the number of decimal places instead of the precision
-		// decimal = session.Decimal.div(numeric.n, numeric.d, Arithmetic.mapRoundingModes2.get(fcrt.getTag()));
-		return false;
 	}
 	
 	let roundingMode;
@@ -1119,46 +938,14 @@ Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
 		case "Math.Arithmetic.Round"   : roundingMode = 5; break;
 	}
 	
-	let decimal;
-	if (numeric instanceof CanonicalArithmetic.Decimal) {
-		decimal = numeric.decimal;
-	}
-	else if (numeric instanceof CanonicalArithmetic.Integer) {
-		decimal = new session.Decimal(numeric.integer.toString());
-	}
-	else { // rational
-		let roundingModeBkp = session.Decimal.rounding;
-		session.Decimal.rounding = roundingMode;
-		let q = CanonicalArithmetic.integerDivision(numeric.numerator, numeric.denominator, session);
-		session.Decimal.rounding = roundingModeBkp;
-		
-		decimal = new session.Decimal(q.toString());
-	}
+	let bkpRoundingMode = session.Decimal.rounding;
+	session.Decimal.set({ rounding: roundingMode });
 	
+	expr.set("Value", n.roundToDecimalPlaces(places, session));
 	
-	//switch (fcrt.getTag()) {
-	//	case "Math.Arithmetic.Truncate": decimal = decimal.toDecimalPlaces(places, 1); break;
-	//	case "Math.Arithmetic.Ceiling" : decimal = decimal.toDecimalPlaces(places, 2); break;
-	//	case "Math.Arithmetic.Floor"   : decimal = decimal.toDecimalPlaces(places, 3); break;
-	//	case "Math.Arithmetic.Round"   : decimal = decimal.toDecimalPlaces(places, 5); break;
-	//}
-	decimal = decimal.toDecimalPlaces(places, roundingMode);
+	session.Decimal.set({ rounding: bkpRoundingMode });
 	
-	if (places <= 0) {
-		fcrt.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(BigInt(decimal.toFixed()))
-			)
-		);
-	}
-	else {
-		fcrt.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(decimal)
-			)
-		);
-	}
-	
+	fcrt.replaceBy(expr);
 	return true;
 };
 
@@ -1169,31 +956,33 @@ Arithmetic.divMod = async (divMod, session) => {
 	if (!divMod.children[1].isInternalNumber()) return false;
 	let divisor = divMod.children[1].get("Value");
 	
+	if (
+		CanonicalArithmetic.isComplex(dividend) ||
+		CanonicalArithmetic.isComplex(divisor)
+	) return false;
+	
 	if (divisor.isZero()) {
 		divMod.replaceBy(Formulae.createExpression("Math.Infinity"));
 		return true;
 	}
 	
 	let tag = divMod.getTag();
-	
 	let isDiv = tag.includes("Div");
 	let isMod = tag.includes("Mod");
 	
-	let dm = dividend.divMod(divisor, isDiv, isMod, session);
+	let dm = CanonicalArithmetic.divMod(dividend, divisor, isDiv, isMod, session);
 	
 	let result;
 	
 	if (isDiv && isMod) {
-		result = Formulae.createExpression("List.List");
-		result.addChild(
-			CanonicalArithmetic.canonical2InternalNumber(dm[0])
-		);
-		result.addChild(
-			CanonicalArithmetic.canonical2InternalNumber(dm[1])
+		result = Formulae.createExpression(
+			"List.List",
+			CanonicalArithmetic.createInternalNumber(dm[0]),
+			CanonicalArithmetic.createInternalNumber(dm[1])
 		);
 	}
 	else {
-		result = CanonicalArithmetic.canonical2InternalNumber(dm[isDiv ? 0: 1])
+		result = CanonicalArithmetic.createInternalNumber(dm)
 	}
 	
 	divMod.replaceBy(result);
@@ -1210,51 +999,46 @@ Arithmetic.modPow = async (modPow, session) => {
 	}
 	
 	let b = modPow.children[0].get("Value");
-	if (!(b instanceof CanonicalArithmetic.Integer) || b.integer < 0n) {
+	if (!CanonicalArithmetic.isInteger(b) || b.isNegative()) {
 		ReductionManager.setInError(modPow.children[0], "Base must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
 	let e = modPow.children[1].get("Value");
-	if (!(e instanceof CanonicalArithmetic.Integer) || e.integer < 0n) {
+	if (!CanonicalArithmetic.isInteger(e) || e.isNegative()) {
 		ReductionManager.setInError(modPow.children[1], "Exponent must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
 	let m = modPow.children[2].get("Value");
-	if (!(m instanceof CanonicalArithmetic.Integer) || m.integer < 0n) {
+	if (!CanonicalArithmetic.isInteger(m) || m.isNegative()) {
 		ReductionManager.setInError(modPow.children[2], "Modulo must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
-	b = b.integer;
-	e = e.integer;
-	m = m.integer;
-	
 	let r;
+	let zero = CanonicalArithmetic.getIntegerZero(session);
+	let one = CanonicalArithmetic.getIntegerOne(session);
+	let two = CanonicalArithmetic.createInteger(2, session);
 	
-	if (m == 1n) {
-		r = 0n;
+	if (m.comparedTo(one) === 0) {
+		r = zero;
 	}
 	else {
-		r = 1n;
-		b = b % m;
-		while (e > 0n) {
-			if ((e % 2n) == 1n) {
-				r = (r * b) % m;
+		r = one;
+		b = CanonicalArithmetic.divMod(b, m, false, true, session);
+		
+		while (e.isPositive()) {
+			if (CanonicalArithmetic.divMod(e, two, false, true, session).comparedTo(one) === 0) {
+				r = CanonicalArithmetic.divMod(r.multiplication(b), m, false, true, session);
 			}
 			
-			b = (b * b) % m;
-			e = e / 2n;
+			b = CanonicalArithmetic.divMod(b.multiplication(b), m, false, true, session);
+			e = e.integerDivision(two, session);
 		}
 	}
 	
-	modPow.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(r)
-		)
-	);
-	
+	modPow.replaceBy(CanonicalArithmetic.createInternalNumber(r));
 	return true;
 };
 
@@ -1267,522 +1051,453 @@ Arithmetic.modInverse = async (modInverse, session) => {
 	}
 	
 	let a = modInverse.children[0].get("Value");
-	if (!(a instanceof CanonicalArithmetic.Integer) || a.integer < 0n) {
+	if (!CanonicalArithmetic.isInteger(a) || a.isNegative()) {
 		ReductionManager.setInError(modInverse.children[0], "Expression must be an non-negative integer");
 		throw new ReductionError();
 	}
 	
 	let m = modInverse.children[1].get("Value");
-	if (!(m instanceof CanonicalArithmetic.Integer) || m.integer < 0n) {
+	if (!CanonicalArithmetic.isInteger(m) || m.isNegative()) {
 		ReductionManager.setInError(modInverse.children[1], "Modulo must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
-	 a = a.integer;
-	 m = m.integer;
+	let zero = CanonicalArithmetic.getIntegerZero(session);
+	let one = CanonicalArithmetic.getIntegerOne(session);
 	
-	let t = 0n, newt = 1n;
-	let r = m,  newr = a;
+	let t = zero, newt = one;
+	let r = m,    newr = a;
 	let quotient;
 	let tmp;
 	
-	while (newr != 0n) {
-		quotient = r / newr;
-		tmp = newt; newt = t - (quotient * newt); t = tmp;
-		tmp = newr; newr = r - (quotient * newr); r = tmp;
+	while (newr.comparedTo(zero) !== 0) {
+		quotient = r.integerDivision(newr, session);
+		
+		[ newt, t ] = [ t.addition(quotient.multiplication(newt).negation()), newt ];
+		[ newr, r ] = [ r.addition(quotient.multiplication(newr).negation()), newr ];
 	}
 	
-	if (r > 1n) {
+	if (r.comparedTo(one) > 0) {
 		ReductionManager.setInError(modInverse.children[0], "Number is not invertible in such that base");
 		throw new ReductionError();
 	}
 	
-	if (t < 0n) {
-		t = t + m;
+	if (t.comparedTo(zero) < 0) {
+		t = t.addition(m);
 	}
 	
-	modInverse.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(t)
-		)
-	);
-	
+	modInverse.replaceBy(CanonicalArithmetic.createInternalNumber(t));
 	return true;
 };
 
-Arithmetic.mapLogs = new Map();
-Arithmetic.mapLogs.set("Math.Transcendental.NaturalLogarithm", null);
-Arithmetic.mapLogs.set("Math.Transcendental.DecimalLogarithm", 10);
-Arithmetic.mapLogs.set("Math.Transcendental.BinaryLogarithm",  2);
-
 Arithmetic.log = async (log, session) => {
 	if (!log.children[0].isInternalNumber()) return false;
+	
 	let x = log.children[0].get("Value");
 	
-	// Logarith of one is zero
+	// one (logarithm is zero)
+	
 	if (x.isOne()) {
 		log.replaceBy(
-			CanonicalArithmetic.number2InternalNumber(
-				0,
-				x instanceof CanonicalArithmetic.Decimal,
-				session
+			CanonicalArithmetic.createInternalNumber(
+				CanonicalArithmetic.isInteger(x) ?
+				CanonicalArithmetic.getIntegerZero(session) :
+				CanonicalArithmetic.getDecimalZero(session)
 			)
 		);
 		return true;
 	}
 	
-	if (!(x instanceof CanonicalArithmetic.Decimal)) return false; // forward to other forms of log()
-	x = x.decimal;
-	
-	let base = null;
-	
-	if (log.children.length === 1) {
-		let b = Arithmetic.mapLogs.get(log.getTag());
-		if (b !== null)  {
-			base = new session.Decimal(b);
-		}
-	}
-	else { // base is provided
-		if (!log.children[1].isInternalNumber()) return false;
-		let n = log.children[1].get("Value");
-		if (n instanceof CanonicalArithmetic.Integer) {
-			base = new session.Decimal(n.toString());
-		}
-		else {
-			base = n.decimal;
-		}
-		
-		if (base.lessThanOrEqualTo(0)) {
-			ReductionManager.setInError(log.children[1], "Invalid base");
-			throw new ReductionError();
-		}
-	}
-	
-	if (x.greaterThan(0)) { // positive argument
+	if (x.isZero()) {
 		log.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(
-					base === null ?
-					session.Decimal.ln(x) :
-					session.Decimal.log(x, base)
+			Formulae.createExpression(
+				"Math.Arithmetic.Negative",
+				Formulae.createExpression("Math.Infinity")
+			)
+		);
+		return true;
+	}
+	
+	let result;
+	arg: {
+		// integer or rational
+		
+		if (CanonicalArithmetic.isInteger(x) || CanonicalArithmetic.isRational(x)) {
+			if (session.numeric) {
+				x = x.toDecimal(session);
+			}
+			else {
+				return false; // forward to other forms of log()
+			}
+		}
+		
+		// decimal
+		
+		if (CanonicalArithmetic.isDecimal(x)) {
+			if (x.isPositive()) {
+				result = CanonicalArithmetic.createInternalNumber(x.naturalLogarithm(session));
+			}
+			else {
+				result = CanonicalArithmetic.createInternalNumber(
+					CanonicalArithmetic.createComplex(
+						x.negation().naturalLogarithm(session),
+						CanonicalArithmetic.getPi(session)
+					)
+				);
+			}
+			break arg;
+		}
+		
+		// complex
+		
+		if (CanonicalArithmetic.isDecimal(x.real) || CanonicalArithmetic.isDecimal(x.imaginary)) { // numeric
+			let imaginary = x.imaginary.toDecimal(session).aTan2(x.real.toDecimal(session), session);
+			
+			if (x.real.isZero()) {
+				result = CanonicalArithmetic.createInternalNumber(
+					CanonicalArithmetic.createComplex(
+						x.imaginary.absoluteValue().naturalLogarithm(session),
+						imaginary
+					)
+				);
+			}
+			else {
+				result = CanonicalArithmetic.createInternalNumber(
+					CanonicalArithmetic.createComplex(
+						CanonicalArithmetic.addition(
+							x.real.multiplication(x.real, session),
+							x.imaginary.multiplication(x.imaginary, session),
+							session
+						).squareRoot(session).naturalLogarithm(session),
+						imaginary
+					)
+				);
+			}
+		}
+		else { // symbolic
+			if (x.real.isZero()) {
+				result = Formulae.createExpression(
+					"Math.Arithmetic.Addition",
+					Formulae.createExpression(
+						"Math.Transcendental.NaturalLogarithm",
+						CanonicalArithmetic.createInternalNumber(
+							x.imaginary.absoluteValue()
+						)
+					),
+					Formulae.createExpression(
+						"Math.Arithmetic.Multiplication",
+						CanonicalArithmetic.createInternalNumber(
+							CanonicalArithmetic.createRational(
+								CanonicalArithmetic.createInteger(x.imaginary.isPositive() ? 1 : -1, session),
+								CanonicalArithmetic.createInteger(2, session)
+							)
+						),
+						Formulae.createExpression("Math.Constant.Pi"),
+						Formulae.createExpression("Math.Complex.Imaginary")
+					)
+				);
+			}
+			else {
+				result = Formulae.createExpression(
+					"Math.Arithmetic.Addition",
+					Formulae.createExpression(
+						"Math.Transcendental.NaturalLogarithm",
+						Formulae.createExpression(
+							"Math.Arithmetic.SquareRoot",
+							CanonicalArithmetic.createInternalNumber(
+								CanonicalArithmetic.addition(
+									x.real.multiplication(x.real, session),
+									x.imaginary.multiplication(x.imaginary, session),
+									session
+								)
+							)
+						)
+					),
+					Formulae.createExpression(
+						"Math.Arithmetic.Multiplication",
+						Formulae.createExpression(
+							"Math.Trigonometric.ArcTangent2",
+							CanonicalArithmetic.createInternalNumber(x.imaginary),
+							CanonicalArithmetic.createInternalNumber(x.real)
+						),
+						Formulae.createExpression("Math.Complex.Imaginary")
+					)
+				);
+			}
+		}
+	}
+	
+	// base
+	
+	base: {
+		let tag = log.getTag();
+		
+		if (tag === "Math.Transcendental.DecimalLogarithm") {
+			if (result.isInternalNumber()) {
+				result.set(
+					"Value",
+					CanonicalArithmetic.division(
+						result.get("Value"),
+						CanonicalArithmetic.getLN10(session),
+						session
+					)
+				);
+			}
+			else {
+				result = Formulae.createExpression(
+					"Math.Arithmetic.Division",
+					result,
+					Formulae.createExpression(
+						"Math.Transcendental.NaturalLogarithm",
+						CanonicalArithmetic.createInternalNumber(
+							CanonicalArithmetic.createInteger(10, session)
+						)
+					)
+				);
+			}
+			
+			break base;
+		}
+		
+		if (tag === "Math.Transcendental.BinaryLogarithm") {
+			if (result.isInternalNumber()) {
+				result.set(
+					"Value",
+					CanonicalArithmetic.division(
+						result.get("Value"),
+						CanonicalArithmetic.getLN2(session),
+						session
+					)
+				);
+			}
+			else {
+				result = Formulae.createExpression(
+					"Math.Arithmetic.Division",
+					result,
+					Formulae.createExpression(
+						"Math.Transcendental.NaturalLogarithm",
+						CanonicalArithmetic.createInternalNumber(
+							CanonicalArithmetic.createInteger(2, session)
+						)
+					)
+				);
+			}
+			
+			break base;
+		}
+		
+		if (log.children.length >= 2) {
+			result = Formulae.createExpression(
+				"Math.Arithmetic.Division",
+				result,
+				Formulae.createExpression(
+					"Math.Transcendental.NaturalLogarithm",
+					log.children[1]
 				)
-			)
-		);
+			);
+			
+			break base;
+		}
 	}
-	else if (x.lessThan(0)) { // negative argument
-		let realPart =
-			base === null ?
-			session.Decimal.ln(x.abs()) :
-			session.Decimal.log(x.abs(), base)
-		;
-		let imaginaryPart = session.Decimal.atan2(0, x);
-		if (base !== null) {
-			imaginaryPart = session.Decimal.div(imaginaryPart, session.Decimal.ln(base));
-		}
-		
-		let mult = Formulae.createExpression("Math.Arithmetic.Multiplication");
-		mult.addChild(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(imaginaryPart)
-			)
-		);
-		mult.addChild(Formulae.createExpression("Math.Complex.Imaginary"));
-		let addition = Formulae.createExpression("Math.Arithmetic.Addition");
-		addition.addChild(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(realPart)
-			)
-		);
-		addition.addChild(mult);
-		
-		log.replaceBy(addition);
-	}
-	else { // x = 0
-		if (base.greaterThan(1)) {
-			let negative = Formulae.createExpression("Math.Arithmetic.Negative");
-			negative.addChild(Formulae.createExpression("Math.Infinity"));
-			log.replaceBy(negative);
-		}
-		else {
-			let infinity = Formulae.createExpression("Math.Infinity");
-			log.replaceBy(infinity);
-		}
+	
+	// finally
+	
+	log.replaceBy(result);
+	
+	if (!result.isInternalNumber()) {
+		await session.reduce(result);
 	}
 	
 	return true;
 };
 
 Arithmetic.sqrt = async (sqrt, session) => {
-	let arg = sqrt.children[0];
-	if (!arg.isInternalNumber()) return false;
-	let numeric = arg.get("Value");
+	let expr = sqrt.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	///////////////////////
-	// negative argument //
-	///////////////////////
-	let negative;
-	if (negative = numeric.isNegative()) {
-		numeric = numeric.negate();
-	}
-	
-	let expr;
+	if (CanonicalArithmetic.isInteger(n)) {
+		let isNegative = n.isNegative();
+		if (n.isNegative()) n = n.negation();
 		
-	if (numeric instanceof CanonicalArithmetic.Decimal) {
-		expr = CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Decimal(
-				session.Decimal.sqrt(numeric.decimal)
-			)
-		)
-	}
-	else if (numeric instanceof CanonicalArithmetic.Integer) {
-		let r = session.Decimal.sqrt(numeric.integer.toString());
-		if (r.isInteger()) {
-			expr = CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(BigInt(r.toString()))
-			);
-		}
-		else {
-			if (negative) {
-				expr = Formulae.createExpression("Math.Arithmetic.SquareRoot");
-				expr.addChild(
-					CanonicalArithmetic.canonical2InternalNumber(numeric)
+		let sr = n.sqrtInteger();
+		
+		if (sr === undefined) {
+			if (isNegative) {
+				expr.set("Value", n);
+				let mult = Formulae.createExpression(
+					"Math.Arithmetic.Multiplication",
+					Formulae.createExpression("Math.Complex.Imaginary")
 				);
-			}
-			else {
+				sqrt.replaceBy(mult);
+				mult.addChildAt(0, sqrt);
 				return true;
 			}
-		}
-	}
-	else { // rational
-		let n = session.Decimal.sqrt(numeric.numerator.toString());
-		let d = session.Decimal.sqrt(numeric.denominator.toString());
-		
-		let ni = n.isInteger();
-		let di = d.isInteger();
-		
-		if (ni && di) {
-			let rational = CanonicalArithmetic.createRational(
-				BigInt(n.toFixed()),
-				BigInt(d.toFixed())
-			);
-			
-			//let rational = new CanonicalArithmetic.Rational(
-			//	BigInt(n.toFixed()),
-			//	BigInt(d.toFixed())
-			//);
-			//rational.normalize();
-			//rational.minimize();
-			
-			expr = CanonicalArithmetic.canonical2InternalNumber(rational);
-		}
-		else if (ni !== di) {
-			let N, D;
-			
-			if (ni) {
-				N = CanonicalArithmetic.canonical2InternalNumber(
-					new CanonicalArithmetic.Integer(BigInt(n.toString()))
-				);
-			}
 			else {
-				N = Formulae.createExpression("Math.Arithmetic.SquareRoot");
-				N.addChild(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(numeric.numerator)
-					)
-				);
+				return false;
 			}
-			
-			if (di) {
-				D = CanonicalArithmetic.canonical2InternalNumber(
-					new CanonicalArithmetic.Integer(BigInt(d.toString()))
-				);
-			}
-			else {
-				D = Formulae.createExpression("Math.Arithmetic.SquareRoot");
-				D.addChild(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(numeric.denominator)
-					)
-				);
-			}
-			
-			expr = Formulae.createExpression("Math.Arithmetic.Division");
-			expr.addChild(N);
-			expr.addChild(D);
 		}
 		else {
-			if (!negative) {
-				return true;
-			}
-			
-			expr = Formulae.createExpression("Math.Arithmetic.SquareRoot");
-			expr.addChild(
-				CanonicalArithmetic.canonical2InternalNumber(numeric)
-			);
-		}
-	}
-	
-	if (negative) {
-		let mult = Formulae.createExpression("Math.Arithmetic.Multiplication");
-		mult.addChild(expr);
-		mult.addChild(Formulae.createExpression("Math.Complex.Imaginary"));
-		expr = mult;
-	}
-	
-	sqrt.replaceBy(expr);
-	return true;
-};
-
-Arithmetic.trigHyper = async (f, session) => {
-	let arg = f.children[0];
-	
-	if (!arg.isInternalNumber()) return false;
-	let number = arg.get("Value");
-	
-	//////////////////
-	// integer zero //
-	//////////////////
-	
-	integer: if (number instanceof CanonicalArithmetic.Integer) {
-		let n = CanonicalArithmetic.getInteger(arg)
-		
-		if (n === 0) {
-			let expr;
-			
-			switch (f.getTag()) {
-				case "Math.Trigonometric.Sine":
-				case "Math.Trigonometric.Tangent":
-				case "Math.Trigonometric.ArcSine":
-				case "Math.Trigonometric.ArcTangent":
-				case "Math.Hyperbolic.Sine":
-				case "Math.Hyperbolic.Tangent":
-				case "Math.Hyperbolic.ArcSine":
-				case "Math.Hyperbolic.ArcTangent":
-					expr = CanonicalArithmetic.number2InternalNumber(0);
-					break;
-				
-				case "Math.Trigonometric.Cosine":
-				case "Math.Trigonometric.Secant":
-				case "Math.Hyperbolic.Cosine":
-				case "Math.Hyperbolic.Secant":
-					expr = CanonicalArithmetic.number2InternalNumber(1);
-					break;
-				
-				case "Math.Trigonometric.Cotangent":
-				case "Math.Trigonometric.Cosecant":
-				case "Math.Trigonometric.ArcCotangent":
-				case "Math.Trigonometric.ArcCosecant":
-				case "Math.Hyperbolic.Cotangent":
-				case "Math.Hyperbolic.Cosecant":
-				case "Math.Hyperbolic.ArcCosine":
-				case "Math.Hyperbolic.ArcCotangent":
-				case "Math.Hyperbolic.ArcSecant":
-				case "Math.Hyperbolic.ArcCosecant":
-					expr = Formulae.createExpression("Math.Infinity");
-					break;
-				
-				default:
-					break integer;
-			}
-			
-			f.replaceBy(expr);
-			return true;
-		}
-		
-		if (n === 1) {
-			let expr;
-			
-			switch (f.getTag()) {
-				case "Math.Trigonometric.ArcCosine":
-				case "Math.Hyperbolic.ArcCosine":
-				case "Math.Hyperbolic.ArcCotangent":
-					expr = CanonicalArithmetic.number2InternalNumber(0);
-					break;
-				
-				case "Math.Trigonometric.ArcSecant":
-				case "Math.Hyperbolic.ArcTangent":
-				case "Math.Hyperbolic.ArcSecant":
-					expr = Formulae.createExpression("Math.Infinity");
-					break;
-				
-				default:
-					break integer;
-			}
-			
-			f.replaceBy(expr);
-			return true;
-		}
-		
-		if (n === -1) {
-			let expr;
-			
-			switch (f.getTag()) {
-				case "Math.Hyperbolic.ArcCotangent":
-					expr = CanonicalArithmetic.number2InternalNumber(0);
-					break;
-				
-				case "Math.Hyperbolic.ArcCosine":
-				case "Math.Hyperbolic.ArcSecant":
-					expr = Formulae.createExpression("Math.Infinity");
-					break;
-				
-				case "Math.Hyperbolic.ArcTangent":
-					expr = Formulae.createExpression(
-							"Math.Arithmetic.Negative",
-							Formulae.createExpression(
-								"Math.Infinity"
-							)
+			if (isNegative) {
+				sqrt.replaceBy(
+					CanonicalArithmetic.createInternalNumber(
+						CanonicalArithmetic.createComplex(
+							CanonicalArithmetic.getIntegerZero(session),
+							sr
 						)
-					;
-					break;
-				
-				default:
-					break integer;
+					)
+				);
+				return true;
 			}
-			
-			f.replaceBy(expr);
-			return true;
+			else {
+				sqrt.replaceBy(CanonicalArithmetic.createInternalNumber(sr));
+				return true;
+			}
 		}
 	}
 	
-	//////////////////////
-	// A decimal number //
-	//////////////////////
-	
-	if (!(number instanceof CanonicalArithmetic.Decimal)) return false;   // to forward to another forms
-	
-	let result;
-	switch (f.getTag()) {
-		case "Math.Trigonometric.Sine":
-			result = session.Decimal.sin(number.decimal);
-			break;
-		
-		case "Math.Trigonometric.Cosine":
-			result = session.Decimal.cos(number.decimal);
-			break;
-		
-		case "Math.Trigonometric.Tangent":
-			result = session.Decimal.tan(number.decimal);
-			break;
-			
-		case "Math.Trigonometric.Cotangent":
-			result = session.Decimal.div(1, session.Decimal.tan(number.decimal));
-			break;
-			
-		case "Math.Trigonometric.Secant":
-			result = session.Decimal.div(1, session.Decimal.cos(number.decimal));
-			break;
-		
-		case "Math.Trigonometric.Cosecant":
-			result = session.Decimal.div(1, session.Decimal.sin(number.decimal));
-			break;
-			
-		case "Math.Trigonometric.ArcSine":
-			result = session.Decimal.asin(number.decimal);
-			break;
-		
-		case "Math.Trigonometric.ArcCosine":
-			result = session.Decimal.acos(number.decimal);
-			break;
-		
-		case "Math.Trigonometric.ArcTangent":
-			result = session.Decimal.atan(number.decimal);
-			break;
-			
-		case "Math.Trigonometric.ArcCotangent":
-			result = session.Decimal.div(1, session.Decimal.atan(number.decimal));
-			break;
-			
-		case "Math.Trigonometric.ArcSecant":
-			result = session.Decimal.div(1, session.Decimal.acos(number.decimal));
-			break;
-		
-		case "Math.Trigonometric.ArcCosecant":
-			result = session.Decimal.div(1, session.Decimal.asin(number.decimal));
-			break;
-			
-		case "Math.Hyperbolic.Sine":
-			result = session.Decimal.sinh(number.decimal);
-			break;
-		
-		case "Math.Hyperbolic.Cosine":
-			result = session.Decimal.cosh(number.decimal);
-			break;
-		
-		case "Math.Hyperbolic.Tangent":
-			result = session.Decimal.tanh(number.decimal);
-			break;
-			
-		case "Math.Hyperbolic.Cotangent":
-			result = session.Decimal.div(1, session.Decimal.tanh(number.decimal));
-			break;
-			
-		case "Math.Hyperbolic.Secant":
-			result = session.Decimal.div(1, session.Decimal.cosh(number.decimal));
-			break;
-		
-		case "Math.Hyperbolic.Cosecant":
-			result = session.Decimal.div(1, session.Decimal.sinh(number.decimal));
-			break;
-			
-		case "Math.Hyperbolic.ArcSine":
-			result = session.Decimal.asinh(number.decimal);
-			break;
-		
-		case "Math.Hyperbolic.ArcCosine":
-			result = session.Decimal.acosh(number.decimal);
-			break;
-		
-		case "Math.Hyperbolic.ArcTangent":
-			result = session.Decimal.atanh(number.decimal);
-			break;
-			
-		case "Math.Hyperbolic.ArcCotangent":
-			result = session.Decimal.div(1, session.Decimal.atanh(number.decimal));
-			break;
-			
-		case "Math.Hyperbolic.ArcSecant":
-			result = session.Decimal.div(1, session.Decimal.acosh(number.decimal));
-			break;
-		
-		case "Math.Hyperbolic.ArcCosecant":
-			result = session.Decimal.div(1, session.Decimal.asinh(number.decimal));
-			break;
-	}
-	
-	if (result.isFinite()) {
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(result)
-			)
+	let sr;
+	try {
+		sr = CanonicalArithmetic.exponentiation(
+			n,
+			CanonicalArithmetic.createRational(
+				CanonicalArithmetic.createInteger(1, session),
+				CanonicalArithmetic.createInteger(2, session)
+			),
+			session
 		);
 	}
-	else {
-		if (result.isNegative()) {
-			let negative = Formulae.createExpression("Math.Arithmetic.Negative");
-			negative.addChild(Formulae.createExpression("Math.Infinity"));
-			f.replaceBy(negative);
+	catch (error) {
+		if (error instanceof CanonicalArithmetic.NonNumericError) {
+			return false;
 		}
 		else {
-			let infinity = Formulae.createExpression("Math.Infinity");
-			f.replaceBy(infinity);
+			throw error;
 		}
 	}
 	
+	expr.set("Value", sr);
+	sqrt.replaceBy(expr);
+	return true;
+}
+
+const trigHyperMap = new Map();
+trigHyperMap.set("Math.Trigonometric.Sine",         CanonicalArithmetic.sine);
+trigHyperMap.set("Math.Trigonometric.Cosine",       CanonicalArithmetic.cosine);
+trigHyperMap.set("Math.Trigonometric.Tangent",      CanonicalArithmetic.tangent);
+trigHyperMap.set("Math.Trigonometric.Cotangent",    CanonicalArithmetic.cotangent);
+trigHyperMap.set("Math.Trigonometric.Secant",       CanonicalArithmetic.secant);
+trigHyperMap.set("Math.Trigonometric.Cosecant",     CanonicalArithmetic.cosecant);
+trigHyperMap.set("Math.Trigonometric.ArcSine",      CanonicalArithmetic.inverseSine);
+trigHyperMap.set("Math.Trigonometric.ArcCosine",    CanonicalArithmetic.inverseCosine);
+trigHyperMap.set("Math.Trigonometric.ArcTangent",   CanonicalArithmetic.inverseTangent);
+trigHyperMap.set("Math.Trigonometric.ArcCotangent", CanonicalArithmetic.inverseCotangent);
+trigHyperMap.set("Math.Trigonometric.ArcSecant",    CanonicalArithmetic.inverseSecant);
+trigHyperMap.set("Math.Trigonometric.ArcCosecant",  CanonicalArithmetic.inverseCosecant);
+trigHyperMap.set("Math.Hyperbolic.Sine",            CanonicalArithmetic.hyperbolicSine);
+trigHyperMap.set("Math.Hyperbolic.Cosine",          CanonicalArithmetic.hyperbolicCosine);
+trigHyperMap.set("Math.Hyperbolic.Tangent",         CanonicalArithmetic.hyperbolicTangent);
+trigHyperMap.set("Math.Hyperbolic.Cotangent",       CanonicalArithmetic.hyperbolicCotangent);
+trigHyperMap.set("Math.Hyperbolic.Secant",          CanonicalArithmetic.hyperbolicSecant);
+trigHyperMap.set("Math.Hyperbolic.Cosecant",        CanonicalArithmetic.hyperbolicCosecant);
+trigHyperMap.set("Math.Hyperbolic.ArcSine",         CanonicalArithmetic.inverseHyperbolicSine);
+trigHyperMap.set("Math.Hyperbolic.ArcCosine",       CanonicalArithmetic.inverseHyperbolicCosine);
+trigHyperMap.set("Math.Hyperbolic.ArcTangent",      CanonicalArithmetic.inverseHyperbolicTangent);
+trigHyperMap.set("Math.Hyperbolic.ArcCotangent",    CanonicalArithmetic.inverseHyperbolicCotangent);
+trigHyperMap.set("Math.Hyperbolic.ArcSecant",       CanonicalArithmetic.inverseHyperbolicSecant);
+trigHyperMap.set("Math.Hyperbolic.ArcCosecant",     CanonicalArithmetic.inverseHyperbolicCosecant);
+
+Arithmetic.trigHyper = async (f, session) => {
+	let expr = f.children[0];
+	
+	if (!expr.isInternalNumber()) return false;
+	let x = expr.get("Value");
+	
+	if (session.numeric || session.noSymbolic) {
+		x = x.toDecimal(session);
+	}
+	else {
+		if (CanonicalArithmetic.isInteger(x) || CanonicalArithmetic.isRational(x)) {
+			return false; // forward
+		}
+		
+		if (CanonicalArithmetic.isComplex(x)) {
+			if (CanonicalArithmetic.isDecimal(x.real) || CanonicalArithmetic.isDecimal(x.imaginary)) {
+				x = x.toDecimal(session);
+			}	
+			else {
+				return false; // forward
+			}
+		}
+	}
+	
+	let r;
+	try {
+		r = trigHyperMap.get(f.getTag())(x, session);
+	}
+	catch (error) {
+		if (error instanceof CanonicalArithmetic.NonNumericError) {
+			return false;
+		}
+		else if (error instanceof CanonicalArithmetic.UnderflowError) {
+			f.replaceBy(Formulae.createExpression("Undefined"));
+			return true;
+		}
+		else {
+			throw error;
+		}
+	}
+	
+	expr.set("Value", r);
+	f.replaceBy(expr);
 	return true;
 };
 
 Arithmetic.atan2 = async (atan2, session) => {
 	if (!atan2.children[0].isInternalNumber()) return false;
 	let numbery = atan2.children[0].get("Value");
+	if (CanonicalArithmetic.isComplex(numbery)) return false;
 	
 	if (!atan2.children[1].isInternalNumber()) return false;
 	let numberx = atan2.children[1].get("Value");
+	if (CanonicalArithmetic.isComplex(numberx)) return false;
+	
+	/////////////
+	// numeric //
+	/////////////
+	
+	if (session.numeric || CanonicalArithmetic.isDecimal(numbery) || CanonicalArithmetic.isDecimal(numberx)) {
+		numbery = CanonicalArithmetic.toDecimal(numbery, session);
+		numberx = CanonicalArithmetic.toDecimal(numberx, session);
+		
+		try {
+			atan2.replaceBy(
+				CanonicalArithmetic.createInternalNumber(
+					numbery.aTan2(numberx, session)
+				)
+			);
+			return true;
+		}
+		catch (e) {
+			if (e instanceof CanonicalArithmetic.DivisionByZeroError) {
+				atan2.replaceBy(Formulae.createExpression("Undefined"));
+				return true;
+			}
+			
+			throw e;
+		}
+	}
+	
+	//////////////
+	// symbolic //
+	//////////////
 	
 	if (numbery.isZero()) {
 		if (numberx.isPositive()) {
 			atan2.replaceBy(
-				CanonicalArithmetic.number2InternalNumber(0)
+				CanonicalArithmetic.createInternalNumber(
+					CanonicalArithmetic.getIntegerZero(session)
+				)
 			);
 		}
 		else if (numberx.isNegative()) {
@@ -1792,7 +1507,7 @@ Arithmetic.atan2 = async (atan2, session) => {
 		}
 		else { // zero
 			atan2.replaceBy(
-				Formulae.createExpression("Math.Infinity")
+				Formulae.createExpression("Undefined")
 			);
 		}
 		
@@ -1804,8 +1519,11 @@ Arithmetic.atan2 = async (atan2, session) => {
 			atan2.replaceBy(
 				Formulae.createExpression(
 					"Math.Arithmetic.Multiplication",
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Rational(1n, 2n)
+					CanonicalArithmetic.createInternalNumber(
+						CanonicalArithmetic.createRational(
+							CanonicalArithmetic.getIntegerOne(session),
+							CanonicalArithmetic.createInteger(2, session)
+						)
 					),
 					Formulae.createExpression("Math.Constant.Pi")
 				)
@@ -1815,8 +1533,11 @@ Arithmetic.atan2 = async (atan2, session) => {
 			atan2.replaceBy(
 				Formulae.createExpression(
 					"Math.Arithmetic.Multiplication",
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Rational(-1n, 2n)
+					CanonicalArithmetic.createInternalNumber(
+						CanonicalArithmetic.createRational(
+							CanonicalArithmetic.getIntegerOne(session),
+							CanonicalArithmetic.createInteger(-2, session)
+						)
 					),
 					Formulae.createExpression("Math.Constant.Pi")
 				)
@@ -1826,144 +1547,65 @@ Arithmetic.atan2 = async (atan2, session) => {
 		return true;
 	}
 	
-	if (!(numberx instanceof CanonicalArithmetic.Decimal || numbery instanceof CanonicalArithmetic.Decimal)) {
-		return false;
-	}
-	
-	if (numberx instanceof CanonicalArithmetic.Decimal) {
-		numberx = numberx.decimal;
-	}
-	else if (numberx instanceof CanonicalArithmetic.Integer) {
-		numberx = new session.Decimal(numberx.integer.toString());
-	}
-	else { // rational
-		numberx = new session.Decimal.div(
-			numberx.numerator.toString(),
-			numberx.denominator.toString()
-		)
-	}
-	
-	if (numbery instanceof CanonicalArithmetic.Decimal) {
-		numbery = numbery.decimal;
-	}
-	else if (numbery instanceof CanonicalArithmetic.Integer) {
-		numbery = new session.Decimal(numbery.integer.toString());
-	}
-	else { // rational
-		numbery = new session.Decimal.div(
-			numbery.numerator.toString(),
-			numbery.denominator.toString()
-		)
-	}
-	
-	atan2.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Decimal(
-				session.Decimal.atan2(numbery, numberx)
-			)
-		)
-	);
-	
-	return true;
+	return false;
 };
 
 Arithmetic.integerPart = async (f, session) => {
-	if (!f.children[0].isInternalNumber()) return false;
-	let numeric = f.children[0].get("Value");
+	let expr = f.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	if (numeric instanceof CanonicalArithmetic.Decimal) {
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(
-					BigInt(numeric.decimal.abs().truncated().toFixed())
-				)
-			)
-		);
-	}
-	else if (numeric instanceof CanonicalArithmetic.Integer) {
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(
-					numeric.integer < 0n ? -numeric.integer : numeric.integer
-				)
-			)
-		);
-	}
-	else { // rational
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(
-					(numeric.numerator < 0n ? -numeric.numerator : numeric.numerator) / numeric.denominator
-				)
-			)
-		);
+	if (CanonicalArithmetic.isDecimal(n)) {
+		expr.set("Value", n.absoluteValue().trunc().toInteger());
+		f.replaceBy(expr);
+		return true;
 	}
 	
-	return true;
+	if (CanonicalArithmetic.isInteger(n)) {
+		expr.set("Value", n.absoluteValue());
+		f.replaceBy(expr);
+		return true;
+	}
+	
+	if (CanonicalArithmetic.isRational(n)) {
+		expr.set("Value", n.numerator.absoluteValue().integerDivisionForGCD(n.denominator));
+		f.replaceBy(expr);
+		return true;
+	}
+	
+	if (CanonicalArithmetic.isComplex(n)) {
+		return false;
+	}
 };
 
 Arithmetic.fractionalPart = async (f, session) => {
-	if (!f.children[0].isInternalNumber()) return false;
-	let numeric = f.children[0].get("Value");
+	let expr = f.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	if (numeric instanceof CanonicalArithmetic.Decimal) {
-		let x = numeric.decimal.abs();
-		
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(
-					session.Decimal.sub(x, x.truncated())
-				)
-			)
-		);
-	}
-	else if (numeric instanceof CanonicalArithmetic.Integer) {
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Decimal(
-					new session.Decimal(0.0)
-				)
-			)
-		);
-	}
-	else { // rational
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Rational(
-					(numeric.numerator < 0n ? -numeric.numerator : numeric.numerator) % numeric.denominator,
-					numeric.denominator
-				)
-			)
-		);
-	} 
-	
-	return true;
-};
-
-Arithmetic.decimalPlaces = async (f, session) => {
-	if (!f.children[0].isInternalNumber()) return false;
-	let numeric = f.children[0].get("Value");
-	
-	if (numeric instanceof CanonicalArithmetic.Decimal) {
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(
-					BigInt(numeric.decimal.decimalPlaces())
-				)
-			)
-		);
-		return true;
-	}
-	else if (numeric instanceof CanonicalArithmetic.Integer) {
-		f.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(0n)
-			)
-		);
+	if (CanonicalArithmetic.isDecimal(n)) {
+		n = n.absoluteValue();
+		expr.set("Value", n.addition(n.trunc().negation()));
+		f.replaceBy(expr);
 		return true;
 	}
 	
-	return false;
+	if (CanonicalArithmetic.isInteger(n)) {
+		expr.set("Value", CanonicalArithmetic.getDecimalZero(session));
+		f.replaceBy(expr);
+		return true;
+	}
+	
+	if (CanonicalArithmetic.isRational(n)) {
+		n = n.absoluteValue();
+		expr.set("Value", CanonicalArithmetic.subtraction(n, n.numerator.integerDivisionForGCD(n.denominator)));
+		f.replaceBy(expr);
+		return true;
+	}
+	
+	if (CanonicalArithmetic.isComplex(n)) {
+		return false;
+	}
 };
 
 Arithmetic.isNumeric = async (isNumeric, session) => {
@@ -1973,58 +1615,75 @@ Arithmetic.isNumeric = async (isNumeric, session) => {
 
 Arithmetic.isX = async (is, session) => {
 	if (!is.children[0].isInternalNumber()) return false;
-	let numeric = is.children[0].get("Value");
+	let number = is.children[0].get("Value");
 	
 	let result;
 	
 	switch (is.getTag()) {
-		case "Math.Arithmetic.IsRealNumber":
-			result = !(numeric instanceof CanonicalArithmetic.Rational);
+		case "Math.Arithmetic.IsInteger":
+			result = CanonicalArithmetic.isInteger(number);
 			break;
 			
-		case "Math.Arithmetic.IsRationalNumber":
-			result = numeric instanceof CanonicalArithmetic.Rational;
+		case "Math.Arithmetic.IsDecimal":
+			result = CanonicalArithmetic.isDecimal(number);
 			break;
 			
 		case "Math.Arithmetic.IsIntegerValue":
 			result =
-				numeric instanceof CanonicalArithmetic.Integer ||
-				numeric instanceof CanonicalArithmetic.Decimal && numeric.decimal.isInteger()
+				CanonicalArithmetic.isInteger(number) ||
+				(CanonicalArithmetic.isDecimal(number) && number.hasIntegerValue())
 			;
 			break;
 			
-		case "Math.Arithmetic.IsInteger":
-			result = numeric instanceof CanonicalArithmetic.Integer;
+		case "Math.Arithmetic.IsRealNumber":
+			result = CanonicalArithmetic.isInteger(number) || CanonicalArithmetic.isDecimal(number);
 			break;
 			
-		case "Math.Arithmetic.IsDecimal":
-			result = numeric instanceof CanonicalArithmetic.Decimal;
+		case "Math.Arithmetic.IsRationalNumber":
+			result = CanonicalArithmetic.isInteger(number);
+			break;
+			
+		case "Math.Arithmetic.IsComplexNumber":
+			result = CanonicalArithmetic.isComplex(number);
 			break;
 			
 		case "Math.Arithmetic.IsNegativeNumber":
-			result = numeric.isNegative();
+			result = !CanonicalArithmetic.isComplex(number) && number.isNegative();
 			break;
 			
 		case "Math.Arithmetic.IsPositiveNumber":
-			result = numeric.isPositive();
+			result = !CanonicalArithmetic.isComplex(number) && number.isPositive();
 			break;
 			
 		case "Math.Arithmetic.IsNumberZero":
-			result = numeric.isZero();
+			result = number.isZero();
 			break;
 			
-		case "Math.Arithmetic.IsEven":
-			result =
-				numeric instanceof CanonicalArithmetic.Integer && numeric.integer % 2n == 0n ||
-				numeric instanceof CanonicalArithmetic.Decimal && numeric.decimal.isInteger() && numeric.decimal.div(2).isInteger()
-			;
+		case "Math.Arithmetic.IsEven": {
+				let i = undefined;
+				if (CanonicalArithmetic.isInteger(number)) i = number;
+				else if (CanonicalArithmetic.isDecimal(number) && number.hasIntegerValue()) i = number.toInteger();
+				if (i === undefined) {
+					result = false;
+				}
+				else {
+					console.log(i.integerDivisionForGCD(CanonicalArithmetic.createInteger(2, session)));
+					result = i.remainder(CanonicalArithmetic.createInteger(2, session)).isZero();
+				}
+			}
 			break;
 			
-		case "Math.Arithmetic.IsOdd":
-			result =
-				numeric instanceof CanonicalArithmetic.Integer && numeric.integer % 2n != 0n ||
-				numeric instanceof CanonicalArithmetic.Decimal && numeric.decimal.isInteger() && !numeric.decimal.div(2).isInteger()
-			;
+		case "Math.Arithmetic.IsOdd": {
+				let i = undefined;
+				if (CanonicalArithmetic.isInteger(number)) i = number;
+				else if (CanonicalArithmetic.isDecimal(number) && number.hasIntegerValue()) i = number.toInteger();
+				if (i === undefined) {
+					result = false;
+				}
+				else {
+					result = !i.remainder(CanonicalArithmetic.createInteger(2, session)).isZero();
+				}
+			}
 			break;
 	}
 	
@@ -2033,43 +1692,43 @@ Arithmetic.isX = async (is, session) => {
 };
 
 Arithmetic.toX = async (to, session) => {
-	if (!to.children[0].isInternalNumber()) return false;
-	let number = to.children[0].get("Value");
+	let expr = to.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
 	
-	let newNumber = null;
+	let tag = to.getTag();
+	let nn = null;
 	
-	switch (to.getTag()) {
+	switch (tag) {
 		case "Math.Arithmetic.ToInteger":
-			if (number instanceof CanonicalArithmetic.Decimal) {
-				if (number.decimal.isInteger()) {
-					newNumber = new CanonicalArithmetic.Integer(BigInt(number.decimal.toFixed()));
+		case "Math.Arithmetic.ToIfInteger": {
+				if (CanonicalArithmetic.isDecimal(n)) {
+					if (n.hasIntegerValue()) nn = n.toInteger();
 				}
-				else {
-					return false;
+				else if (CanonicalArithmetic.isInteger(n)) nn = n;
+				else if (CanonicalArithmetic.isComplex(n)) {
+					if (n.real.hasIntegerValue() && n.imaginary.hasIntegerValue()) {
+						nn = CanonicalArithmetic.createComplex(n.real.toInteger(), n.imaginary.toInteger());
+					}
 				}
-			}
-			break;
-			
-		case "Math.Arithmetic.ToIfInteger":
-			if (number instanceof CanonicalArithmetic.Decimal) {
-				if (number.decimal.isInteger()) {
-					newNumber = new CanonicalArithmetic.Integer(BigInt(number.decimal.toFixed()));
+				
+				if (nn === null && tag === "Math.Arithmetic.ToInteger") { // It could not be converted to integer
+					ReductionManager.setInError(expr, "Number cannot be converted to integer");
+					throw new ReductionError();
 				}
 			}
 			break;
 			
 		case "Math.Arithmetic.ToDecimal":
-			if (number instanceof CanonicalArithmetic.Integer) {
-				newNumber = new CanonicalArithmetic.Decimal(new session.Decimal(number.integer.toString()));
-			}
+			nn = n.toDecimal(session);
 			break;
 	}
 	
-	if (newNumber === null) {
-		to.replaceBy(to.children[0]);
+	if (nn === null) {
+		to.replaceBy(expr);
 	}
 	else {
-		to.replaceBy(CanonicalArithmetic.canonical2InternalNumber(newNumber));
+		to.replaceBy(CanonicalArithmetic.createInternalNumber(nn));
 	}
 	
 	return true;
@@ -2082,7 +1741,8 @@ Arithmetic.toNumber = async (toNumber, session) => {
 	
 	let base = 10;
 	if (toNumber.children.length >= 2) {
-		base = CanonicalArithmetic.getInteger(toNumber.children[1]);
+		base = CanonicalArithmetic.getNativeInteger(toNumber.children[1]);
+		if (base === undefined) return false;
 		if (base < 2 || base > 36) return false;
 	}
 	
@@ -2091,15 +1751,30 @@ Arithmetic.toNumber = async (toNumber, session) => {
 		if (result === null || result[0] !== s) return false;
 		let point = s.indexOf(".") >= 0;
 		toNumber.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
+			CanonicalArithmetic.createInternalNumber(
 				point ?
-				new CanonicalArithmetic.Decimal(new session.Decimal(s)) :
-				new CanonicalArithmetic.Integer(BigInt(s))
+				CanonicalArithmetic.createDecimalFromString(s, session) :
+				CanonicalArithmetic.createIntegerFromString(s, session)
 			)
 		);
 		return true;
 	}
 	else {
+		base = CanonicalArithmetic.createInteger(base, session);
+		
+		let hasDecimalPoint = s.indexOf(".") >= 0;
+		let number, fraction;
+		
+		if (hasDecimalPoint) {
+			base = CanonicalArithmetic.createDecimal(base, session);
+			number = CanonicalArithmetic.getDecimalZero(session);
+			fraction = CanonicalArithmetic.getDecimalOne(session);
+		}
+		else {
+			base = CanonicalArithmetic.createInteger(base, session);
+			number = CanonicalArithmetic.getIntegerZero(session);
+		}
+		
 		// 0-9 48-57
 		// a-z 97-122
 		// A-Z 65-90
@@ -2109,8 +1784,8 @@ Arithmetic.toNumber = async (toNumber, session) => {
 		let cp;
 		let i = 0;
 		let point = false;
-		let number = new session.Decimal(0);
-		let fraction = new session.Decimal(1);
+		//let number = new session.Decimal(0);
+		//let fraction = new session.Decimal(1);
 		let negative = false;
 			
 		for (const codePoint of s) {
@@ -2146,43 +1821,49 @@ Arithmetic.toNumber = async (toNumber, session) => {
 			
 			// ok
 			if (!point) {
-				number = session.Decimal.add(session.Decimal.mul(number, base), cp);
+				//number = session.Decimal.add(session.Decimal.mul(number, base), cp);
+				number = number.multiplication(base, session).addition(
+					hasDecimalPoint ? CanonicalArithmetic.createDecimal(cp, session) : CanonicalArithmetic.createInteger(cp, session),
+					session
+				);
 			}
 			else {
-				fraction = session.Decimal.div(fraction, base);
-				number = session.Decimal.add(number, session.Decimal.mul(fraction, cp));
+				//fraction = session.Decimal.div(fraction, base);
+				//number = session.Decimal.add(number, session.Decimal.mul(fraction, cp));
+				fraction = fraction.division(base, session);
+				number = number.addition(
+					fraction.multiplication(
+						hasDecimalPoint ? CanonicalArithmetic.createDecimal(cp, session) : CanonicalArithmetic.reateInteger(cp, session),
+						session
+					)
+				);
 			}
   			
   			++i;
   		}
 		
   		if (i == 0) return false;
-		if (negative) number = number.negated();
+		if (negative) number = number.negation();
 		
-		toNumber.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				point ?
-				new CanonicalArithmetic.Decimal(number) :
-				new CanonicalArithmetic.Integer(BigInt(number.toFixed()))
-			)
-		);
+		toNumber.replaceBy(CanonicalArithmetic.createInternalNumber(number));
 		
 		return true;
 	}
 };
 
 Arithmetic.factorial = async (factorial, session) => {
-	let number = CanonicalArithmetic.getInteger(factorial.children[0]);
+	let number = CanonicalArithmetic.getNativeInteger(factorial.children[0]);
 	if (number === undefined || number < 0n) return false;
+	number = CanonicalArithmetic.createInteger(number, session);
 	
-	let result = 1n;
-	for (let i = 2n; i <= number; ++i) result *= i;
+	let one = CanonicalArithmetic.getIntegerOne(session);
 	
-	factorial.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(result)
-		)
-	);
+	let result = one;
+	for (let i = CanonicalArithmetic.createInteger(2, session); i.comparedTo(number) <= 0; i = i.addition(one)) {
+		result = result.multiplication(i);
+	}
+	
+	factorial.replaceBy(CanonicalArithmetic.createInternalNumber(result));
 	
 	return true;
 };
@@ -2193,25 +1874,17 @@ Arithmetic.toString = async (toString, session) => {
 	
 	let base = 10;
 	if (toString.children.length >= 2) {
-		base = CanonicalArithmetic.getInteger(toString.children[1]);
+		base = CanonicalArithmetic.getNativeInteger(toString.children[1]);
 		if (base === undefined) return false;
 	}
 	
-	if (base == 10n) {
-		let expr = Formulae.createExpression("String.String");
-		
-		if (number instanceof CanonicalArithmetic.Integer) {
-			expr.set("Value", number.integer.toString());
+	if (base == 10) {
+		if (CanonicalArithmetic.isInteger(number) || CanonicalArithmetic.isDecimal(number)) {
+			let expr = Formulae.createExpression("String.String");
+			expr.set("Value", number.toText());
+			toString.replaceBy(expr);
+			return true;
 		}
-		else if (number instanceof CanonicalArithmetic.Decimal){
-			expr.set("Value", number.decimal.toFixed());
-		}
-		else { // rational
-			return false;
-		}
-		
-		toString.replaceBy(expr);
-		return true;
 	}
 	
 	return false;
@@ -2220,41 +1893,33 @@ Arithmetic.toString = async (toString, session) => {
 Arithmetic.digits = async (digits, session) => {
 	if (!digits.children[0].isInternalNumber()) return false;
 	let number = digits.children[0].get("Value");
-	if (number === null || number instanceof CanonicalArithmetic.Decimal || number.isNegative()) return false;
+	if (!CanonicalArithmetic.isInteger(number)) return false;
+	if (number.isNegative()) return false;
 	
-	let base = 10n;
+	let base = 10;
 	if (digits.children.length >= 2) {
-		base = CanonicalArithmetic.getInteger(digits.children[1]);
+		base = CanonicalArithmetic.getNativeInteger(digits.children[1]);
 		if (base === undefined || base < 2 ) return false;
-		base = BigInt(base);
 	}
-
+	base = CanonicalArithmetic.createInteger(base, session);
+	
 	let expr = Formulae.createExpression("List.List");
-	let quotient = number.integer;
+	let quotient = number;
 	let remainder;
 	
 	do {
-		remainder = quotient % base;
-		quotient = quotient / base;
-		expr.addChildAt(
-			0,
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(remainder)
-			)
-		);
-	} while (quotient != 0n);
+		remainder = quotient.remainder(base);
+		quotient = quotient.integerDivisionForGCD(base);
+		expr.addChildAt(0, CanonicalArithmetic.createInternalNumber(remainder));
+	} while (!quotient.isZero());
 	
 	if (digits.children.length >= 3) {
-		let size = CanonicalArithmetic.getInteger(digits.children[2]);
+		let size = CanonicalArithmetic.getNativeInteger(digits.children[2]);
 		if (size === undefined || base < 1 ) return false;
 		if (size > expr.children.length) {
+			let zero = CanonicalArithmetic.getIntegerZero(session);
 			for (let i = 0, n = size - expr.children.length; i < n; ++i) {
-				expr.addChildAt(
-					0,
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(0n)
-					)
-				);
+				expr.addChildAt(0, CanonicalArithmetic.createInternalNumber(zero));
 			}
 		}
 	}
@@ -2264,7 +1929,7 @@ Arithmetic.digits = async (digits, session) => {
 };
 
 Arithmetic.toTime = async (toTime, session) => {
-	let number = CanonicalArithmetic.getInteger(toTime.children[0]);
+	let number = CanonicalArithmetic.getNativeInteger(toTime.children[0]);
 	if (number === undefined) return false;
 	if (number < -8_640_000_000_000_000 || number > 8_640_000_000_000_000) return false;
 	
@@ -2282,8 +1947,10 @@ Arithmetic.gcdLcm = async (gcdLcm, session) => {
 	let pivot;
 	
 	for (pos = 0; pos < n; ++pos) {
-		pivot = CanonicalArithmetic.getBigInt(list.children[pos]);
-		if (pivot !== undefined) break;
+		pivot = list.children[pos];
+		if (!pivot.isInternalNumber()) continue;
+		pivot = pivot.get("Value");
+		if (CanonicalArithmetic.isInteger(pivot)) break;
 	}
 	
 	if (pos >= n) return false; // there was no numeric, integer addends
@@ -2294,14 +1961,17 @@ Arithmetic.gcdLcm = async (gcdLcm, session) => {
 	let r = pivot;
 	
 	for (let i = n - 1; i > pos; --i) {
-		sibling = CanonicalArithmetic.getBigInt(list.children[i]);
+		sibling = list.children[i];
+		if (!sibling.isInternalNumber()) continue;
+		sibling = sibling.get("Value");
 		
-		if (sibling != undefined) {
+		if (CanonicalArithmetic.isInteger(sibling)) {
 			if (isGcd) {
-				r = CanonicalArithmetic.gcd(r, sibling);
+				r = r.gcd(sibling);
 			}
 			else {   // LCM(a, b) = | ab | / GCD(a, b)
-				r = CanonicalArithmetic.abs(r * sibling) / CanonicalArithmetic.gcd(r, sibling);
+				//r = CanonicalArithmetic.abs(r * sibling) / CanonicalArithmetic.gcd(r, sibling);
+				r = r.multiplication(sibling).absoluteValue().integerDivisionForGCD(r.gcd(sibling));
 			}
 			
 			list.removeChildAt(i);
@@ -2310,32 +1980,18 @@ Arithmetic.gcdLcm = async (gcdLcm, session) => {
 	}
 		
 	if (list.children.length == 1) { // just one child
-		gcdLcm.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(r)
-			)
-		)
+		gcdLcm.replaceBy(CanonicalArithmetic.createInternalNumber(r));
 		return true;
 	}
 	else { // more than one child
 		if (pos == 0) {
 			if (performed) {
-				list.setChild(
-					0,
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(r)
-					)
-				);
+				list.setChild(0, CanonicalArithmetic.createInternalNumber(r));
 			}
 		}
 		else {
 			list.removeChildAt(pos);
-			list.addChildAt(
-				0,
-				CanonicalArithmetic.canonical2InternalNumber(
-					new CanonicalArithmetic.Integer(r)
-				)
-			);
+			list.addChildAt(0, CanonicalArithmetic.createInternalNumber(r));
 			//performed = true;
 		}
 	}
@@ -2344,41 +2000,37 @@ Arithmetic.gcdLcm = async (gcdLcm, session) => {
 };
 
 Arithmetic.factors = async (factors, session) => {
-	let n = CanonicalArithmetic.getBigInt(factors.children[0]);
-	if (n === undefined || n <= 2n) return false;
-
+	let n = factors.children[0];
+	if (!n.isInternalNumber()) return false;
+	n = n.get("Value");
+	if (!CanonicalArithmetic.isInteger(n)) return false;
+	if (n.comparedTo(CanonicalArithmetic.getIntegerOne(session)) <= 0) return false;
+	
+	let one = CanonicalArithmetic.getIntegerOne(session);
+	let two = CanonicalArithmetic.createInteger(2, session);
+	let three = CanonicalArithmetic.createInteger(3, session);
+	
 	let list = Formulae.createExpression("List.List");
 	
-	while (((n % 2n) + 0n) == 0n) {
-		list.addChild(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(2n)
-			)
-		);
-		n = n / 2n;
+	while (n.remainder(two).isZero()) {
+		list.addChild(CanonicalArithmetic.createInternalNumber(two));
+		n = n.integerDivisionForGCD(two);
 	}
 	
-	if (n > 1n) {
-		let f = 3n;
-		while ((f * f) <= n) {
-			if (((n % f) + 0n) == 0n) {
-				list.addChild(
-					CanonicalArithmetic.canonical2InternalNumber(
-						new CanonicalArithmetic.Integer(f)
-					)
-				);
-				n = n / f;
+	if (n.comparedTo(one) > 0) {
+		let f = three;
+		
+		while (f.multiplication(f).comparedTo(n) <= 0) {
+			if (n.remainder(f).isZero()) {
+				list.addChild(CanonicalArithmetic.createInternalNumber(f));
+				n = n.integerDivisionForGCD(f);
 			}
 			else {
-				f = f + 2n;
+				f = f.addition(two);
 			}
 		}
 		
-		list.addChild(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(n)
-			)
-		);
+		list.addChild(CanonicalArithmetic.createInternalNumber(n));
 	}
 	
 	factors.replaceBy(list);
@@ -2386,6 +2038,22 @@ Arithmetic.factors = async (factors, session) => {
 };
 
 Arithmetic.divisionTest = async (divisionTest, session) => {
+	let divisor = CanonicalArithmetic.getInteger(divisionTest.children[0]);
+	if (divisor === undefined || divisor.isZero()) return false;
+	
+	let multiple = CanonicalArithmetic.getInteger(divisionTest.children[1]);
+	if (multiple === undefined) return false;
+	
+	let divides = multiple.remainder(divisor).isZero();
+	
+	if (divisionTest.getTag() === "Math.Arithmetic.DoesNotDivide") {
+		divides = !divides;
+	}
+	
+	divisionTest.replaceBy(Formulae.createExpression(divides ? "Logic.True" : "Logic.False"));
+	return true;
+	
+	/*
 	let divisor = CanonicalArithmetic.getBigInt(divisionTest.children[0]);
 	if (divisor === undefined || divisor === 0n) return false;
 	
@@ -2394,7 +2062,7 @@ Arithmetic.divisionTest = async (divisionTest, session) => {
 	
 	// DO NOT remove the part
 	// + 0n
-	// It causes closure compiler to behaves bad !!! 
+	// It causes closure compiler to behave bad !!! 
 	
 	let rem = (multiple % divisor) + 0n;
 	let divides = rem == 0n;
@@ -2405,43 +2073,26 @@ Arithmetic.divisionTest = async (divisionTest, session) => {
 	
 	divisionTest.replaceBy(Formulae.createExpression(divides ? "Logic.True" : "Logic.False"));
 	return true;
+	*/
 };
 
 Arithmetic.random = (random, session) => {
-	let prec = null;
-	if (random.children.length >= 1) {
-		prec = CanonicalArithmetic.getBigInt(random.children[0]);
-		if (prec === undefined || prec < 1n) return false;
-	}
-	
-	random.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Decimal(
-				prec === null ? session.Decimal.random() : session.Decimal.random(Number(prec))
-			)
-		)
-	);
-	
+	random.replaceBy(CanonicalArithmetic.createInternalNumber(CanonicalArithmetic.getRandom(session)));
 	return true;
 };
 
 Arithmetic.randomInRange = async (randomInRange, session) => {
-	let n1 = CanonicalArithmetic.getInteger(randomInRange.children[0]);
+	let n1 = CanonicalArithmetic.getNativeInteger(randomInRange.children[0]);
 	if (n1 === undefined) return false;
 	
-	let n2 = CanonicalArithmetic.getInteger(randomInRange.children[1]);
+	let n2 = CanonicalArithmetic.getNativeInteger(randomInRange.children[1]);
 	if (n2 === undefined) return false;
 	
 	if (n1 == n2) return false;
 
 	let x = Math.min(n1, n2) + Math.trunc(Math.random() * (Math.abs(n2 - n1) + 1));
 	
-	randomInRange.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Integer(BigInt(x))
-		)
-	);
-	
+	randomInRange.replaceBy(CanonicalArithmetic.createInternalNumber(CanonicalArithmetic.createInteger(x, session)));
 	return true;
 };
 
@@ -2489,30 +2140,22 @@ Arithmetic.piecewise = async (piecewise, session) => {
 	return true;
 };
 
-Arithmetic.nPi = async (n, session) => {
-	if (n.children.length > 1 || n.children[0].getTag() !== "Math.Constant.Pi") return false;
-	
-	n.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Decimal(
-				session.Decimal.acos(-1.0)
-			)
-		)
-	);
-	
-	return true;
-};
 
-Arithmetic.nE = async (n, session) => {
-	if (n.children.length > 1 || n.children[0].getTag() !== "Math.Constant.Euler") return false;
-	
-	n.replaceBy(
-		CanonicalArithmetic.canonical2InternalNumber(
-			new CanonicalArithmetic.Decimal(
-				session.Decimal.exp(1.0)
-			)
-		)
-	);
+Arithmetic.constant = async (c, session) => {
+	if (session.numeric || session.noSymbolic) {
+		let r;
+		switch (c.getTag()) {
+			case "Math.Constant.Pi":
+				r = CanonicalArithmetic.getPi(session);
+				break;
+			
+			case "Math.Constant.Euler":
+				r = CanonicalArithmetic.getE(session);
+				break;
+		}
+		
+		c.replaceBy(CanonicalArithmetic.createInternalNumber(r));
+	}
 	
 	return true;
 };
@@ -2559,23 +2202,26 @@ Arithmetic.summationProductReducer = async (summationProduct, session) => {
 		if (n >= 4) {
 			if (!summationProduct.children[2].isInternalNumber()) return false;
 			from = summationProduct.children[2].get("Value");
+			if (CanonicalArithmetic.isComplex(from)) return false;
 		}
 		else {
-			from = new CanonicalArithmetic.Integer(1n);
+			from = CanonicalArithmetic.getIntegerOne(session);
 		}
 		
 		// to
 		if (!summationProduct.children[n == 3 ? 2 : 3].isInternalNumber()) return false;
 		let to = summationProduct.children[n == 3 ? 2 : 3].get("Value");
+		if (CanonicalArithmetic.isComplex(to)) return false;
 		
 		// step
 		let step;
 		if (n == 5) {
 			if (!summationProduct.children[4].isInternalNumber()) return false;
 			step = summationProduct.children[4].get("Value");
+			if (CanonicalArithmetic.isComplex(step)) return false;
 		}
 		else {
-			step = new CanonicalArithmetic.Integer(1n);
+			step = CanonicalArithmetic.getIntegerOne(session);
 		}
 		
 		if (step.isZero()) return false;
@@ -2603,26 +2249,24 @@ Arithmetic.summationProductReducer = async (summationProduct, session) => {
 		
 		filling: while (true) {
 			if (negative) {
-				if (from.comparison(to, session) < 0) {
+				if (CanonicalArithmetic.comparison(from, to, session) < 0) {
 					break filling;
 				}
 			}
 			else {
-				if (from.comparison(to, session) > 0) {
+				if (CanonicalArithmetic.comparison(from, to, session) > 0) {
 					break filling;
 				}
 			}
 			
-			scopeEntry.setValue(
-				CanonicalArithmetic.canonical2InternalNumber(from)
-			);
+			scopeEntry.setValue(CanonicalArithmetic.createInternalNumber(from));
 			
 			result.addChild(clone = arg.clone());
 			//session.log("Element created");
 			
 			await session.reduce(clone);
 			
-			from = from.addition(step, session);
+			from = CanonicalArithmetic.addition(from, step, session);
 		}
 		
 		result.removeScope();
@@ -2630,8 +2274,8 @@ Arithmetic.summationProductReducer = async (summationProduct, session) => {
 	
 	if ((n = result.children.length) == 0) {
 		result.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(summation ? 0n : 1n)
+			CanonicalArithmetic.createInternalNumber(
+				summation ? CanonicalArithmetic.getIntegerZero(session) : CanonicalArithmetic.getIntegerOne(session)
 			)
 		);
 	}
@@ -2688,10 +2332,8 @@ Arithmetic.summationProductListReducer = async (summationProduct, session) => {
 	let n = result.children.length;
 	if (n == 0) {
 		result.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				new CanonicalArithmetic.Integer(
-					summation ? 0n : 1n
-				)
+			CanonicalArithmetic.createInternalNumber(
+				summation ? CanonicalArithmetic.getIntegerZero(session) : CanonicalArithmetic.getIntegerOne(session)
 			)
 		);
 	}
@@ -2707,27 +2349,29 @@ Arithmetic.summationProductListReducer = async (summationProduct, session) => {
 
 /**
 	Modular exponetiation
-	given b, e, m: BigInt
+	given b, e, m: Integers
 	returns (b ^ e) mod m
  */
 
-Arithmetic.modularExponentiationNumeric = (x, y, p) => {
+
+Arithmetic.modularExponentiationNumeric = (x, y, p, session) => {
 	// Initialize result
-	let res = 1;
 	
-	// Update x if it is more than or
-	// equal to p
-	x = x % p;
-	while (y > 0) {
+	let two = CanonicalArithmetic.createInteger(2, session);
+	let res = CanonicalArithmetic.getIntegerOne(session);
+	
+	// Update x if it is greater than or equal to p
+	x = x.remainder(p);
+	while (y.isPositive()) {
 		// If y is odd, multiply
 		// x with result
-		if (y & 1) {
-			res = (res * x) % p;
+		if (!y.remainder(two).isZero()) {
+			res = res.multiplication(x).remainder(p);
 		}
 		
 		// y must be even now
-		y = y >> 1; // y = y/2
-		x = (x * x) % p;
+		y = y.integerDivisionForGCD(two); // y = y/2
+		x = x.multiplication(x).remainder(p);
 	}
 	return res;
 };
@@ -2736,54 +2380,59 @@ Arithmetic.modularExponentiationNumeric = (x, y, p) => {
 	Miller-Rabin primality test
  */
 
-Arithmetic.millerRabinTestNumeric = (n, d) => {
-	// Pick a random number in [2..n-2]
+Arithmetic.millerRabinTestNumeric = (n, d, session) => {
+	let one = CanonicalArithmetic.getIntegerOne(session);
+	let two = CanonicalArithmetic.createInteger(2, session);
+	
+	// Pick a random number in [2 .. n - 2]
 	// Corner cases make sure that n > 4
-	let a = 2 + Math.floor(Math.random() * (n - 2)) % (n - 4);
 	
-	// Compute a^d % n
-	let x = Arithmetic.modularExponentiationNumeric(a, d, n);
+	let a = n.randomInRange(two, CanonicalArithmetic.subtraction(n, two));
 	
-	if (x == 1 || x == n - 1) {
+	// Compute a ^ d % n
+	let x = Arithmetic.modularExponentiationNumeric(a, d, n, session);
+	
+	if (x.isOne() || x.comparedTo(CanonicalArithmetic.subtraction(n, one)) === 0) {
 		return true;
 	}
 	
-	// Keep squaring x while one
-	// of the following doesn't
-	// happen
-	// (i) d does not reach n-1
-	// (ii) (x^2) % n is not 1
-	// (iii) (x^2) % n is not n-1
+	// Keep squaring x while one of the following doesn't happen
+	// (a) d does not reach n - 1
+	// (b) (x ^ 2) % n is not 1
+	// (c) (x ^ 2) % n is not n - 1
 	
-	while (d != n - 1) {
-		x = (x * x) % n;
-		d *= 2;
+	while (d.comparedTo(CanonicalArithmetic.subtraction(n, one)) !== 0) {
+		x = x.multiplication(x).remainder(n);
+		d = d.multiplication(two);
 		
-		if (x == 1) return false;
-		if (x == n - 1) return true;
+		if (x.isOne()) return false;
+		if (x.comparedTo(CanonicalArithmetic.subtraction(n, one)) === 0) return true;
 	}
 	
 	// Return composite
 	return false;
 };
 
-Arithmetic.isProbablePrimeNumeric = (n, k) => {
+Arithmetic.isProbablePrimeNumeric = (n, k, session) => {
+	let one = CanonicalArithmetic.getIntegerOne(session);
+	let two = CanonicalArithmetic.createInteger(2, session);
+	
 	// Corner cases
-	if (n <= 1 || n == 4) return false;
-	if (n <= 3) return true;
+	if (n.comparedTo(one) <= 0 || n.comparedTo(CanonicalArithmetic.createInteger(4, session)) === 0) return false;
+	if (n.comparedTo(CanonicalArithmetic.createInteger(3, session)) <= 0) return true;
 	
 	// Find r such that n =
 	// 2^d * r + 1 for some r >= 1
 	
-	let d = n - 1;
-	while (d % 2 == 0) {
-		d /= 2;
+	let d = CanonicalArithmetic.subtraction(n, one);
+	while (d.remainder(two).isZero()) {
+		d = d.integerDivisionForGCD(two);
 	}
 	
 	// Iterate given number of 'k' times
 	
 	for (let i = 0; i < k; ++i) {
-		if (!Arithmetic.millerRabinTestNumeric(n, d)) {
+		if (!Arithmetic.millerRabinTestNumeric(n, d, session)) {
 			return false;
 		}
 	}
@@ -2795,26 +2444,24 @@ Arithmetic.isPrime = async (isPrime, session) => {
 	if (!isPrime.children[0].isInternalNumber()) return false;
 	let n = isPrime.children[0].get("Value");
 	
-	if (!(n instanceof CanonicalArithmetic.Integer) || n.integer < 0n) {
+	if (!CanonicalArithmetic.isInteger(n) || n.isNegative()) {
 		ReductionManager.setInError(isPrime.children[0], "Expression must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
-	if (n.integer > Number.MAX_SAFE_INTEGER) {
-		ReductionManager.setInError(isPrime.children[0], "Number is too big");
-		throw new ReductionError();
-	}
-	
-	n = Number(n.integer);
 	isPrime.replaceBy(
 		Formulae.createExpression(
-			Arithmetic.isProbablePrimeNumeric(n, 17) ? "Logic.True" : "Logic.False"
+			Arithmetic.isProbablePrimeNumeric(n, 17, session) ? "Logic.True" : "Logic.False"
 		)
 	);
 	return true;
 };
 
 Arithmetic.setReducers = () => {
+	// internal numbers
+	
+	ReductionManager.addReducer("Math.InternalNumber", Arithmetic.internalNumber, "Arithmetic.internalNumber");
+	
 	// precision
 	
 	ReductionManager.addReducer("Math.Arithmetic.SignificantDigits", Arithmetic.significantDigits, "Arithmetic.significantDigits");
@@ -2832,13 +2479,10 @@ Arithmetic.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.SetEuclideanDivisionMode", Arithmetic.setEuclideanDivisionMode, "Arithmetic.setEuclideanDivisionMode");
 	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", Arithmetic.getEuclideanDivisionMode, "Arithmetic.getEuclideanDivisionMode");
 	
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nNumeric,               "Arithmetic.nNumeric");
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPrecision,             "Arithmetic.nPrecision", { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nPi,                    "Arithmetic.nPi");
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.nE,                     "Arithmetic.nE");
-	ReductionManager.addReducer("Math.Numeric", ReductionManager.expansionReducer, "ReductionManager.expansionReducer", { precedence: ReductionManager.PRECEDENCE_LOW});
+	ReductionManager.addReducer("Math.Numeric", Arithmetic.numeric, "Arithmetic.numeric", { special: true });
+	ReductionManager.addReducer("Math.SetNoSymbolic", Arithmetic.setNoSymbolic, "Arithmetic.setNoSymbolic");
 	
-	// internal representation
+	// NO NEGATIVE, acoording to internal representation
 	//ReductionManager.addReducer("Math.Arithmetic.Negative",       Arithmetic.negativeNumeric,        "Arithmetic.negativeNumeric");
 	
 	ReductionManager.addReducer("Math.Arithmetic.Addition",       Arithmetic.additionNumeric,        "Arithmetic.additionNumeric");
@@ -2948,6 +2592,9 @@ Arithmetic.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.Arithmetic.Piecewise", Arithmetic.piecewise, "Arithmetic.piecewise", { special: true });
 	
+	ReductionManager.addReducer("Math.Constant.Pi",    Arithmetic.constant, "Arithmetic.constant");
+	ReductionManager.addReducer("Math.Constant.Euler", Arithmetic.constant, "Arithmetic.constant");
+	
 	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductReducer,     "Arithmetic.summationProductReducer", { special: true });
 	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductListReducer, "Arithmetic.summationProductListReducer", { special: true });
 	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductReducer    , "Arithmetic.summationProductReducer", { special: true });
@@ -2955,3 +2602,4 @@ Arithmetic.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.Arithmetic.IsPrime", Arithmetic.isPrime, "Arithmetic.isPrime");
 };
+
