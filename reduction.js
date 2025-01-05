@@ -33,16 +33,16 @@ Arithmetic.internalNumber = async (internalNumber, session) => {
 		
 		if (session.numeric && number.type !== 1) { // integer, rational or complex
 			internalNumber.set("Value", number.toDecimal(session));
-			return true;
+			return false;
 		}
 		
 		if (session.noSymbolic && number.type === 2) { // rational
 			internalNumber.set("Value", number.toDecimal(session));
-			return true;
+			return false;
 		}
 	}
 	
-	return true;
+	return false;
 };
 
 ///////////////
@@ -57,7 +57,10 @@ Arithmetic.significantDigits = async (significantDigits, session) => {
 	try {
 		significantDigits.replaceBy(
 			CanonicalArithmetic.createInternalNumber(
-				number.significantDigits()
+				CanonicalArithmetic.createInteger(
+					number.significantDigits(),
+					session
+				)
 			)
 		);
 		return true;
