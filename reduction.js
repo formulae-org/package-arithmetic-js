@@ -734,7 +734,7 @@ Arithmetic.rationalize = async (rationalize, session) => {
 		case 1: { // decimal
 			let repeating = 0;
 			if (rationalize.children.length >= 2) {
-				let repeating = CanonicalArithmetic.getNativeInteger(rationalize.children[1]);
+				repeating = CanonicalArithmetic.getNativeInteger(rationalize.children[1]);
 				if (repeating === undefined || repeating < 0) return false;
 			}
 			
@@ -957,11 +957,26 @@ Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
 	let bkpRoundingMode = session.Decimal.rounding;
 	session.Decimal.set({ rounding: roundingMode });
 	
-	expr.set("Value", n.roundToDecimalPlaces(places, session));
+	switch (n.type) {
+		case 0: // integer
+		case 2: // rational
+			n = n.toDecimal(session).roundToDecimalPlaces(-places, session);
+			break;
+		
+		case 1: // decimal
+			n = n.roundToDecimalPlaces(-places, session);
+			break;
+	}
 	
 	session.Decimal.set({ rounding: bkpRoundingMode });
 	
-	fcrt.replaceBy(expr);
+	if (places <= 0) {
+		n = n.toInteger(session);
+	}
+	
+	//expr.set("Value", n.roundToDecimalPlaces(places, session));
+	
+	fcrt.replaceBy(CanonicalArithmetic.createInternalNumber(n, session));
 	return true;
 };
 
@@ -1465,7 +1480,10 @@ Arithmetic.trigHyper = async (f, session) => {
 		if (error instanceof CanonicalArithmetic.NonNumericError) {
 			return false;
 		}
-		else if (error instanceof CanonicalArithmetic.UnderflowError) {
+		else if (
+			error instanceof CanonicalArithmetic.OverflowError ||
+			error instanceof CanonicalArithmetic.UnderflowError
+		) {
 			f.replaceBy(Formulae.createExpression("Undefined"));
 			return true;
 		}
@@ -1615,7 +1633,7 @@ Arithmetic.fractionalPart = async (f, session) => {
 	
 	if (CanonicalArithmetic.isDecimal(n)) {
 		n = n.absoluteValue();
-		expr.set("Value", n.addition(n.trunc().negation()));
+		expr.set("Value", n.addition(n.trunc().negation(), session));
 		f.replaceBy(expr);
 		return true;
 	}
@@ -1776,22 +1794,31 @@ Arithmetic.toNumber = async (toNumber, session) => {
 		if (base < 2 || base > 36) return false;
 	}
 	
-	if (base == 10) {
+	if (base === 10) {
 		let result = s.match(/[-]?[0-9]+[.]?[0-9]*/);
 		if (result === null || result[0] !== s) return false;
 		let point = s.indexOf(".") >= 0;
-		toNumber.replaceBy(
-			CanonicalArithmetic.createInternalNumber(
-				point ?
-				CanonicalArithmetic.createDecimalFromString(s, session) :
-				CanonicalArithmetic.createIntegerFromString(s, session),
-				session
-			)
-		);
+		
+		try {
+			toNumber.replaceBy(
+				CanonicalArithmetic.createInternalNumber(
+					point ?
+					CanonicalArithmetic.createDecimalFromString(s, session) :
+					CanonicalArithmetic.createIntegerFromString(s, session),
+					session
+				)
+			);
+		}
+		catch (error) {
+			if (error instanceof CanonicalArithmetic.ConversionError) {
+				return false;
+			}
+		}
+		
 		return true;
 	}
 	else {
-		base = CanonicalArithmetic.createInteger(base, session);
+		let b = base;
 		
 		let hasDecimalPoint = s.indexOf(".") >= 0;
 		let number, fraction;
@@ -1837,13 +1864,13 @@ Arithmetic.toNumber = async (toNumber, session) => {
 			}
   			
   			// digit
-  			if (cp >= 48 && cp <= 47 + base) {
+  			if (cp >= 48 && cp <= 47 + b) {
 				cp -= 48;
 			}
-			else if (cp >= 65 && cp <= 55 + base) {
+			else if (cp >= 65 && cp <= 55 + b) {
 				cp -= 55;
 			}
-			else if (cp >= 97 && cp <= 87 + base) {
+			else if (cp >= 97 && cp <= 87 + b) {
 				cp -= 87;
 			}
 			else {
@@ -1866,7 +1893,8 @@ Arithmetic.toNumber = async (toNumber, session) => {
 					fraction.multiplication(
 						hasDecimalPoint ? CanonicalArithmetic.createDecimal(cp, session) : CanonicalArithmetic.reateInteger(cp, session),
 						session
-					)
+					),
+					session
 				);
 			}
   			
