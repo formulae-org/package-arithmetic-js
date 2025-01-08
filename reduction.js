@@ -1482,7 +1482,8 @@ Arithmetic.trigHyper = async (f, session) => {
 		}
 		else if (
 			error instanceof CanonicalArithmetic.OverflowError ||
-			error instanceof CanonicalArithmetic.UnderflowError
+			error instanceof CanonicalArithmetic.UnderflowError ||
+			error instanceof CanonicalArithmetic.DomainError
 		) {
 			f.replaceBy(Formulae.createExpression("Undefined"));
 			return true;
@@ -2009,7 +2010,10 @@ Arithmetic.gcdLcm = async (gcdLcm, session) => {
 		pivot = list.children[pos];
 		if (!pivot.isInternalNumber()) continue;
 		pivot = pivot.get("Value");
-		if (CanonicalArithmetic.isInteger(pivot)) break;
+		if (pivot.hasIntegerValue()) {
+			if (!CanonicalArithmetic.isInteger(pivot)) pivot = pivot.toInteger(session);
+			break;
+		}
 	}
 	
 	if (pos >= n) return false; // there was no numeric, integer addends
@@ -2024,7 +2028,8 @@ Arithmetic.gcdLcm = async (gcdLcm, session) => {
 		if (!sibling.isInternalNumber()) continue;
 		sibling = sibling.get("Value");
 		
-		if (CanonicalArithmetic.isInteger(sibling)) {
+		if (sibling.hasIntegerValue()) {
+			if (!CanonicalArithmetic.isInteger(sibling)) sibling = sibling.toInteger(session);
 			if (isGcd) {
 				r = r.gcd(sibling);
 			}
@@ -2062,8 +2067,9 @@ Arithmetic.factors = async (factors, session) => {
 	let n = factors.children[0];
 	if (!n.isInternalNumber()) return false;
 	n = n.get("Value");
-	if (!CanonicalArithmetic.isInteger(n)) return false;
-	if (n.comparedTo(CanonicalArithmetic.getIntegerOne(session)) <= 0) return false;
+	if (!n.hasIntegerValue()) return false;
+	if (!CanonicalArithmetic.isInteger(n)) n = n.toInteger(session);
+	if (!n.isPositive()) return false;
 	
 	let one = CanonicalArithmetic.getIntegerOne(session);
 	let two = CanonicalArithmetic.createInteger(2, session);
@@ -2136,10 +2142,17 @@ Arithmetic.divisionTest = async (divisionTest, session) => {
 };
 
 Arithmetic.random = (random, session) => {
+	let precision = -1;
+	if (random.children.length >= 1) {
+		precision = CanonicalArithmetic.getNativeInteger(random.children[0]);
+		if (precision === undefined || precision <= 0) return false;
+	}
+	
 	random.replaceBy(CanonicalArithmetic.createInternalNumber(
-		CanonicalArithmetic.getRandom(session),
+		CanonicalArithmetic.getRandom(precision, session),
 		session
 	));
+	
 	return true;
 };
 
@@ -2454,7 +2467,7 @@ Arithmetic.millerRabinTestNumeric = (n, d, session) => {
 	// Pick a random number in [2 .. n - 2]
 	// Corner cases make sure that n > 4
 	
-	let a = n.randomInRange(two, CanonicalArithmetic.subtraction(n, two));
+	let a = two.randomInRange(CanonicalArithmetic.subtraction(n, two));
 	
 	// Compute a ^ d % n
 	let x = Arithmetic.modularExponentiationNumeric(a, d, n, session);
