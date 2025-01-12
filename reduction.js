@@ -1689,7 +1689,7 @@ Arithmetic.isX = async (is, session) => {
 			break;
 			
 		case "Math.Arithmetic.IsRationalNumber":
-			result = CanonicalArithmetic.isInteger(number);
+			result = CanonicalArithmetic.isRational(number);
 			break;
 			
 		case "Math.Arithmetic.IsComplexNumber":
