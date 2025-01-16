@@ -131,7 +131,8 @@ Arithmetic.Number = class extends Expression.NullaryExpression {
 		if (this.visualizationNumber === undefined) {
 			let s;
 			
-			if (typeof this.number === "bigint") {
+			//if (typeof this.number === "bigint") {
+			if (this.number.constructor === BigInt) {
 				s = this.number.toString();
 			}
 			else { // Decimal
