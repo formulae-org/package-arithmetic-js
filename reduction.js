@@ -1230,7 +1230,7 @@ Arithmetic.log = async (log, session) => {
 							session
 						),
 						Formulae.createExpression("Math.Constant.Pi"),
-						Formulae.createExpression("Math.Complex.Imaginary")
+						Formulae.createExpression("Math.Complex.ImaginaryUnit")
 					)
 				);
 			}
@@ -1258,7 +1258,7 @@ Arithmetic.log = async (log, session) => {
 							CanonicalArithmetic.createInternalNumber(x.imaginary, session),
 							CanonicalArithmetic.createInternalNumber(x.real, session)
 						),
-						Formulae.createExpression("Math.Complex.Imaginary")
+						Formulae.createExpression("Math.Complex.ImaginaryUnit")
 					)
 				);
 			}
@@ -1367,7 +1367,7 @@ Arithmetic.sqrt = async (sqrt, session) => {
 				expr.set("Value", n);
 				let mult = Formulae.createExpression(
 					"Math.Arithmetic.Multiplication",
-					Formulae.createExpression("Math.Complex.Imaginary")
+					Formulae.createExpression("Math.Complex.ImaginaryUnit")
 				);
 				sqrt.replaceBy(mult);
 				mult.addChildAt(0, sqrt);
