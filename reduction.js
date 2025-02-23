@@ -20,14 +20,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 export class Arithmetic extends Formulae.ReductionPackage {};
 
-Arithmetic.TAG_NUMBER   = "Math.Number";
-Arithmetic.TAG_INFINITY = "Math.Infinity";
+const TAG_INFINITY = "Math.Infinity";
 
 /////////////////////
 // internal number //
 /////////////////////
 
-Arithmetic.internalNumber = async (internalNumber, session) => {
+const internalNumber = async (internalNumber, session) => {
 	if (session.numeric || session.noSymbolic) {
 		let number = internalNumber.get("Value");
 		
@@ -49,7 +48,7 @@ Arithmetic.internalNumber = async (internalNumber, session) => {
 // precision //
 ///////////////
 
-Arithmetic.significantDigits = async (significantDigits, session) => {
+const significantDigits = async (significantDigits, session) => {
 	if (!significantDigits.children[0].isInternalNumber()) return false;
 	
 	let number = significantDigits.children[0].get("Value");
@@ -71,7 +70,7 @@ Arithmetic.significantDigits = async (significantDigits, session) => {
 	}
 };
 
-Arithmetic.setPrecision = async (setPrecision, session) => {
+const setPrecision = async (setPrecision, session) => {
 	let precisionExpr = await session.reduceAndGet(setPrecision.children[0], 0);
 	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
@@ -83,7 +82,7 @@ Arithmetic.setPrecision = async (setPrecision, session) => {
 	return true;
 };
 
-Arithmetic.getPrecision = async (getPrecision, session) => {
+const getPrecision = async (getPrecision, session) => {
 	getPrecision.replaceBy(
 		CanonicalArithmetic.createInternalNumber(
 			CanonicalArithmetic.createInteger(session.Decimal.precision, session),
@@ -93,7 +92,7 @@ Arithmetic.getPrecision = async (getPrecision, session) => {
 	return true;
 };
 
-Arithmetic.withPrecision = async (withPrecision, session) => {
+const withPrecision = async (withPrecision, session) => {
 	let precisionExpr = await session.reduceAndGet(withPrecision.children[1], 1);
 	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
@@ -113,7 +112,7 @@ Arithmetic.withPrecision = async (withPrecision, session) => {
 	return true;
 };
 
-Arithmetic.decimalPlaces = async (decimalPlaces, session) => {
+const decimalPlaces = async (decimalPlaces, session) => {
 	if (!decimalPlaces.children[0].isInternalNumber()) return false;
 	
 	let number = decimalPlaces.children[0].get("Value");
@@ -133,7 +132,7 @@ Arithmetic.decimalPlaces = async (decimalPlaces, session) => {
 // rounding modes and euclidean division mode //
 ////////////////////////////////////////////////
 
-Arithmetic.arrayRoundingModes = [
+const arrayRoundingModes = [
 	"Math.Arithmetic.RoundingMode.AwayFromZero",
 	"Math.Arithmetic.RoundingMode.TowardsZero",
 	"Math.Arithmetic.RoundingMode.TowardsInfinity",
@@ -146,12 +145,12 @@ Arithmetic.arrayRoundingModes = [
 	"Math.Arithmetic.EuclideanMode"
 ];
 
-Arithmetic.mapRoundingModes = new Map();
-for (let i = 0, n = Arithmetic.arrayRoundingModes.length; i < n; ++i) {
-	Arithmetic.mapRoundingModes.set(Arithmetic.arrayRoundingModes[i], i);
+const mapRoundingModes = new Map();
+for (let i = 0, n = arrayRoundingModes.length; i < n; ++i) {
+	mapRoundingModes.set(arrayRoundingModes[i], i);
 };
 
-Arithmetic.setRoundingMode = async (setRoundingMode, session) => {
+const setRoundingMode = async (setRoundingMode, session) => {
 	let tag = setRoundingMode.children[0].getTag();
 	if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) {
 		ReductionManager.setInError(
@@ -161,20 +160,20 @@ Arithmetic.setRoundingMode = async (setRoundingMode, session) => {
 		throw new ReductionError();
 	}
 	
-	session.Decimal.rounding = Arithmetic.mapRoundingModes.get(tag);
+	session.Decimal.rounding = mapRoundingModes.get(tag);
 	return true;
 };
 
-Arithmetic.getRoundingMode = async (getRoundingMode, session) => {
+const getRoundingMode = async (getRoundingMode, session) => {
 	getRoundingMode.replaceBy(
 		Formulae.createExpression(
-			Arithmetic.arrayRoundingModes[session.Decimal.rounding]
+			arrayRoundingModes[session.Decimal.rounding]
 		)
 	);
 	return true;
 };
 
-Arithmetic.setEuclideanDivisionMode = async (setEuclideanDivisionMode, session) => {
+const setEuclideanDivisionMode = async (setEuclideanDivisionMode, session) => {
 	let tag = setEuclideanDivisionMode.children[0].getTag();
 	if (!(tag.startsWith("Math.Arithmetic.RoundingMode.") || tag === "Math.Arithmetic.EuclideanMode")) {
 		ReductionManager.setInError(
@@ -184,14 +183,14 @@ Arithmetic.setEuclideanDivisionMode = async (setEuclideanDivisionMode, session) 
 		throw new ReductionError();
 	}
 	
-	session.Decimal.modulo = Arithmetic.mapRoundingModes.get(tag);
+	session.Decimal.modulo = mapRoundingModes.get(tag);
 	return true;
 };
 
-Arithmetic.getEuclideanDivisionMode = async (getEuclideanDivisionMode, session) => {
+const getEuclideanDivisionMode = async (getEuclideanDivisionMode, session) => {
 	getEuclideanDivisionMode.replaceBy(
 		Formulae.createExpression(
-			Arithmetic.arrayRoundingModes[session.Decimal.modulo]
+			arrayRoundingModes[session.Decimal.modulo]
 		)
 	);
 	return true;
@@ -203,7 +202,7 @@ Arithmetic.getEuclideanDivisionMode = async (getEuclideanDivisionMode, session) 
 
 // Numeric(expression, [precision])
 
-Arithmetic.numeric = async (numeric, session) => {
+const numeric = async (numeric, session) => {
 	let precision = undefined;
 	
 	if (numeric.children.length >= 2) {
@@ -242,7 +241,7 @@ Arithmetic.numeric = async (numeric, session) => {
 
 // SetNoSymbolic
 
-Arithmetic.setNoSymbolic = async (setNoSymbolic, session) => {
+const setNoSymbolic = async (setNoSymbolic, session) => {
 	session.noSymbolic = true;
 	return true;
 };
@@ -250,7 +249,7 @@ Arithmetic.setNoSymbolic = async (setNoSymbolic, session) => {
 /*
 // N(numeric)
 
-Arithmetic.nNumeric = async (n, session) => {
+const nNumeric = async (n, session) => {
 	if (n.children.length != 1) return false; // forward to N(expr, precision)
 	
 	if (!n.children[0].isInternalNumber()) return false;
@@ -285,7 +284,7 @@ Arithmetic.nNumeric = async (n, session) => {
 };
 
 // N(expression, precision)
-Arithmetic.nPrecision = async (n, session) => {
+const nPrecision = async (n, session) => {
 	//console.log("N(expression, precision)");
 	if (n.children.length < 2) return false; // forward to N(expr)
 	
@@ -312,7 +311,7 @@ Arithmetic.nPrecision = async (n, session) => {
 // addition //
 //////////////
 
-Arithmetic.additionNumeric = async (addition, session) => {
+const additionNumeric = async (addition, session) => {
 	let pos, n = addition.children.length;
 	let number = null;
 	
@@ -392,7 +391,7 @@ Arithmetic.additionNumeric = async (addition, session) => {
 // multiplication //
 ////////////////////
 
-Arithmetic.multiplicationNumeric = async (multiplication, session) => {
+const multiplicationNumeric = async (multiplication, session) => {
 	let pos, n = multiplication.children.length;
 	let number = null;
 	
@@ -484,7 +483,7 @@ Arithmetic.multiplicationNumeric = async (multiplication, session) => {
 // numeric / 0         =>   infinity or -infinity (depends on sign of numerator)
 // numeric / numeric   =>   numeric
 
-Arithmetic.divisionNumerics = async (division, session) => {
+const divisionNumerics = async (division, session) => {
 	if (
 		division.children[0].isInternalNumber() &&
 		division.children[1].isInternalNumber()
@@ -494,7 +493,7 @@ Arithmetic.divisionNumerics = async (division, session) => {
 		
 		// zero denominator
 		if (d.isZero()) {
-			let infinity = Formulae.createExpression(Arithmetic.TAG_INFINITY);
+			let infinity = Formulae.createExpression(TAG_INFINITY);
 			
 			// negative numerator
 			if (n.isNegative()) {
@@ -533,7 +532,7 @@ Arithmetic.divisionNumerics = async (division, session) => {
 
 // number ^ number
 
-Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
+const exponentiationNumerics = async (exponentiation, session) => {
 	if (
 		exponentiation.children[0].isInternalNumber() &&
 		exponentiation.children[1].isInternalNumber()
@@ -608,7 +607,7 @@ Arithmetic.exponentiationNumerics = async (exponentiation, session) => {
 	return false; // Ok, forward to other forms of Division
 };
 
-Arithmetic.comparisonNumerics = async (comparisonExpression, session) => {
+const comparisonNumerics = async (comparisonExpression, session) => {
 	if (
 		!comparisonExpression.children[0].isInternalNumber() ||
 		!comparisonExpression.children[1].isInternalNumber()
@@ -726,7 +725,7 @@ const rationalizeDecimal = (number, repeating, session) => {
 	}
 };
 
-Arithmetic.rationalize = async (rationalize, session) => {
+const rationalize = async (rationalize, session) => {
 	if (!rationalize.children[0].isInternalNumber()) return false;
 	let number = rationalize.children[0].get("Value");
 	
@@ -757,7 +756,7 @@ Arithmetic.rationalize = async (rationalize, session) => {
 	return false;
 };
 
-Arithmetic.absNumeric = async (abs, session) => {
+const absNumeric = async (abs, session) => {
 	if (!abs.children[0].isInternalNumber()) return false;
 	let number = abs.children[0].get("Value");
 	
@@ -786,7 +785,7 @@ Arithmetic.absNumeric = async (abs, session) => {
 	return true;
 };
 
-Arithmetic.signNumeric = async (sign, session) => {
+const signNumeric = async (sign, session) => {
 	if (!sign.children[0].isInternalNumber()) return false;
 	let number = sign.children[0].get("Value");
 	
@@ -809,7 +808,7 @@ Arithmetic.signNumeric = async (sign, session) => {
 // Rounding //
 //////////////
 
-Arithmetic.roundToPrecision = async (roundToPrecision, session) => {
+const roundToPrecision = async (roundToPrecision, session) => {
 	let expr = roundToPrecision.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -821,7 +820,7 @@ Arithmetic.roundToPrecision = async (roundToPrecision, session) => {
 	if (roundToPrecision.children.length >= 3) {
 		let tag = roundToPrecision.children[2].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		roundingMode = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = mapRoundingModes.get(tag);
 	}
 	
 	if (roundingMode !== undefined) {
@@ -839,7 +838,7 @@ Arithmetic.roundToPrecision = async (roundToPrecision, session) => {
 	return true;
 };
 
-Arithmetic.roundToInteger = async (roundToInteger, session) => {
+const roundToInteger = async (roundToInteger, session) => {
 	let expr = roundToInteger.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -848,7 +847,7 @@ Arithmetic.roundToInteger = async (roundToInteger, session) => {
 	if (roundToInteger.children.length >= 2) {
 		let tag = roundToInteger.children[1].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		roundingMode = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = mapRoundingModes.get(tag);
 	}
 	
 	if (roundingMode !== undefined) {
@@ -866,7 +865,7 @@ Arithmetic.roundToInteger = async (roundToInteger, session) => {
 	return true;
 };
 
-Arithmetic.roundToDecimalPlaces = async (roundToDecimalPlaces, session) => {
+const roundToDecimalPlaces = async (roundToDecimalPlaces, session) => {
 	let expr = roundToDecimalPlaces.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -878,7 +877,7 @@ Arithmetic.roundToDecimalPlaces = async (roundToDecimalPlaces, session) => {
 	if (roundToDecimalPlaces.children.length >= 3) {
 		let tag = roundToDecimalPlaces.children[2].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		roundingMode = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = mapRoundingModes.get(tag);
 	}
 	
 	if (roundingMode !== undefined) {
@@ -896,7 +895,7 @@ Arithmetic.roundToDecimalPlaces = async (roundToDecimalPlaces, session) => {
 	return true;
 };
 
-Arithmetic.roundToMultiple = async (roundToMultiple, session) => {
+const roundToMultiple = async (roundToMultiple, session) => {
 	let expr = roundToMultiple.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -911,7 +910,7 @@ Arithmetic.roundToMultiple = async (roundToMultiple, session) => {
 	if (roundToMultiple.children.length >= 3) {
 		let tag = roundToMultiple.children[2].getTag();
 		if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) return false;
-		roundingMode = Arithmetic.mapRoundingModes.get(tag);
+		roundingMode = mapRoundingModes.get(tag);
 	}
 	
 	if (roundingMode !== undefined) {
@@ -932,7 +931,7 @@ Arithmetic.roundToMultiple = async (roundToMultiple, session) => {
 	return true;
 };
 
-Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
+const floorCeilingRoundTruncate = async (fcrt, session) => {
 	let expr = fcrt.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -980,7 +979,7 @@ Arithmetic.floorCeilingRoundTruncate = async (fcrt, session) => {
 	return true;
 };
 
-Arithmetic.divMod = async (divMod, session) => {
+const divMod = async (divMod, session) => {
 	if (!divMod.children[0].isInternalNumber()) return false;
 	let dividend = divMod.children[0].get("Value");
 	
@@ -1020,7 +1019,7 @@ Arithmetic.divMod = async (divMod, session) => {
 	return true;
 };
 
-Arithmetic.modPow = async (modPow, session) => {
+const modPow = async (modPow, session) => {
 	if (
 		!modPow.children[0].isInternalNumber() ||
 		!modPow.children[1].isInternalNumber() ||
@@ -1073,7 +1072,7 @@ Arithmetic.modPow = async (modPow, session) => {
 	return true;
 };
 
-Arithmetic.modInverse = async (modInverse, session) => {
+const modInverse = async (modInverse, session) => {
 	if (
 		!modInverse.children[0].isInternalNumber() ||
 		!modInverse.children[1].isInternalNumber()
@@ -1121,7 +1120,7 @@ Arithmetic.modInverse = async (modInverse, session) => {
 	return true;
 };
 
-Arithmetic.log = async (log, session) => {
+const log = async (log, session) => {
 	if (!log.children[0].isInternalNumber()) return false;
 	
 	let x = log.children[0].get("Value");
@@ -1351,7 +1350,7 @@ Arithmetic.log = async (log, session) => {
 	return true;
 };
 
-Arithmetic.sqrt = async (sqrt, session) => {
+const sqrt = async (sqrt, session) => {
 	let expr = sqrt.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -1448,7 +1447,7 @@ trigHyperMap.set("Math.Hyperbolic.ArcCotangent",    CanonicalArithmetic.inverseH
 trigHyperMap.set("Math.Hyperbolic.ArcSecant",       CanonicalArithmetic.inverseHyperbolicSecant);
 trigHyperMap.set("Math.Hyperbolic.ArcCosecant",     CanonicalArithmetic.inverseHyperbolicCosecant);
 
-Arithmetic.trigHyper = async (f, session) => {
+const trigHyper = async (f, session) => {
 	let expr = f.children[0];
 	
 	if (!expr.isInternalNumber()) return false;
@@ -1498,7 +1497,7 @@ Arithmetic.trigHyper = async (f, session) => {
 	return true;
 };
 
-Arithmetic.atan2 = async (atan2, session) => {
+const atan2 = async (atan2, session) => {
 	if (!atan2.children[0].isInternalNumber()) return false;
 	let numbery = atan2.children[0].get("Value");
 	if (CanonicalArithmetic.isComplex(numbery)) return false;
@@ -1599,7 +1598,7 @@ Arithmetic.atan2 = async (atan2, session) => {
 	return false;
 };
 
-Arithmetic.integerPart = async (f, session) => {
+const integerPart = async (f, session) => {
 	let expr = f.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -1627,7 +1626,7 @@ Arithmetic.integerPart = async (f, session) => {
 	}
 };
 
-Arithmetic.fractionalPart = async (f, session) => {
+const fractionalPart = async (f, session) => {
 	let expr = f.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -1657,12 +1656,12 @@ Arithmetic.fractionalPart = async (f, session) => {
 	}
 };
 
-Arithmetic.isNumeric = async (isNumeric, session) => {
+const isNumeric = async (isNumeric, session) => {
 	isNumeric.replaceBy(Formulae.createExpression(isNumeric.children[0].isInternalNumber() ? "Logic.True" : "Logic.False"));
 	return true;
 };
 
-Arithmetic.isX = async (is, session) => {
+const isX = async (is, session) => {
 	if (!is.children[0].isInternalNumber()) return false;
 	let number = is.children[0].get("Value");
 	
@@ -1740,7 +1739,7 @@ Arithmetic.isX = async (is, session) => {
 	return true;
 };
 
-Arithmetic.toX = async (to, session) => {
+const toX = async (to, session) => {
 	let expr = to.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
@@ -1783,7 +1782,7 @@ Arithmetic.toX = async (to, session) => {
 	return true;
 };
 
-Arithmetic.toNumber = async (toNumber, session) => {
+const toNumber = async (toNumber, session) => {
 	let arg = toNumber.children[0];
 	if (arg.getTag() !== "String.String") return false;
 	let s = arg.get("Value");
@@ -1848,24 +1847,24 @@ Arithmetic.toNumber = async (toNumber, session) => {
 		let negative = false;
 			
 		for (const codePoint of s) {
-  			cp = codePoint.codePointAt(0);
-  			
-  			// minus sign
-  			if (cp == 45) {
-  				if (i != 0) return false;
-  				negative = true;
-  				continue;
-  			}
-  			
-  			// decimal pont
-  			if (cp == 46) {
+			cp = codePoint.codePointAt(0);
+			
+			// minus sign
+			if (cp == 45) {
+				if (i != 0) return false;
+				negative = true;
+				continue;
+			}
+			
+			// decimal pont
+			if (cp == 46) {
 				if (point) return false;
 				point = true;
 				continue;
 			}
-  			
-  			// digit
-  			if (cp >= 48 && cp <= 47 + b) {
+			
+			// digit
+			if (cp >= 48 && cp <= 47 + b) {
 				cp -= 48;
 			}
 			else if (cp >= 65 && cp <= 55 + b) {
@@ -1898,11 +1897,11 @@ Arithmetic.toNumber = async (toNumber, session) => {
 					session
 				);
 			}
-  			
-  			++i;
-  		}
+			
+			++i;
+		}
 		
-  		if (i == 0) return false;
+		if (i == 0) return false;
 		if (negative) number = number.negation();
 		
 		toNumber.replaceBy(CanonicalArithmetic.createInternalNumber(number, session));
@@ -1911,7 +1910,7 @@ Arithmetic.toNumber = async (toNumber, session) => {
 	}
 };
 
-Arithmetic.factorial = async (factorial, session) => {
+const factorial = async (factorial, session) => {
 	let number = CanonicalArithmetic.getNativeInteger(factorial.children[0]);
 	if (number === undefined || number < 0n) return false;
 	number = CanonicalArithmetic.createInteger(number, session);
@@ -1928,7 +1927,7 @@ Arithmetic.factorial = async (factorial, session) => {
 	return true;
 };
 
-Arithmetic.toString = async (toString, session) => {
+const toString = async (toString, session) => {
 	if (!toString.children[0].isInternalNumber()) return false;
 	let number = toString.children[0].get("Value");
 	
@@ -1950,7 +1949,7 @@ Arithmetic.toString = async (toString, session) => {
 	return false;
 };
 
-Arithmetic.digits = async (digits, session) => {
+const digits = async (digits, session) => {
 	if (!digits.children[0].isInternalNumber()) return false;
 	let number = digits.children[0].get("Value");
 	if (!CanonicalArithmetic.isInteger(number)) return false;
@@ -1988,7 +1987,7 @@ Arithmetic.digits = async (digits, session) => {
 	return true;
 };
 
-Arithmetic.toTime = async (toTime, session) => {
+const toTime = async (toTime, session) => {
 	let number = CanonicalArithmetic.getNativeInteger(toTime.children[0]);
 	if (number === undefined) return false;
 	if (number < -8_640_000_000_000_000 || number > 8_640_000_000_000_000) return false;
@@ -1999,7 +1998,7 @@ Arithmetic.toTime = async (toTime, session) => {
 	return true;
 };
 
-Arithmetic.gcdLcm = async (gcdLcm, session) => {
+const gcdLcm = async (gcdLcm, session) => {
 	let list = gcdLcm.children[0];
 	if (list.getTag() !== "List.List") return false;
 	let isGcd = gcdLcm.getTag() === "Math.Arithmetic.GreatestCommonDivisor";
@@ -2063,7 +2062,7 @@ Arithmetic.gcdLcm = async (gcdLcm, session) => {
 	return false; // Ok, forward to other forms of GCD/LCM(...)
 };
 
-Arithmetic.factors = async (factors, session) => {
+const factors = async (factors, session) => {
 	let n = factors.children[0];
 	if (!n.isInternalNumber()) return false;
 	n = n.get("Value");
@@ -2102,7 +2101,7 @@ Arithmetic.factors = async (factors, session) => {
 	return true;
 };
 
-Arithmetic.divisionTest = async (divisionTest, session) => {
+const divisionTest = async (divisionTest, session) => {
 	let divisor = CanonicalArithmetic.getInteger(divisionTest.children[0]);
 	if (divisor === undefined || divisor.isZero()) return false;
 	
@@ -2141,7 +2140,7 @@ Arithmetic.divisionTest = async (divisionTest, session) => {
 	*/
 };
 
-Arithmetic.random = (random, session) => {
+const random = (random, session) => {
 	let precision = -1;
 	if (random.children.length >= 1) {
 		precision = CanonicalArithmetic.getNativeInteger(random.children[0]);
@@ -2156,7 +2155,7 @@ Arithmetic.random = (random, session) => {
 	return true;
 };
 
-Arithmetic.randomInRange = async (randomInRange, session) => {
+const randomInRange = async (randomInRange, session) => {
 	let n1 = CanonicalArithmetic.getNativeInteger(randomInRange.children[0]);
 	if (n1 === undefined) return false;
 	
@@ -2174,7 +2173,7 @@ Arithmetic.randomInRange = async (randomInRange, session) => {
 	return true;
 };
 
-Arithmetic.piecewise = async (piecewise, session) => {
+const piecewise = async (piecewise, session) => {
 	let cases = Math.floor(piecewise.children.length / 2);
 	let result, bkp = null;
 	
@@ -2219,7 +2218,7 @@ Arithmetic.piecewise = async (piecewise, session) => {
 };
 
 
-Arithmetic.constant = async (c, session) => {
+const constant = async (c, session) => {
 	if (session.numeric || session.noSymbolic) {
 		let r;
 		switch (c.getTag()) {
@@ -2238,7 +2237,7 @@ Arithmetic.constant = async (c, session) => {
 	return true;
 };
 
-Arithmetic.summationProductReducer = async (summationProduct, session) => {
+const summationProductReducer = async (summationProduct, session) => {
 	let n = summationProduct.children.length;
 	let summation = summationProduct.getTag() === "Math.Arithmetic.Summation";
 	let result;
@@ -2368,7 +2367,7 @@ Arithmetic.summationProductReducer = async (summationProduct, session) => {
 	return true;
 };
 
-Arithmetic.summationProductListReducer = async (summationProduct, session) => {
+const summationProductListReducer = async (summationProduct, session) => {
 	if (summationProduct.children.length != 3) return false;
 	let summation = summationProduct.getTag() === "Math.Arithmetic.Summation";
 	
@@ -2433,8 +2432,7 @@ Arithmetic.summationProductListReducer = async (summationProduct, session) => {
 	returns (b ^ e) mod m
  */
 
-
-Arithmetic.modularExponentiationNumeric = (x, y, p, session) => {
+const modularExponentiationNumeric = (x, y, p, session) => {
 	// Initialize result
 	
 	let two = CanonicalArithmetic.createInteger(2, session);
@@ -2460,7 +2458,7 @@ Arithmetic.modularExponentiationNumeric = (x, y, p, session) => {
 	Miller-Rabin primality test
  */
 
-Arithmetic.millerRabinTestNumeric = (n, d, session) => {
+const millerRabinTestNumeric = (n, d, session) => {
 	let one = CanonicalArithmetic.getIntegerOne(session);
 	let two = CanonicalArithmetic.createInteger(2, session);
 	
@@ -2470,7 +2468,7 @@ Arithmetic.millerRabinTestNumeric = (n, d, session) => {
 	let a = two.randomInRange(CanonicalArithmetic.subtraction(n, two));
 	
 	// Compute a ^ d % n
-	let x = Arithmetic.modularExponentiationNumeric(a, d, n, session);
+	let x = modularExponentiationNumeric(a, d, n, session);
 	
 	if (x.isOne() || x.comparedTo(CanonicalArithmetic.subtraction(n, one)) === 0) {
 		return true;
@@ -2493,7 +2491,7 @@ Arithmetic.millerRabinTestNumeric = (n, d, session) => {
 	return false;
 };
 
-Arithmetic.isProbablePrimeNumeric = (n, k, session) => {
+const isProbablePrimeNumeric = (n, k, session) => {
 	let one = CanonicalArithmetic.getIntegerOne(session);
 	let two = CanonicalArithmetic.createInteger(2, session);
 	
@@ -2512,7 +2510,7 @@ Arithmetic.isProbablePrimeNumeric = (n, k, session) => {
 	// Iterate given number of 'k' times
 	
 	for (let i = 0; i < k; ++i) {
-		if (!Arithmetic.millerRabinTestNumeric(n, d, session)) {
+		if (!millerRabinTestNumeric(n, d, session)) {
 			return false;
 		}
 	}
@@ -2520,7 +2518,7 @@ Arithmetic.isProbablePrimeNumeric = (n, k, session) => {
 	return true;
 };
 
-Arithmetic.isPrime = async (isPrime, session) => {
+const isPrime = async (isPrime, session) => {
 	if (!isPrime.children[0].isInternalNumber()) return false;
 	let n = isPrime.children[0].get("Value");
 	
@@ -2531,7 +2529,7 @@ Arithmetic.isPrime = async (isPrime, session) => {
 	
 	isPrime.replaceBy(
 		Formulae.createExpression(
-			Arithmetic.isProbablePrimeNumeric(n, 17, session) ? "Logic.True" : "Logic.False"
+			isProbablePrimeNumeric(n, 17, session) ? "Logic.True" : "Logic.False"
 		)
 	);
 	return true;
@@ -2540,146 +2538,144 @@ Arithmetic.isPrime = async (isPrime, session) => {
 Arithmetic.setReducers = () => {
 	// internal numbers
 	
-	ReductionManager.addReducer("Math.InternalNumber", Arithmetic.internalNumber, "Arithmetic.internalNumber");
+	ReductionManager.addReducer("Math.InternalNumber", internalNumber, "Arithmetic.internalNumber");
 	
 	// precision
 	
-	ReductionManager.addReducer("Math.Arithmetic.SignificantDigits", Arithmetic.significantDigits, "Arithmetic.significantDigits");
-	ReductionManager.addReducer("Math.Arithmetic.SetPrecision",      Arithmetic.setPrecision,      "Arithmetic.setPrecision");
-	ReductionManager.addReducer("Math.Arithmetic.GetPrecision",      Arithmetic.getPrecision,      "Arithmetic.getPrecision");
-	ReductionManager.addReducer("Math.Arithmetic.WithPrecision",     Arithmetic.withPrecision,     "Arithmetic.withPrecision", { special: true });
-	
-	// rounding
+	ReductionManager.addReducer("Math.Arithmetic.SignificantDigits", significantDigits, "ArithmeticPackage.significantDigits");
+	ReductionManager.addReducer("Math.Arithmetic.SetPrecision",      setPrecision,      "ArithmeticPackage.setPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.GetPrecision",      getPrecision,      "ArithmeticPackage.getPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.WithPrecision",     withPrecision,     "ArithmeticPackage.withPrecision", { special: true });
 	
 	// rounding mode
 	
-	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode", Arithmetic.setRoundingMode, "Arithmetic.setRoundingMode");
-	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode", Arithmetic.getRoundingMode, "Arithmetic.getRoundingMode");
+	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode", setRoundingMode, "ArithmeticPackage.setRoundingMode");
+	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode", getRoundingMode, "ArithmeticPackage.getRoundingMode");
 	
-	ReductionManager.addReducer("Math.Arithmetic.SetEuclideanDivisionMode", Arithmetic.setEuclideanDivisionMode, "Arithmetic.setEuclideanDivisionMode");
-	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", Arithmetic.getEuclideanDivisionMode, "Arithmetic.getEuclideanDivisionMode");
+	ReductionManager.addReducer("Math.Arithmetic.SetEuclideanDivisionMode", setEuclideanDivisionMode, "ArithmeticPackage.setEuclideanDivisionMode");
+	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", getEuclideanDivisionMode, "ArithmeticPackage.getEuclideanDivisionMode");
 	
-	ReductionManager.addReducer("Math.Numeric", Arithmetic.numeric, "Arithmetic.numeric", { special: true });
-	ReductionManager.addReducer("Math.SetNoSymbolic", Arithmetic.setNoSymbolic, "Arithmetic.setNoSymbolic");
+	ReductionManager.addReducer("Math.Numeric",       numeric,       "ArithmeticPackage.numeric", { special: true });
+	ReductionManager.addReducer("Math.SetNoSymbolic", setNoSymbolic, "ArithmeticPackage.setNoSymbolic");
 	
-	// NO NEGATIVE, acoording to internal representation
-	//ReductionManager.addReducer("Math.Arithmetic.Negative",       Arithmetic.negativeNumeric,        "Arithmetic.negativeNumeric");
+	// NO NEGATIVES, acoording to internal representation
+	//ReductionManager.addReducer("Math.Arithmetic.Negative", negativeNumeric, "ArithmeticPackage.negativeNumeric");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Addition",       Arithmetic.additionNumeric,        "Arithmetic.additionNumeric");
-	ReductionManager.addReducer("Math.Arithmetic.Multiplication", Arithmetic.multiplicationNumeric,  "Arithmetic.multiplicationNumeric");
-	ReductionManager.addReducer("Math.Arithmetic.Division",       Arithmetic.divisionNumerics,       "Arithmetic.divisionNumerics");
-	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", Arithmetic.exponentiationNumerics, "Arithmetic.exponentiationNumerics");
+	ReductionManager.addReducer("Math.Arithmetic.Addition",       additionNumeric,        "ArithmeticPackage.additionNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.Multiplication", multiplicationNumeric,  "ArithmeticPackage.multiplicationNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.Division",       divisionNumerics,       "ArithmeticPackage.divisionNumerics");
+	ReductionManager.addReducer("Math.Arithmetic.Exponentiation", exponentiationNumerics, "ArithmeticPackage.exponentiationNumerics");
 	
-	ReductionManager.addReducer("Relation.Compare", Arithmetic.comparisonNumerics, "Arithmetic.comparisonNumerics");
+	ReductionManager.addReducer("Relation.Compare", comparisonNumerics, "ArithmeticPackage.comparisonNumerics");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Rationalize",   Arithmetic.rationalize, "Arithmetic.rationalize");
-	ReductionManager.addReducer("Math.Arithmetic.AbsoluteValue", Arithmetic.absNumeric,  "Arithmetic.absNumeric");
-	ReductionManager.addReducer("Math.Arithmetic.Sign",          Arithmetic.signNumeric, "Arithmetic.signNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.Rationalize",   rationalize, "ArithmeticPackage.rationalize");
+	ReductionManager.addReducer("Math.Arithmetic.AbsoluteValue", absNumeric,  "ArithmeticPackage.absNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.Sign",          signNumeric, "ArithmeticPackage.signNumeric");
 	
 	// rounding
 	
-	ReductionManager.addReducer("Math.Arithmetic.RoundToPrecision",     Arithmetic.roundToPrecision,     "Arithmetic.roundToPrecision");
-	ReductionManager.addReducer("Math.Arithmetic.RoundToInteger",       Arithmetic.roundToInteger,       "Arithmetic.roundToInteger");
-	ReductionManager.addReducer("Math.Arithmetic.RoundToDecimalPlaces", Arithmetic.roundToDecimalPlaces, "Arithmetic.roundToDecimalPlaces");
-	ReductionManager.addReducer("Math.Arithmetic.RoundToMultiple",      Arithmetic.roundToMultiple,      "Arithmetic.roundToMultiple");
+	ReductionManager.addReducer("Math.Arithmetic.RoundToPrecision",     roundToPrecision,     "ArithmeticPackage.roundToPrecision");
+	ReductionManager.addReducer("Math.Arithmetic.RoundToInteger",       roundToInteger,       "ArithmeticPackage.roundToInteger");
+	ReductionManager.addReducer("Math.Arithmetic.RoundToDecimalPlaces", roundToDecimalPlaces, "ArithmeticPackage.roundToDecimalPlaces");
+	ReductionManager.addReducer("Math.Arithmetic.RoundToMultiple",      roundToMultiple,      "ArithmeticPackage.roundToMultiple");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Truncate", Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
-	ReductionManager.addReducer("Math.Arithmetic.Ceiling",  Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
-	ReductionManager.addReducer("Math.Arithmetic.Floor",    Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
-	ReductionManager.addReducer("Math.Arithmetic.Round",    Arithmetic.floorCeilingRoundTruncate, "Arithmetic.floorCeilingRoundTruncate");
+	ReductionManager.addReducer("Math.Arithmetic.Truncate", floorCeilingRoundTruncate, "ArithmeticPackage.floorCeilingRoundTruncate");
+	ReductionManager.addReducer("Math.Arithmetic.Ceiling",  floorCeilingRoundTruncate, "ArithmeticPackage.floorCeilingRoundTruncate");
+	ReductionManager.addReducer("Math.Arithmetic.Floor",    floorCeilingRoundTruncate, "ArithmeticPackage.floorCeilingRoundTruncate");
+	ReductionManager.addReducer("Math.Arithmetic.Round",    floorCeilingRoundTruncate, "ArithmeticPackage.floorCeilingRoundTruncate");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Div",    Arithmetic.divMod, "Arithmetic.divMod");
-	ReductionManager.addReducer("Math.Arithmetic.Mod",    Arithmetic.divMod, "Arithmetic.divMod");
-	ReductionManager.addReducer("Math.Arithmetic.DivMod", Arithmetic.divMod, "Arithmetic.divMod");
+	ReductionManager.addReducer("Math.Arithmetic.Div",    divMod, "ArithmeticPackage.divMod");
+	ReductionManager.addReducer("Math.Arithmetic.Mod",    divMod, "ArithmeticPackage.divMod");
+	ReductionManager.addReducer("Math.Arithmetic.DivMod", divMod, "ArithmeticPackage.divMod");
 	
-	ReductionManager.addReducer("Math.Arithmetic.ModularExponentiation"       , Arithmetic.modPow,     "Arithmetic.modPow");
-	ReductionManager.addReducer("Math.Arithmetic.ModularMultiplicativeInverse", Arithmetic.modInverse, "Arithmetic.modInverse");
+	ReductionManager.addReducer("Math.Arithmetic.ModularExponentiation"       , modPow,     "ArithmeticPackage.modPow");
+	ReductionManager.addReducer("Math.Arithmetic.ModularMultiplicativeInverse", modInverse, "ArithmeticPackage.modInverse");
 	
-	ReductionManager.addReducer("Math.Transcendental.NaturalLogarithm", Arithmetic.log, "Arithmetic.log");
-	ReductionManager.addReducer("Math.Transcendental.DecimalLogarithm", Arithmetic.log, "Arithmetic.log");
-	ReductionManager.addReducer("Math.Transcendental.BinaryLogarithm",  Arithmetic.log, "Arithmetic.log");
-	ReductionManager.addReducer("Math.Transcendental.Logarithm",        Arithmetic.log, "Arithmetic.log");
+	ReductionManager.addReducer("Math.Transcendental.NaturalLogarithm", log, "ArithmeticPackage.log");
+	ReductionManager.addReducer("Math.Transcendental.DecimalLogarithm", log, "ArithmeticPackage.log");
+	ReductionManager.addReducer("Math.Transcendental.BinaryLogarithm",  log, "ArithmeticPackage.log");
+	ReductionManager.addReducer("Math.Transcendental.Logarithm",        log, "ArithmeticPackage.log");
 	
-	ReductionManager.addReducer("Math.Arithmetic.SquareRoot", Arithmetic.sqrt, "Arithmetic.sqrt");
+	ReductionManager.addReducer("Math.Arithmetic.SquareRoot", sqrt, "ArithmeticPackage.sqrt");
 	
-	ReductionManager.addReducer("Math.Trigonometric.Sine",         Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.Cosine",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.Tangent",      Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.Cotangent",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.Secant",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.Cosecant",     Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.ArcSine",      Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.ArcCosine",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.ArcTangent",   Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.ArcCotangent", Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.ArcSecant",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.ArcCosecant",  Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Trigonometric.ArcTangent2",  Arithmetic.atan2,     "Arithmetic.atan2");
+	ReductionManager.addReducer("Math.Trigonometric.Sine",         trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Cosine",       trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Tangent",      trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Cotangent",    trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Secant",       trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.Cosecant",     trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcSine",      trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcCosine",    trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcTangent",   trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcCotangent", trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcSecant",    trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcCosecant",  trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Trigonometric.ArcTangent2",  atan2,     "ArithmeticPackage.atan2");
 	
-	ReductionManager.addReducer("Math.Hyperbolic.Sine",            Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.Cosine",          Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.Tangent",         Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.Cotangent",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.Secant",          Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.Cosecant",        Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.ArcSine",         Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.ArcCosine",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.ArcTangent",      Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.ArcCotangent",    Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.ArcSecant",       Arithmetic.trigHyper, "Arithmetic.trigHyper");
-	ReductionManager.addReducer("Math.Hyperbolic.ArcCosecant",     Arithmetic.trigHyper, "Arithmetic.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Sine",            trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Cosine",          trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Tangent",         trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Cotangent",       trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Secant",          trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.Cosecant",        trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcSine",         trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcCosine",       trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcTangent",      trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcCotangent",    trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcSecant",       trigHyper, "ArithmeticPackage.trigHyper");
+	ReductionManager.addReducer("Math.Hyperbolic.ArcCosecant",     trigHyper, "ArithmeticPackage.trigHyper");
 	
-	ReductionManager.addReducer("Math.Arithmetic.IntegerPart",    Arithmetic.integerPart,    "Arithmetic.integerPart");
-	ReductionManager.addReducer("Math.Arithmetic.FractionalPart", Arithmetic.fractionalPart, "Arithmetic.fractionalPart");
-	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces",  Arithmetic.decimalPlaces,  "Arithmetic.decimalPlaces");
+	ReductionManager.addReducer("Math.Arithmetic.IntegerPart",    integerPart,    "ArithmeticPackage.integerPart");
+	ReductionManager.addReducer("Math.Arithmetic.FractionalPart", fractionalPart, "ArithmeticPackage.fractionalPart");
+	ReductionManager.addReducer("Math.Arithmetic.DecimalPlaces",  decimalPlaces,  "ArithmeticPackage.decimalPlaces");
 	
-	ReductionManager.addReducer("Math.Arithmetic.IsNumeric",        Arithmetic.isNumeric, "Arithmetic.isNumeric");
+	ReductionManager.addReducer("Math.Arithmetic.IsNumeric",        isNumeric, "ArithmeticPackage.isNumeric");
 	
-	ReductionManager.addReducer("Math.Arithmetic.IsRealNumber",     Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsRationalNumber", Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsNumeric",        Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsIntegerValue",   Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsInteger",        Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsDecimal",        Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsNegativeNumber", Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsPositiveNumber", Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsNumberZero",     Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsEven",           Arithmetic.isX, "Arithmetic.isX");
-	ReductionManager.addReducer("Math.Arithmetic.IsOdd",            Arithmetic.isX, "Arithmetic.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsRealNumber",     isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsRationalNumber", isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsIntegerValue",   isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsInteger",        isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsDecimal",        isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsNegativeNumber", isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsPositiveNumber", isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsNumberZero",     isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsEven",           isX, "ArithmeticPackage.isX");
+	ReductionManager.addReducer("Math.Arithmetic.IsOdd",            isX, "ArithmeticPackage.isX");
 	
-	ReductionManager.addReducer("Math.Arithmetic.ToInteger",   Arithmetic.toX,      "Arithmetic.toX");
-	ReductionManager.addReducer("Math.Arithmetic.ToIfInteger", Arithmetic.toX,      "Arithmetic.toX");
-	ReductionManager.addReducer("Math.Arithmetic.ToDecimal",   Arithmetic.toX,      "Arithmetic.toX");
-	ReductionManager.addReducer("Math.Arithmetic.ToNumber",    Arithmetic.toNumber, "Arithmetic.toNumber");
+	ReductionManager.addReducer("Math.Arithmetic.ToInteger",   toX, "ArithmeticPackage.toX");
+	ReductionManager.addReducer("Math.Arithmetic.ToIfInteger", toX, "ArithmeticPackage.toX");
+	ReductionManager.addReducer("Math.Arithmetic.ToDecimal",   toX, "ArithmeticPackage.toX");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Factorial", Arithmetic.factorial, "Arithmetic.factorial");
+	ReductionManager.addReducer("Math.Arithmetic.ToNumber", toNumber, "ArithmeticPackage.toNumber");
 	
-	ReductionManager.addReducer("String.ToString", Arithmetic.toString, "Arithmetic.toString");
-	ReductionManager.addReducer("Time.ToTime",     Arithmetic.toTime,   "Arithmetic.toTime");
+	ReductionManager.addReducer("Math.Arithmetic.Factorial", factorial, "ArithmeticPackage.factorial");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Digits", Arithmetic.digits, "Arithmetic.digits");
+	ReductionManager.addReducer("String.ToString", toString, "ArithmeticPackage.toString");
+	ReductionManager.addReducer("Time.ToTime",     toTime,   "ArithmeticPackage.toTime");
 	
-	ReductionManager.addReducer("Math.Arithmetic.GreatestCommonDivisor", Arithmetic.gcdLcm, "Arithmetic.gcdLcm");
-	ReductionManager.addReducer("Math.Arithmetic.LeastCommonMultiple",   Arithmetic.gcdLcm, "Arithmetic.gcdLcm");
+	ReductionManager.addReducer("Math.Arithmetic.Digits", digits, "ArithmeticPackage.digits");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Factors", Arithmetic.factors, "Arithmetic.factors");
+	ReductionManager.addReducer("Math.Arithmetic.GreatestCommonDivisor", gcdLcm, "ArithmeticPackage.gcdLcm");
+	ReductionManager.addReducer("Math.Arithmetic.LeastCommonMultiple",   gcdLcm, "ArithmeticPackage.gcdLcm");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Divides",       Arithmetic.divisionTest, "Arithmetic.divisionTest");
-	ReductionManager.addReducer("Math.Arithmetic.DoesNotDivide", Arithmetic.divisionTest, "Arithmetic.divisionTest");
+	ReductionManager.addReducer("Math.Arithmetic.Factors", factors, "ArithmeticPackage.factors");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Random",        Arithmetic.random,        "Arithmetic.random");
-	ReductionManager.addReducer("Math.Arithmetic.RandomInRange", Arithmetic.randomInRange, "Arithmetic.randomInRange");
+	ReductionManager.addReducer("Math.Arithmetic.Divides",       divisionTest, "ArithmeticPackage.divisionTest");
+	ReductionManager.addReducer("Math.Arithmetic.DoesNotDivide", divisionTest, "ArithmeticPackage.divisionTest");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Piecewise", Arithmetic.piecewise, "Arithmetic.piecewise", { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Random",        random,        "ArithmeticPackage.random");
+	ReductionManager.addReducer("Math.Arithmetic.RandomInRange", randomInRange, "ArithmeticPackage.randomInRange");
 	
-	ReductionManager.addReducer("Math.Constant.Pi",    Arithmetic.constant, "Arithmetic.constant");
-	ReductionManager.addReducer("Math.Constant.Euler", Arithmetic.constant, "Arithmetic.constant");
+	ReductionManager.addReducer("Math.Arithmetic.Piecewise", piecewise, "ArithmeticPackage.piecewise", { special: true });
 	
-	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductReducer,     "Arithmetic.summationProductReducer", { special: true });
-	ReductionManager.addReducer("Math.Arithmetic.Summation", Arithmetic.summationProductListReducer, "Arithmetic.summationProductListReducer", { special: true });
-	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductReducer    , "Arithmetic.summationProductReducer", { special: true });
-	ReductionManager.addReducer("Math.Arithmetic.Product",   Arithmetic.summationProductListReducer, "Arithmetic.summationProductListReducer", { special: true });
+	ReductionManager.addReducer("Math.Constant.Pi",    constant, "ArithmeticPackage.constant");
+	ReductionManager.addReducer("Math.Constant.Euler", constant, "ArithmeticPackage.constant");
 	
-	ReductionManager.addReducer("Math.Arithmetic.IsPrime", Arithmetic.isPrime, "Arithmetic.isPrime");
+	ReductionManager.addReducer("Math.Arithmetic.Summation", summationProductReducer,     "ArithmeticPackage.summationProductReducer", { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Summation", summationProductListReducer, "ArithmeticPackage.summationProductListReducer", { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Product",   summationProductReducer    , "ArithmeticPackage.summationProductReducer", { special: true });
+	ReductionManager.addReducer("Math.Arithmetic.Product",   summationProductListReducer, "ArithmeticPackage.summationProductListReducer", { special: true });
+	
+	ReductionManager.addReducer("Math.Arithmetic.IsPrime", isPrime, "ArithmeticPackage.isPrime");
 };
 

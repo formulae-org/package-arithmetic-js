@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export class Arithmetic extends Formulae.EditionPackage {};
 
-Arithmetic.editionNumber = function() {
+const editionNumber = function() {
 	let number, s;
 	
 	while (true) {
@@ -44,7 +44,7 @@ Arithmetic.editionNumber = function() {
 	Formulae.setSelected(Formulae.sHandler, n, false);
 }
 
-Arithmetic.actionNumber = {
+const actionNumber = {
 	isAvailableNow: () => Formulae.sHandler.type != Formulae.ROW_OUTPUT,
 	getDescription: () => Arithmetic.messages.actionNumber,
 	doAction: () => {
@@ -87,7 +87,7 @@ Arithmetic.actionNumber = {
 	}
 };
 
-Arithmetic.editionNegative = function() {
+const editionNegative = function() {
 	let negative = Formulae.createExpression("Math.Arithmetic.Negative");
 	Formulae.sExpression.replaceBy(negative);
 	negative.addChild(Formulae.sExpression);
@@ -96,7 +96,7 @@ Arithmetic.editionNegative = function() {
 	Formulae.setSelected(Formulae.sHandler, Formulae.sExpression, false);
 }
 
-Arithmetic.operatorEdition = function(tag, next, forced, negative) {
+const operatorEdition = function(tag, next, forced, negative) {
 	let nullExpr = new Expression.Null();
 	let newExpr;
 	
@@ -124,29 +124,29 @@ Arithmetic.operatorEdition = function(tag, next, forced, negative) {
 };
 
 Arithmetic.setEditions = function() {
-	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = Arithmetic.editionNumber);
+	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = editionNumber);
 	
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumeric, () => Expression.wrapperEdition("Math.Numeric"));
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafSetNoSymbolic, () => Expression.replacingEdition("Math.SetNoSymbolic"));
 	
 	Formulae.addEdition(this.messages.pathMath, null, "∞", () => Expression.replacingEdition("Math.Infinity"));
 	
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafNegative, Formulae.editionNegative = Arithmetic.editionNegative);
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafNegative, Formulae.editionNegative = editionNegative);
 	
-	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionAfter,        Formulae.editionAddition = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  false, false));
-	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionAfterForced,  () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  true,  false));
-	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionBefore,       Formulae.editionAdditionAlt = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, false, false));
-	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionBeforeForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, true,  false));
+	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionAfter,        Formulae.editionAddition = () => operatorEdition("Math.Arithmetic.Addition", true,  false, false));
+	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionAfterForced,  () => operatorEdition("Math.Arithmetic.Addition", true,  true,  false));
+	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionBefore,       Formulae.editionAdditionAlt = () => operatorEdition("Math.Arithmetic.Addition", false, false, false));
+	Formulae.addEdition(this.messages.pathAddition, null, this.messages.leafAdditionBeforeForced, () => operatorEdition("Math.Arithmetic.Addition", false, true,  false));
 	
-	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionAfter,        Formulae.editionSubtraction = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  false, true));
-	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionAfterForced,  () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", true,  true,  true));
-	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionBefore,       Formulae.aditionSubtractionAlt = () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, false, true));
-	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionBeforeForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Addition", false, true,  true));
+	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionAfter,        Formulae.editionSubtraction = () => operatorEdition("Math.Arithmetic.Addition", true,  false, true));
+	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionAfterForced,  () => operatorEdition("Math.Arithmetic.Addition", true,  true,  true));
+	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionBefore,       Formulae.aditionSubtractionAlt = () => operatorEdition("Math.Arithmetic.Addition", false, false, true));
+	Formulae.addEdition(this.messages.pathSubtraction, null, this.messages.leafSubtractionBeforeForced, () => operatorEdition("Math.Arithmetic.Addition", false, true,  true));
 	
-	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationAfter,       Formulae.editionMultiplication = () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", true,  false, false));
-	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationAfterForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", true,  true,  false));
-	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationBefore,      Formulae.editionMultiplicationAlt = () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", false, false, false));
-	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationBeforeForced, () => Arithmetic.operatorEdition("Math.Arithmetic.Multiplication", false, true,  false));
+	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationAfter,       Formulae.editionMultiplication = () => operatorEdition("Math.Arithmetic.Multiplication", true,  false, false));
+	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationAfterForced, () => operatorEdition("Math.Arithmetic.Multiplication", true,  true,  false));
+	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationBefore,      Formulae.editionMultiplicationAlt = () => operatorEdition("Math.Arithmetic.Multiplication", false, false, false));
+	Formulae.addEdition(this.messages.pathMultiplication, null, this.messages.leafMultiplicationBeforeForced, () => operatorEdition("Math.Arithmetic.Multiplication", false, true,  false));
 	
 	Formulae.addEdition(this.messages.pathDivision, null, this.messages.leafDenominator, () => Expression.binaryEdition("Math.Arithmetic.Division", false));
 	Formulae.addEdition(this.messages.pathDivision, null, this.messages.leafNumerator,   () => Expression.binaryEdition("Math.Arithmetic.Division", true));
@@ -280,5 +280,5 @@ Arithmetic.setEditions = function() {
 };
 
 Arithmetic.setActions = function() {
-	Formulae.addAction("Math.Number", Arithmetic.actionNumber);
+	Formulae.addAction("Math.Number", actionNumber);
 };

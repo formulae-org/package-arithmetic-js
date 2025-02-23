@@ -20,12 +20,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export class Arithmetic extends Formulae.ExpressionPackage {};
 
-Arithmetic.TAG_NUMBER = "Math.Number";
+const TAG_NUMBER = "Math.Number";
 
-Arithmetic.decimalIntegerZero = true; // true -> 5.0    false -> 5.
-
-Arithmetic.Number = class extends Expression.NullaryExpression {
-	getTag() { return Arithmetic.TAG_NUMBER; }
+const Number = class extends Expression.NullaryExpression {
+	getTag() { return TAG_NUMBER; }
 	getName() { return Arithmetic.messages.nameNumber; }
 	
 	//clone() {
@@ -162,7 +160,7 @@ Arithmetic.Number = class extends Expression.NullaryExpression {
 	}
 }
 
-Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
+const InternalNumber = class extends Expression.NullaryExpression {
 	getTag() { return "Math.InternalNumber"; }
 	getName() { return "Internal number"; }
 	isInternalNumber() { return true; }
@@ -226,17 +224,17 @@ Arithmetic.InternalNumber = class extends Expression.NullaryExpression {
 	}
 }
 
-Arithmetic.Negative = class extends Expression.UnaryExpression {
+const Negative = class extends Expression.UnaryExpression {
 	getTag() { return "Math.Arithmetic.Negative"; }
 	getName() { return Arithmetic.messages.nameNegative; }
 	parenthesesWhenSuperSubscripted() { return true; }
-
+	
 	prepareDisplay(context) {
 		let child = this.children[0];
 		child.prepareDisplay(context);
-
-		this.width = Math.ceil(context.measureText("-").width) + Arithmetic.Negative.SPACE;
-
+		
+		this.width = Math.ceil(context.measureText("-").width) + Negative.SPACE;
+		
 		if (child.parenthesesAsOperator()) {
 			this.width += 4;
 			child.x = this.width;
@@ -246,23 +244,23 @@ Arithmetic.Negative = class extends Expression.UnaryExpression {
 			child.x = this.width;
 			this.width += child.width;
 		}
-
+		
 		child.y = 0;
-
+		
 		this.height = child.height;
 		this.horzBaseline = child.horzBaseline;
 		this.vertBaseline = child.x + child.vertBaseline;
 	}
-
+	
 	display(context, x, y) {
 		let child = this.children[0];
-
+		
 		super.drawText(context, "-", x, y + this.horzBaseline + Math.round(context.fontInfo.size / 2));
-
+		
 		if (child.parenthesesAsOperator()) {
 			child.drawParenthesesAround(context, x + child.x, y + child.y);
 		}
-
+		
 		child.display(context, x + child.x, y + child.y);
 	}
 	
@@ -271,58 +269,58 @@ Arithmetic.Negative = class extends Expression.UnaryExpression {
 	}
 }
 
-Arithmetic.Negative.SPACE = 2;
+Negative.SPACE = 2;
 
-Arithmetic.Addition = class extends Expression.OperatorExpression {
+const Addition = class extends Expression.OperatorExpression {
 	constructor() {
 		super();
-
+		
 		this.plusWidth = 0;
 		this.minusWidth = 0;
 	}
-
+	
 	getTag() { return "Math.Arithmetic.Addition"; }
 	getName() { return Arithmetic.messages.nameAddition; }
 	getChildName(index) { return Arithmetic.messages.childAddition; }
 	parenthesesAsOperator() { return true; }
 	parenthesesWhenSuperSubscripted() { return true; }
-
+	
 	prepareDisplay(context) {
 		this.horzBaseline = 0;
 		this.width = 0;
-
+		
 		this.plusWidth = Math.round(context.measureText("+").width);
 		this.minusWidth = Math.round(context.measureText("-").width);
-
+		
 		let maxSemiHeight = 0;
 		
 		let i, child;
 		for (i = 0; i < this.children.length; ++i) {
 			child = this.children[i];
-
+			
 			if (i > 0 && child.getTag() == "Math.Arithmetic.Negative") {
 				let grandChild = child.children[0];
 				
 				grandChild.prepareDisplay(context);
-
+				
 				grandChild.x = this.minusWidth + 5;
 				grandChild.y = 0;
-
+				
 				child.width = grandChild.x + grandChild.width;
 				child.height = grandChild.height;
 				child.horzBaseline = grandChild.horzBaseline;
 				child.vertBaseline = grandChild.x + grandChild.vertBaseline;
-
+				
 				if (grandChild.parenthesesAsOperator()) {
 					grandChild.x += 4;
 					child.vertBaseline += 4;
 					child.width += 4;
 				}
-
+				
 				this.width += 5;
 				child.x = this.width;
 				this.width += child.width;
-
+				
 				if (grandChild.parenthesesAsOperator()) {
 					this.width += 4;
 				}					
@@ -331,21 +329,21 @@ Arithmetic.Addition = class extends Expression.OperatorExpression {
 				if (child.parenthesesAsOperator()) {
 					this.width += 4;
 				}
-
+				
 				child.prepareDisplay(context);
-
+				
 				if (i > 0) {
 					this.width += 5 + this.plusWidth + 5;
 				}
-
+				
 				child.x = this.width;
 				this.width += child.width;
-
+				
 				if (child.parenthesesAsOperator()) {
 					this.width += 4;
 				}
 			}
-
+			
 			if (child.horzBaseline > this.horzBaseline) this.horzBaseline = child.horzBaseline;
 			if (child.height - child.horzBaseline > maxSemiHeight) maxSemiHeight = child.height - child.horzBaseline;
 		}
@@ -361,30 +359,30 @@ Arithmetic.Addition = class extends Expression.OperatorExpression {
 	
 	display(context, x, y) {
 		let i, child, pos;
-
+		
 		for (i = 0; i < this.children.length; ++i) {
 			child = this.children[i];
 			if (i > 0 && child.getTag() == "Math.Arithmetic.Negative") {
 				let grandChild = child.children[0];
-
+				
 				grandChild.display(context, x + child.x + grandChild.x, y + child.y);
-
+				
 				if (grandChild.parenthesesAsOperator()) {
 					grandChild.drawParenthesesAround(context, x + child.x + grandChild.x, y + child.y + grandChild.y);
 				}
-
+				
 				super.drawText(context, "-", x + child.x, y + this.horzBaseline + Math.round(context.fontInfo.size / 2));
 			}
 			else {
 				pos = x + child.x;
-
+				
 				child.display(context, pos, y + child.y);
-
+				
 				if (child.parenthesesAsOperator()) {
 					child.drawParenthesesAround(context, pos, y + child.y);
 					pos -= 4;
 				}
-
+				
 				if (i > 0) {
 					super.drawText(context, "+", pos - 5 - this.plusWidth, y + this.horzBaseline + Math.round(context.fontInfo.size / 2));
 				}
@@ -399,23 +397,23 @@ Arithmetic.Addition = class extends Expression.OperatorExpression {
 	}
 }
 
-Arithmetic.Multiplication = class extends Expression.OperatorExpression {
+const Multiplication = class extends Expression.OperatorExpression {
 	constructor() {
 		super();
 		this.symbolWidth = 0;
 	}
-
+	
 	getTag() { return "Math.Arithmetic.Multiplication"; }
 	getName() { return Arithmetic.messages.nameMultiplication }
 	getChildName(index) { return Arithmetic.messages.childMultiplication; }
 	parenthesesWhenSuperSubscripted() { return true; }
-
+	
 	prepareDisplay(context) {
 		this.horzBaseline = 0;
 		this.width = 0;
-
+		
 		this.symbolWidth = Math.round(context.measureText("×").width);
-
+		
 		let maxSemiHeight = 0;
 		let isNumber, wasNumber = false;
 		
@@ -423,19 +421,19 @@ Arithmetic.Multiplication = class extends Expression.OperatorExpression {
 		for (i = 0; i < this.children.length; ++i) {
 			child = this.children[i];
 			isNumber = child.getTag() === "Math.Number";
-
+			
 			parentheses =
 				child.parenthesesAsOperator() ||
 				child.getTag() == "Math.Arithmetic.Multiplication" ||
 				child.getTag() == "Math.Arithmetic.Negative"
 			;
-
+			
 			if (parentheses) {
 				this.width += 4;
 			}
-
+			
 			child.prepareDisplay(context);
-
+			
 			if (i > 0) {
 				if (isNumber && wasNumber) {
 					this.width += 5 + this.symbolWidth + 5;
@@ -444,17 +442,17 @@ Arithmetic.Multiplication = class extends Expression.OperatorExpression {
 					this.width += 5;
 				}
 			}
-
+			
 			child.x = this.width;
 			this.width += child.width;
-
+			
 			if (parentheses) {
 				this.width += 4;
 			}
-
+			
 			if (child.horzBaseline > this.horzBaseline) this.horzBaseline = child.horzBaseline;
 			if (child.height - child.horzBaseline > maxSemiHeight) maxSemiHeight = child.height - child.horzBaseline;
-
+			
 			wasNumber = isNumber;
 		}
 		
@@ -470,29 +468,29 @@ Arithmetic.Multiplication = class extends Expression.OperatorExpression {
 	display(context, x, y) {
 		let i, child, pos, parentheses;
 		let isNumber, wasNumber = false;
-
+		
 		for (i = 0; i < this.children.length; ++i) {
 			child = this.children[i];
 			isNumber = child.getTag() == "Math.Number";
-
+			
 			parentheses =
 				child.parenthesesAsOperator() ||
 				child.getTag() == "Math.Arithmetic.Multiplication" ||
 				child.getTag() == "Math.Arithmetic.Negative"
 			;
-
+			
 			pos = x + child.x;
 			child.display(context, pos, y + child.y);
-
+			
 			if (parentheses) {
 				child.drawParenthesesAround(context, pos, y + child.y);
 				pos -= 4;
 			}
-
+			
 			if (i > 0 && isNumber && wasNumber) {
 				super.drawText(context, "×", pos - 5 - this.symbolWidth, y + this.horzBaseline + Math.round(context.fontInfo.size / 2));
 			}
-
+			
 			wasNumber = isNumber;
 		}
 	}
@@ -504,12 +502,12 @@ Arithmetic.Multiplication = class extends Expression.OperatorExpression {
 	}
 }
 
-Arithmetic.Division = class extends Expression.BinaryExpression {
+const Division = class extends Expression.BinaryExpression {
 	getTag() { return "Math.Arithmetic.Division"; }
 	getName() { return Arithmetic.messages.nameDivision; }
 	getChildName(index) { return Arithmetic.messages.childrenDivision[index]; }
 	parenthesesWhenSuperSubscripted() { return true; }
-
+	
 	moveAcross(i, direction) {
 		if (direction == Expression.UP) {
 			if (i == 1) {
@@ -567,10 +565,10 @@ Arithmetic.Division = class extends Expression.BinaryExpression {
 	}
 }
 
-Arithmetic.SquareRoot = class extends Expression.UnaryExpression {
+const SquareRoot = class extends Expression.UnaryExpression {
 	getTag() { return "Math.Arithmetic.SquareRoot"; }
 	getName() { return Arithmetic.messages.nameSquareRoot; }
-
+	
 	prepareDisplay(context) {
 		let child = this.children[0];
 		
@@ -602,7 +600,7 @@ Arithmetic.SquareRoot = class extends Expression.UnaryExpression {
 		context.lineTo (x + w,                   y                  ); // preventing obfuscation
 		context.lineTo (x + w + 3 + child.width, y                  ); // preventing obfuscation
 		context.stroke();
-
+		
 		child.display(context, Math.floor(x + child.x), Math.floor(y + child.y));
 	}
 	
@@ -611,7 +609,7 @@ Arithmetic.SquareRoot = class extends Expression.UnaryExpression {
 	}
 }
 
-Arithmetic.AbsFloorCeiling = class extends Expression {
+const AbsFloorCeiling = class extends Expression {
 	getTag() {
 		switch (this.type) {
 			case 0: return "Math.Arithmetic.AbsoluteValue";
@@ -619,7 +617,7 @@ Arithmetic.AbsFloorCeiling = class extends Expression {
 			case 2: return "Math.Arithmetic.Ceiling";
 		}
 	}
-
+	
 	getName() {
 		switch (this.type) {
 			case 0: return Arithmetic.messages.nameAbsoluteValue;
@@ -627,25 +625,25 @@ Arithmetic.AbsFloorCeiling = class extends Expression {
 			case 2: return Arithmetic.messages.nameCeiling;
 		}
 	}
-
+	
 	getChildName(index) { return Arithmetic.messages.childrenRoundingTruncation[index]; }
-
+	
 	canHaveChildren(count)  { return count == 1 || (this.type != 0 && count == 2); }
-
+	
 	prepareDisplay(context) {
 		if (this.children.length > 1) {
 			this.children[0].prepareDisplay(context);
 			this.children[1].prepareDisplay(context);
-
+			
 			this.getMnemonic = this.type == 1 ? () => Arithmetic.messages.mnemonicFloor : () => Arithmetic.messages.mnemonicCeiling;
 			this.prepareDisplayAsFunction(context);
-
+			
 			return;
 		}
-
+		
 		let child = this.children[0];
 		child.prepareDisplay(context);
-
+		
 		child.x = 3;
 		child.y = 3;
 		
@@ -657,19 +655,19 @@ Arithmetic.AbsFloorCeiling = class extends Expression {
 	
 	display(context, x, y) {
 		let child;
-
+		
 		if (this.children.length > 1) {
 			child = this.children[0]; child.display(context, x + child.x, y + child.y);
 			child = this.children[1]; child.display(context, x + child.x, y + child.y);
 			this.displayAsFunction(context, x, y);
 			return;
 		}
-
+		
 		child = this.children[0];
 		child.display(context, x + child.x, y + child.y);
-
+		
 		context.beginPath();
-
+		
 		if (this.type == 2) {
 			context.moveTo (x + 3, y); // preventing obfuscation
 			context.lineTo (x, y);     // preventing obfuscation
@@ -679,7 +677,7 @@ Arithmetic.AbsFloorCeiling = class extends Expression {
 		}
 		context.lineTo(x, y + this.height);
 		if (this.type == 1) context.lineTo(x + 3, y + this.height);
-
+		
 		if (this.type == 2) {
 			context.moveTo (x + this.width - 3, y); // preventing obfuscation
 			context.lineTo (x + this.width, y);     // preventing obfuscation
@@ -689,12 +687,12 @@ Arithmetic.AbsFloorCeiling = class extends Expression {
 		}
 		context.lineTo(x + this.width, y + this.height);
 		if (this.type == 1) context.lineTo(x + this.width - 3, y + this.height);
-
+		
 		context.stroke();
 	}
 }
 
-Arithmetic.Factorial = class extends Expression.UnaryExpression {
+const Factorial = class extends Expression.UnaryExpression {
 	getTag() { return "Math.Arithmetic.Factorial"; }
 	getName() { return Arithmetic.messages.nameFactorial; }
 	
@@ -724,7 +722,7 @@ Arithmetic.Factorial = class extends Expression.UnaryExpression {
 	}
 }
 
-Arithmetic.Summation = class extends Expression.SummationLikeSymbol {
+const Summation = class extends Expression.SummationLikeSymbol {
 	constructor() {
 		super();
 		this.symbol = "Σ";
@@ -732,7 +730,7 @@ Arithmetic.Summation = class extends Expression.SummationLikeSymbol {
 	
 	getTag() { return "Math.Arithmetic.Summation"; }
 	getName() { return Arithmetic.messages.nameSummation; }
-
+	
 	getChildName(index) {
 		switch (index) {
 			case 0: return Arithmetic.messages.childSummation0;
@@ -744,7 +742,7 @@ Arithmetic.Summation = class extends Expression.SummationLikeSymbol {
 	}
 }
 
-Arithmetic.Product = class extends Expression.SummationLikeSymbol {
+const Product = class extends Expression.SummationLikeSymbol {
 	constructor() {
 		super();
 		this.symbol = "Π";
@@ -764,7 +762,7 @@ Arithmetic.Product = class extends Expression.SummationLikeSymbol {
 	}
 }
 
-Arithmetic.Piecewise = class extends Expression {
+const Piecewise = class extends Expression {
 	getTag() { return "Math.Arithmetic.Piecewise"; }
 	getName() { return "Piecewise"; }
 	canHaveChildren(count) { return count >= 2; }
@@ -791,23 +789,23 @@ Arithmetic.Piecewise = class extends Expression {
 		for (let c = 0; c < cases; ++c) {
 			(child1 = this.children[2 * c    ]).prepareDisplay(context);
 			(child2 = this.children[2 * c + 1]).prepareDisplay(context);
-		
+			
 			child1.x = 14;
-		
+			
 			if (c > 0) this.height += 10;
 			this.height += Math.max(child1.horzBaseline, child2.horzBaseline);
 			child1.y = this.height - child1.horzBaseline;
 			child2.y = this.height - child2.horzBaseline;
 			this.height += Math.max(child1.height - child1.horzBaseline, child2.height - child2.horzBaseline);
-		
+			
 			if (child1.width > indent) indent = child1.width;
 		}
-	
+		
 		indent = 14 + indent + 10 + Math.round(context.measureText("if").width) + 10;
 		
 		for (let c = 0; c < cases; ++c) {
 			child2 = this.children[2 * c + 1];
-		
+			
 			child2.x = indent;
 			if (child2.x + child2.width > this.width) this.width = child2.x + child2.width;
 		}
@@ -816,11 +814,11 @@ Arithmetic.Piecewise = class extends Expression {
 		
 		if (otherwise != null) {
 			otherwise.x = 14;
-		
+			
 			this.height += 10;
 			otherwise.y = this.height;
 			this.height += otherwise.height;
-		
+			
 			let i = this.children[1].x - 10 - Math.round(context.measureText("if").width);
 			let w = Math.round(context.measureText("otherwise").width);
 			if (i + w > this.width) this.width = i + w;
@@ -872,17 +870,17 @@ Arithmetic.Piecewise = class extends Expression {
 };
 
 Arithmetic.setExpressions = function(module) {
-	Formulae.setExpression(module, "Math.Number",                    Arithmetic.Number);
-	Formulae.setExpression(module, "Math.InternalNumber",            Arithmetic.InternalNumber); /////
-	Formulae.setExpression(module, "Math.Arithmetic.Negative",       Arithmetic.Negative);
-	Formulae.setExpression(module, "Math.Arithmetic.Addition",       Arithmetic.Addition);
-	Formulae.setExpression(module, "Math.Arithmetic.Multiplication", Arithmetic.Multiplication);
-	Formulae.setExpression(module, "Math.Arithmetic.Division",       Arithmetic.Division);
-	Formulae.setExpression(module, "Math.Arithmetic.SquareRoot",     Arithmetic.SquareRoot);
-	Formulae.setExpression(module, "Math.Arithmetic.Factorial",      Arithmetic.Factorial);
-	Formulae.setExpression(module, "Math.Arithmetic.Summation",      Arithmetic.Summation);
-	Formulae.setExpression(module, "Math.Arithmetic.Product",        Arithmetic.Product);
-	Formulae.setExpression(module, "Math.Arithmetic.Piecewise",      Arithmetic.Piecewise);
+	Formulae.setExpression(module, "Math.Number",                    Number);
+	Formulae.setExpression(module, "Math.InternalNumber",            InternalNumber);
+	Formulae.setExpression(module, "Math.Arithmetic.Negative",       Negative);
+	Formulae.setExpression(module, "Math.Arithmetic.Addition",       Addition);
+	Formulae.setExpression(module, "Math.Arithmetic.Multiplication", Multiplication);
+	Formulae.setExpression(module, "Math.Arithmetic.Division",       Division);
+	Formulae.setExpression(module, "Math.Arithmetic.SquareRoot",     SquareRoot);
+	Formulae.setExpression(module, "Math.Arithmetic.Factorial",      Factorial);
+	Formulae.setExpression(module, "Math.Arithmetic.Summation",      Summation);
+	Formulae.setExpression(module, "Math.Arithmetic.Product",        Product);
+	Formulae.setExpression(module, "Math.Arithmetic.Piecewise",      Piecewise);
 	
 	// rounding operations
 	
@@ -925,7 +923,7 @@ Arithmetic.setExpressions = function(module) {
 	
 	[ "AbsoluteValue", "Floor", "Ceiling" ].forEach((tag, type) =>
 		Formulae.setExpression(module, "Math.Arithmetic." + tag, {
-			clazz: Arithmetic.AbsFloorCeiling,
+			clazz: AbsFloorCeiling,
 			type:  type
 		}
 	));
@@ -989,7 +987,6 @@ Arithmetic.setExpressions = function(module) {
 			getLiteral: () => row[2],
 			getName:    () => Arithmetic.messages["name" + row[1]],
 			isReduced   () { return this.reduced; }
-
 		}
 	));
 	
@@ -1123,3 +1120,4 @@ Arithmetic.setExpressions = function(module) {
 		max:          2
 	});
 };
+
