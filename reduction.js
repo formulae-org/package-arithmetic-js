@@ -18,7 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 'use strict';
 
-export class Arithmetic extends Formulae.ReductionPackage {};
+export class ArithmeticPackage extends Formulae.ReductionPackage {};
 
 const TAG_INFINITY = "Math.Infinity";
 
@@ -2535,7 +2535,7 @@ const isPrime = async (isPrime, session) => {
 	return true;
 };
 
-Arithmetic.setReducers = () => {
+ArithmeticPackage.setReducers = () => {
 	// internal numbers
 	
 	ReductionManager.addReducer("Math.InternalNumber", internalNumber, "Arithmetic.internalNumber");

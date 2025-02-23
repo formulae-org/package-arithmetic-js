@@ -18,13 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 'use strict';
 
-export class Arithmetic extends Formulae.ExpressionPackage {};
+export class ArithmeticPackage extends Formulae.ExpressionPackage {};
 
 const TAG_NUMBER = "Math.Number";
 
 const Number = class extends Expression.NullaryExpression {
 	getTag() { return TAG_NUMBER; }
-	getName() { return Arithmetic.messages.nameNumber; }
+	getName() { return ArithmeticPackage.messages.nameNumber; }
 	
 	//clone() {
 	//	let cloned = super.clone();
@@ -226,7 +226,7 @@ const InternalNumber = class extends Expression.NullaryExpression {
 
 const Negative = class extends Expression.UnaryExpression {
 	getTag() { return "Math.Arithmetic.Negative"; }
-	getName() { return Arithmetic.messages.nameNegative; }
+	getName() { return ArithmeticPackage.messages.nameNegative; }
 	parenthesesWhenSuperSubscripted() { return true; }
 	
 	prepareDisplay(context) {
@@ -280,8 +280,8 @@ const Addition = class extends Expression.OperatorExpression {
 	}
 	
 	getTag() { return "Math.Arithmetic.Addition"; }
-	getName() { return Arithmetic.messages.nameAddition; }
-	getChildName(index) { return Arithmetic.messages.childAddition; }
+	getName() { return ArithmeticPackage.messages.nameAddition; }
+	getChildName(index) { return ArithmeticPackage.messages.childAddition; }
 	parenthesesAsOperator() { return true; }
 	parenthesesWhenSuperSubscripted() { return true; }
 	
@@ -404,8 +404,8 @@ const Multiplication = class extends Expression.OperatorExpression {
 	}
 	
 	getTag() { return "Math.Arithmetic.Multiplication"; }
-	getName() { return Arithmetic.messages.nameMultiplication }
-	getChildName(index) { return Arithmetic.messages.childMultiplication; }
+	getName() { return ArithmeticPackage.messages.nameMultiplication }
+	getChildName(index) { return ArithmeticPackage.messages.childMultiplication; }
 	parenthesesWhenSuperSubscripted() { return true; }
 	
 	prepareDisplay(context) {
@@ -504,8 +504,8 @@ const Multiplication = class extends Expression.OperatorExpression {
 
 const Division = class extends Expression.BinaryExpression {
 	getTag() { return "Math.Arithmetic.Division"; }
-	getName() { return Arithmetic.messages.nameDivision; }
-	getChildName(index) { return Arithmetic.messages.childrenDivision[index]; }
+	getName() { return ArithmeticPackage.messages.nameDivision; }
+	getChildName(index) { return ArithmeticPackage.messages.childrenDivision[index]; }
 	parenthesesWhenSuperSubscripted() { return true; }
 	
 	moveAcross(i, direction) {
@@ -555,8 +555,8 @@ const Division = class extends Expression.BinaryExpression {
 		ch2.display(context, x + ch2.x, y + ch2.y);
 		
 		context.beginPath();
-		context.moveTo (x, y - 0.5 + this.horzBaseline);              // preventing obfuscation
-		context.lineTo (x + this.width, y - 0.5 + this.horzBaseline); // preventing obfuscation
+		context.moveTo(x, y - 0.5 + this.horzBaseline);
+		context.lineTo(x + this.width, y - 0.5 + this.horzBaseline);
 		context.stroke();
 	}
 	
@@ -567,7 +567,7 @@ const Division = class extends Expression.BinaryExpression {
 
 const SquareRoot = class extends Expression.UnaryExpression {
 	getTag() { return "Math.Arithmetic.SquareRoot"; }
-	getName() { return Arithmetic.messages.nameSquareRoot; }
+	getName() { return ArithmeticPackage.messages.nameSquareRoot; }
 	
 	prepareDisplay(context) {
 		let child = this.children[0];
@@ -620,13 +620,13 @@ const AbsFloorCeiling = class extends Expression {
 	
 	getName() {
 		switch (this.type) {
-			case 0: return Arithmetic.messages.nameAbsoluteValue;
-			case 1: return Arithmetic.messages.nameFloor;
-			case 2: return Arithmetic.messages.nameCeiling;
+			case 0: return ArithmeticPackage.messages.nameAbsoluteValue;
+			case 1: return ArithmeticPackage.messages.nameFloor;
+			case 2: return ArithmeticPackage.messages.nameCeiling;
 		}
 	}
 	
-	getChildName(index) { return Arithmetic.messages.childrenRoundingTruncation[index]; }
+	getChildName(index) { return ArithmeticPackage.messages.childrenRoundingTruncation[index]; }
 	
 	canHaveChildren(count)  { return count == 1 || (this.type != 0 && count == 2); }
 	
@@ -635,7 +635,7 @@ const AbsFloorCeiling = class extends Expression {
 			this.children[0].prepareDisplay(context);
 			this.children[1].prepareDisplay(context);
 			
-			this.getMnemonic = this.type == 1 ? () => Arithmetic.messages.mnemonicFloor : () => Arithmetic.messages.mnemonicCeiling;
+			this.getMnemonic = this.type == 1 ? () => ArithmeticPackage.messages.mnemonicFloor : () => ArithmeticPackage.messages.mnemonicCeiling;
 			this.prepareDisplayAsFunction(context);
 			
 			return;
@@ -694,7 +694,7 @@ const AbsFloorCeiling = class extends Expression {
 
 const Factorial = class extends Expression.UnaryExpression {
 	getTag() { return "Math.Arithmetic.Factorial"; }
-	getName() { return Arithmetic.messages.nameFactorial; }
+	getName() { return ArithmeticPackage.messages.nameFactorial; }
 	
 	prepareDisplay(context) {
 		let child = this.children[0];
@@ -729,15 +729,15 @@ const Summation = class extends Expression.SummationLikeSymbol {
 	}
 	
 	getTag() { return "Math.Arithmetic.Summation"; }
-	getName() { return Arithmetic.messages.nameSummation; }
+	getName() { return ArithmeticPackage.messages.nameSummation; }
 	
 	getChildName(index) {
 		switch (index) {
-			case 0: return Arithmetic.messages.childSummation0;
-			case 1: return Arithmetic.messages.childSummationProduct1;
-			case 2: return this.children.length == 3 ? Arithmetic.messages.childSummationProduct23 : Arithmetic.messages.childSummationProduct2X;
-			case 3: return Arithmetic.messages.childSummationProduct3;
-			case 4: return Arithmetic.messages.childSummationProduct4;
+			case 0: return ArithmeticPackage.messages.childSummation0;
+			case 1: return ArithmeticPackage.messages.childSummationProduct1;
+			case 2: return this.children.length == 3 ? ArithmeticPackage.messages.childSummationProduct23 : ArithmeticPackage.messages.childSummationProduct2X;
+			case 3: return ArithmeticPackage.messages.childSummationProduct3;
+			case 4: return ArithmeticPackage.messages.childSummationProduct4;
 		}
 	}
 }
@@ -749,15 +749,15 @@ const Product = class extends Expression.SummationLikeSymbol {
 	}
 	
 	getTag() { return "Math.Arithmetic.Product"; }
-	getName() { return Arithmetic.messages.nameProduct; }
+	getName() { return ArithmeticPackage.messages.nameProduct; }
 	
 	getChildName(index) {
 		switch (index) {
-			case 0: return Arithmetic.messages.childProduct0;
-			case 1: return Arithmetic.messages.childSummationProduct1;
-			case 2: return this.children.length == 3 ? Arithmetic.messages.childSummationProduct23 : Arithmetic.messages.childSummationProduct2X;
-			case 3: return Arithmetic.messages.childSummationProduct3;
-			case 4: return Arithmetic.messages.childSummationProduct4;
+			case 0: return ArithmeticPackage.messages.childProduct0;
+			case 1: return ArithmeticPackage.messages.childSummationProduct1;
+			case 2: return this.children.length == 3 ? ArithmeticPackage.messages.childSummationProduct23 : ArithmeticPackage.messages.childSummationProduct2X;
+			case 3: return ArithmeticPackage.messages.childSummationProduct3;
+			case 4: return ArithmeticPackage.messages.childSummationProduct4;
 		}
 	}
 }
@@ -858,18 +858,18 @@ const Piecewise = class extends Expression {
 		}
 		
 		context.beginPath();
-		context.moveTo (x + 4, y               );          //    . // preventing obfuscation
-		context.lineTo (x + 2, y + 2           );          //   /  // preventing obfuscation
-		context.lineTo (x + 2, y + this.horzBaseline - 2); //   |  // preventing obfuscation
-		context.lineTo (x,     y + this.horzBaseline    ); //  /   // preventing obfuscation
-		context.lineTo (x + 2, y + this.horzBaseline + 2); //  \.  // preventing obfuscation
-		context.lineTo (x + 2, y + this.height - 2  );     //   |  // preventing obfuscation
-		context.lineTo (x + 4, y + this.height      );     //   \  // preventing obfuscation
+		context.moveTo(x + 4, y               );          //    .
+		context.lineTo(x + 2, y + 2           );          //   /
+		context.lineTo(x + 2, y + this.horzBaseline - 2); //   |
+		context.lineTo(x,     y + this.horzBaseline    ); //  /
+		context.lineTo(x + 2, y + this.horzBaseline + 2); //  \.
+		context.lineTo(x + 2, y + this.height - 2  );     //   |
+		context.lineTo(x + 4, y + this.height      );     //   \
 		context.stroke();
 	}
 };
 
-Arithmetic.setExpressions = function(module) {
+ArithmeticPackage.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Number",                    Number);
 	Formulae.setExpression(module, "Math.InternalNumber",            InternalNumber);
 	Formulae.setExpression(module, "Math.Arithmetic.Negative",       Negative);
@@ -887,9 +887,9 @@ Arithmetic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Arithmetic.RoundToInteger", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Arithmetic.RoundToInteger",
-		getMnemonic:  () => Arithmetic.messages.mnemonicRoundToInteger,
-		getName:      () => Arithmetic.messages.nameRoundToInteger,
-		getChildName: index => Arithmetic.messages.childrenRoundToInteger[index],
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicRoundToInteger,
+		getName:      () => ArithmeticPackage.messages.nameRoundToInteger,
+		getChildName: index => ArithmeticPackage.messages.childrenRoundToInteger[index],
 		max:          2
 	});
 	
@@ -897,9 +897,9 @@ Arithmetic.setExpressions = function(module) {
 		Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 			clazz:        Expression.Function,
 			getTag:       () => "Math.Arithmetic." + tag,
-			getMnemonic:  () => Arithmetic.messages["mnemonic" + tag],
-			getName:      () => Arithmetic.messages["name" + tag],
-			getChildName: index => Arithmetic.messages["children" + tag][index],
+			getMnemonic:  () => ArithmeticPackage.messages["mnemonic" + tag],
+			getName:      () => ArithmeticPackage.messages["name" + tag],
+			getChildName: index => ArithmeticPackage.messages["children" + tag][index],
 			min: 2, max: 3
 		}
 	));
@@ -914,8 +914,8 @@ Arithmetic.setExpressions = function(module) {
 		tag => Formulae.setExpression(module, "Math.Arithmetic.RoundingMode." + tag, {
 			clazz   : Expression.LabelExpression,
 			getTag  : () => "Math.Arithmetic.RoundingMode." + tag,
-			getLabel: () => Arithmetic.messages["labelRoundingMode" + tag],
-			getName : () => "Rounding mode " + Arithmetic.messages["labelRoundingMode" + tag]
+			getLabel: () => ArithmeticPackage.messages["labelRoundingMode" + tag],
+			getName : () => "Rounding mode " + ArithmeticPackage.messages["labelRoundingMode" + tag]
 		}
 	));
 	
@@ -933,17 +933,17 @@ Arithmetic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Numeric", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Numeric",
-		getMnemonic:  () => Arithmetic.messages.mnemonicNumeric,
-		getName:      () => Arithmetic.messages.nameNumeric,
-		getChildName: index => Arithmetic.messages.childrenNumeric[index],
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicNumeric,
+		getName:      () => ArithmeticPackage.messages.nameNumeric,
+		getChildName: index => ArithmeticPackage.messages.childrenNumeric[index],
 		max:          2
 	});
 	
 	Formulae.setExpression(module, "Math.SetNoSymbolic", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.SetNoSymbolic",
-		getMnemonic:  () => Arithmetic.messages.mnemonicSetNoSymbolic,
-		getName:      () => Arithmetic.messages.nameSetNoSymbolic,
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicSetNoSymbolic,
+		getName:      () => ArithmeticPackage.messages.nameSetNoSymbolic,
 		min: 0, max: 0
 	});
 	
@@ -952,9 +952,9 @@ Arithmetic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Arithmetic.WithPrecision", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Arithmetic.WithPrecision",
-		getMnemonic:  () => Arithmetic.messages.mnemonicWithPrecision,
-		getName:      () => Arithmetic.messages.nameWithPrecision,
-		getChildName: index => Arithmetic.messages.childrenWithPrecision[index],
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicWithPrecision,
+		getName:      () => ArithmeticPackage.messages.nameWithPrecision,
+		getChildName: index => ArithmeticPackage.messages.childrenWithPrecision[index],
 		min: 2, max: 2
 	});
 	
@@ -962,8 +962,8 @@ Arithmetic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Arithmetic.Exponentiation", {
 		clazz: Expression.Exponentiation,
 		getTag:       () => "Math.Arithmetic.Exponentiation",
-		getName:      () => Arithmetic.messages.nameExponentiation,
-		getChildName: index => Arithmetic.messages.childrenExponentiation[index]
+		getName:      () => ArithmeticPackage.messages.nameExponentiation,
+		getChildName: index => ArithmeticPackage.messages.childrenExponentiation[index]
 	});
 	
 	[ // literals
@@ -973,7 +973,7 @@ Arithmetic.setExpressions = function(module) {
 			clazz:      Expression.Literal,
 			getTag:     () => row[0] + "." + row[1],
 			getLiteral: () => row[2],
-			getName:    () => Arithmetic.messages["name" + row[1]],
+			getName:    () => ArithmeticPackage.messages["name" + row[1]],
 		}
 	));
 	
@@ -985,7 +985,7 @@ Arithmetic.setExpressions = function(module) {
 			clazz:      Expression.Literal,
 			getTag:     () => row[0] + "." + row[1],
 			getLiteral: () => row[2],
-			getName:    () => Arithmetic.messages["name" + row[1]],
+			getName:    () => ArithmeticPackage.messages["name" + row[1]],
 			isReduced   () { return this.reduced; }
 		}
 	));
@@ -994,8 +994,8 @@ Arithmetic.setExpressions = function(module) {
 	[ "GetPrecision", "GetRoundingMode", "GetEuclideanDivisionMode" /*, "Random" */  ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:       Expression.Function,
 		getTag:      () => "Math.Arithmetic." + tag,
-		getMnemonic: () => Arithmetic.messages["mnemonic" + tag],
-		getName:     () => Arithmetic.messages["name" + tag],
+		getMnemonic: () => ArithmeticPackage.messages["mnemonic" + tag],
+		getName:     () => ArithmeticPackage.messages["name" + tag],
 		min: 0, max: 0
 	}));
 	
@@ -1009,17 +1009,17 @@ Arithmetic.setExpressions = function(module) {
 	].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:       Expression.Function,
 		getTag:      () => "Math.Arithmetic." + tag,
-		getMnemonic: () => Arithmetic.messages["mnemonic" + tag],
-		getName:     () => Arithmetic.messages["name" + tag]
+		getMnemonic: () => ArithmeticPackage.messages["mnemonic" + tag],
+		getName:     () => ArithmeticPackage.messages["name" + tag]
 	}));
 	
 	// truncationg & rounding
 	[ "Truncate", "Round" ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Arithmetic." + tag,
-		getMnemonic:  () => Arithmetic.messages["mnemonic" + tag],
-		getName:      () => Arithmetic.messages["name" + tag],
-		getChildName: index => Arithmetic.messages.childrenRoundingTruncation[index],
+		getMnemonic:  () => ArithmeticPackage.messages["mnemonic" + tag],
+		getName:      () => ArithmeticPackage.messages["name" + tag],
+		getChildName: index => ArithmeticPackage.messages.childrenRoundingTruncation[index],
 		max: 2
 	}));
 	
@@ -1034,9 +1034,9 @@ Arithmetic.setExpressions = function(module) {
 	].forEach(row => Formulae.setExpression(module, "Math.Arithmetic." + row[0], {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Arithmetic." + row[0],
-		getMnemonic:  () => Arithmetic.messages["mnemonic" + row[0]],
-		getName:      () => Arithmetic.messages["name" + row[0]],
-		getChildName: index => Arithmetic.messages["children" + row[0]][index],
+		getMnemonic:  () => ArithmeticPackage.messages["mnemonic" + row[0]],
+		getName:      () => ArithmeticPackage.messages["name" + row[0]],
+		getChildName: index => ArithmeticPackage.messages["children" + row[0]][index],
 		min:          row[1],
 		max:          row[2]
 	}));
@@ -1048,8 +1048,8 @@ Arithmetic.setExpressions = function(module) {
 		clazz:        Expression.Infix,
 		getTag:       () => "Math.Arithmetic." + row[0],
 		getOperator:  () => row[1],
-		getName:      () => Arithmetic.messages["name" + row[0]],
-		getChildName: index => Arithmetic.messages.childrenDivision[1 - index],
+		getName:      () => ArithmeticPackage.messages["name" + row[0]],
+		getChildName: index => ArithmeticPackage.messages.childrenDivision[1 - index],
 		min: 2, max: 2
 	}));
 	
@@ -1057,42 +1057,42 @@ Arithmetic.setExpressions = function(module) {
 	[ "Div", "Mod", "DivMod" ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:        Expression.Infix,
 		getTag:       () => "Math.Arithmetic." + tag,
-		getOperator:  () => Arithmetic.messages["operator" + tag],
-		getName:      () => Arithmetic.messages["name" + tag],
-		getChildName: index => Arithmetic.messages.childrenDivisions[index],
+		getOperator:  () => ArithmeticPackage.messages["operator" + tag],
+		getName:      () => ArithmeticPackage.messages["name" + tag],
+		getChildName: index => ArithmeticPackage.messages.childrenDivisions[index],
 		min: 2, max: 2
 	}));
 	
 	Formulae.setExpression(module, "Math.Arithmetic.EuclideanMode", {
 		clazz   : Expression.LabelExpression,
 		getTag  : () => "Math.Arithmetic.EuclideanMode",
-		getLabel: () => Arithmetic.messages["labelEuclideanMode"],
-		getName : () => Arithmetic.messages["labelEuclideanMode"]
+		getLabel: () => ArithmeticPackage.messages["labelEuclideanMode"],
+		getName : () => ArithmeticPackage.messages["labelEuclideanMode"]
 	});
 	
 	// GCD, LCM
 	[ "GreatestCommonDivisor", "LeastCommonMultiple" ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:      Expression.PrefixedLiteral,
 		getTag:     () => "Math.Arithmetic." + tag,
-		getLiteral: () => Arithmetic.messages["literal" + tag],
-		getName:    () => Arithmetic.messages["name" + tag]
+		getLiteral: () => ArithmeticPackage.messages["literal" + tag],
+		getName:    () => ArithmeticPackage.messages["name" + tag]
 	}));
 	
 	// transcendental functions
 	[ "DecimalLogarithm", "NaturalLogarithm", "BinaryLogarithm" ].forEach(tag => Formulae.setExpression(module, "Math.Transcendental." + tag, {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Transcendental." + tag,
-		getMnemonic:  () => Arithmetic.messages["mnemonic" + tag],
-		getName:      () => Arithmetic.messages["name" + tag]
+		getMnemonic:  () => ArithmeticPackage.messages["mnemonic" + tag],
+		getName:      () => ArithmeticPackage.messages["name" + tag]
 	}));
 	
 	// general logarithm
 	Formulae.setExpression(module, "Math.Transcendental.Logarithm", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Transcendental.Logarithm",
-		getMnemonic:  () => Arithmetic.messages.mnemonicLogarithm,
-		getName:      () => Arithmetic.messages.nameLogarithm,
-		getChildName: index => Arithmetic.messages.childrenLogarithm[index],
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicLogarithm,
+		getName:      () => ArithmeticPackage.messages.nameLogarithm,
+		getChildName: index => ArithmeticPackage.messages.childrenLogarithm[index],
 		min: 2, max: 2
 	});
 	
@@ -1104,8 +1104,8 @@ Arithmetic.setExpressions = function(module) {
 		].forEach(fun => Formulae.setExpression(module, "Math." + type + "." + fun, {
 			clazz:       Expression.Function,
 			getTag:      () => "Math." + type + "." + fun,
-			getMnemonic: () => Arithmetic.messages["mnemonic" + type.charAt(0) + fun],
-			getName:     () => Arithmetic.messages["name" + type.charAt(0) + fun]
+			getMnemonic: () => ArithmeticPackage.messages["mnemonic" + type.charAt(0) + fun],
+			getName:     () => ArithmeticPackage.messages["name" + type.charAt(0) + fun]
 		}))
 	});
 	
@@ -1113,9 +1113,9 @@ Arithmetic.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Trigonometric.ArcTangent2", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Trigonometric.ArcTangent2",
-		getMnemonic:  () => Arithmetic.messages.mnemonicArcTangent2,
-		getName:      () => Arithmetic.messages.nameArcTangent2,
-		getChildName: index => Arithmetic.messages.childrenArcTangent2[index],
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicArcTangent2,
+		getName:      () => ArithmeticPackage.messages.nameArcTangent2,
+		getChildName: index => ArithmeticPackage.messages.childrenArcTangent2[index],
 		min:          2,
 		max:          2
 	});

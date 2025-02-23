@@ -18,13 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 'use strict';
 
-export class Arithmetic extends Formulae.EditionPackage {};
+export class ArithmeticPackage extends Formulae.EditionPackage {};
 
 const editionNumber = function() {
 	let number, s;
 	
 	while (true) {
-		s = prompt(Arithmetic.messages.enterNumber, s);
+		s = prompt(ArithmeticPackage.messages.enterNumber, s);
 		if (s === null) return;
 		try {
 			number = s.includes(".") ? new Decimal(s) : BigInt(s);
@@ -46,7 +46,7 @@ const editionNumber = function() {
 
 const actionNumber = {
 	isAvailableNow: () => Formulae.sHandler.type != Formulae.ROW_OUTPUT,
-	getDescription: () => Arithmetic.messages.actionNumber,
+	getDescription: () => ArithmeticPackage.messages.actionNumber,
 	doAction: () => {
 		let s;
 		{
@@ -66,7 +66,7 @@ const actionNumber = {
 		let number;
 		
 		while (true) {
-			s = prompt(Arithmetic.messages.enterNumber, s);
+			s = prompt(ArithmeticPackage.messages.enterNumber, s);
 			if (s === null) return;
 			try {
 				number = s.includes(".") ? new Decimal(s) : BigInt(s);
@@ -123,7 +123,7 @@ const operatorEdition = function(tag, next, forced, negative) {
 	Formulae.setSelected(Formulae.sHandler, nullExpr, false);
 };
 
-Arithmetic.setEditions = function() {
+ArithmeticPackage.setEditions = function() {
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = editionNumber);
 	
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumeric, () => Expression.wrapperEdition("Math.Numeric"));
@@ -174,9 +174,9 @@ Arithmetic.setEditions = function() {
 		"Nearest.HalfEven"
 	].forEach(tag => {
 		Formulae.addEdition(
-			Arithmetic.messages.pathRoundingModes,
+			ArithmeticPackage.messages.pathRoundingModes,
 			null,
-			Arithmetic.messages["labelRoundingMode" + tag],
+			ArithmeticPackage.messages["labelRoundingMode" + tag],
 			() => Expression.replacingEdition("Math.Arithmetic.RoundingMode." + tag)
 		)
 	});
@@ -248,11 +248,11 @@ Arithmetic.setEditions = function() {
 	
 	[ 4, 5, 3, 2 ].forEach(type => {
 		Formulae.addEdition(
-			Arithmetic.messages.pathSummation, "packages/org.formulae.math.arithmetic/img/summation" + type + ".png", null,
+			ArithmeticPackage.messages.pathSummation, "packages/org.formulae.math.arithmetic/img/summation" + type + ".png", null,
 			() => Expression.multipleEdition("Math.Arithmetic.Summation", type, 0)
 		);
 		Formulae.addEdition(
-			Arithmetic.messages.pathProduct, "packages/org.formulae.math.arithmetic/img/product" + type + ".png", null,
+			ArithmeticPackage.messages.pathProduct, "packages/org.formulae.math.arithmetic/img/product" + type + ".png", null,
 			() => Expression.multipleEdition("Math.Arithmetic.Product", type, 0)
 		);
 	});
@@ -269,16 +269,16 @@ Arithmetic.setEditions = function() {
 		"ArcSine",      "ArcCosine", "ArcTangent",
 		"ArcCotangent", "ArcSecant", "ArcCosecant"
 	].forEach(tag => {
-		Formulae.addEdition(this.messages.pathTrigonometric, null, Arithmetic.messages["leaf" + tag], () => Expression.wrapperEdition("Math.Trigonometric." + tag));
-		Formulae.addEdition(this.messages.pathHyperbolic,    null, Arithmetic.messages["leaf" + tag], () => Expression.wrapperEdition("Math.Hyperbolic." + tag));
+		Formulae.addEdition(this.messages.pathTrigonometric, null, ArithmeticPackage.messages["leaf" + tag], () => Expression.wrapperEdition("Math.Trigonometric." + tag));
+		Formulae.addEdition(this.messages.pathHyperbolic,    null, ArithmeticPackage.messages["leaf" + tag], () => Expression.wrapperEdition("Math.Hyperbolic." + tag));
 	});
 	
-	Formulae.addEdition(this.messages.pathTrigonometric, null, Arithmetic.messages.leafArcTangent2, () => Expression.binaryEdition("Math.Trigonometric.ArcTangent2"));
+	Formulae.addEdition(this.messages.pathTrigonometric, null, ArithmeticPackage.messages.leafArcTangent2, () => Expression.binaryEdition("Math.Trigonometric.ArcTangent2"));
 	
 	Formulae.addEdition(this.messages.pathConstant, null, "π", () => Expression.replacingEdition("Math.Constant.Pi"));
 	Formulae.addEdition(this.messages.pathConstant, null, "e", () => Expression.replacingEdition("Math.Constant.Euler"));
 };
 
-Arithmetic.setActions = function() {
+ArithmeticPackage.setActions = function() {
 	Formulae.addAction("Math.Number", actionNumber);
 };
