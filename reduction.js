@@ -55,8 +55,8 @@ const significantDigits = async (significantDigits, session) => {
 	
 	try {
 		significantDigits.replaceBy(
-			CanonicalArithmetic.createInternalNumber(
-				CanonicalArithmetic.createInteger(
+			Arithmetic.createInternalNumber(
+				Arithmetic.createInteger(
 					number.significantDigits(),
 					session
 				),
@@ -72,7 +72,7 @@ const significantDigits = async (significantDigits, session) => {
 
 const setPrecision = async (setPrecision, session) => {
 	let precisionExpr = await session.reduceAndGet(setPrecision.children[0], 0);
-	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
+	let precision = Arithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
 		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
 		throw new ReductionError();
@@ -84,8 +84,8 @@ const setPrecision = async (setPrecision, session) => {
 
 const getPrecision = async (getPrecision, session) => {
 	getPrecision.replaceBy(
-		CanonicalArithmetic.createInternalNumber(
-			CanonicalArithmetic.createInteger(session.Decimal.precision, session),
+		Arithmetic.createInternalNumber(
+			Arithmetic.createInteger(session.Decimal.precision, session),
 			session
 		)
 	);
@@ -94,7 +94,7 @@ const getPrecision = async (getPrecision, session) => {
 
 const withPrecision = async (withPrecision, session) => {
 	let precisionExpr = await session.reduceAndGet(withPrecision.children[1], 1);
-	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
+	let precision = Arithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
 		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
 		throw new ReductionError();
@@ -116,11 +116,11 @@ const decimalPlaces = async (decimalPlaces, session) => {
 	if (!decimalPlaces.children[0].isInternalNumber()) return false;
 	
 	let number = decimalPlaces.children[0].get("Value");
-	if (CanonicalArithmetic.isRational(number) || CanonicalArithmetic.isComplex(number)) return false;
+	if (Arithmetic.isRational(number) || Arithmetic.isComplex(number)) return false;
 	
 	decimalPlaces.replaceBy(
-		CanonicalArithmetic.createInternalNumber(
-			CanonicalArithmetic.createInteger(number.decimalPlaces(), session),
+		Arithmetic.createInternalNumber(
+			Arithmetic.createInteger(number.decimalPlaces(), session),
 			session
 		)
 	);
@@ -207,7 +207,7 @@ const numeric = async (numeric, session) => {
 	
 	if (numeric.children.length >= 2) {
 		let precisionExpr = await session.reduceAndGet(numeric.children[1], 1);
-		precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
+		precision = Arithmetic.getNativeInteger(precisionExpr);
 		if (precision === undefined || precision <= 0) {
 			ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
 			throw new ReductionError();
@@ -256,23 +256,23 @@ const nNumeric = async (n, session) => {
 	
 	let number = n.children[0].get("Value");
 	
-	if (CanonicalArithmetic.isInteger(number)) {
+	if (Arithmetic.isInteger(number)) {
 		n.replaceBy(
-			CanonicalArithmetic.canonical2InternalNumber(
-				CanonicalArithmetic.ToDecimal(number, session)
+			Arithmetic.canonical2InternalNumber(
+				Arithmetic.ToDecimal(number, session)
 			)
 		);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isDecimal(number)) {
+	if (Arithmetic.isDecimal(number)) {
 		n.replaceBy(n.children[0]);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isRational(number)) {
+	if (Arithmetic.isRational(number)) {
 		n.replaceBy(
-			CanonicalArithmetic.createInternalNumber(
+			Arithmetic.createInternalNumber(
 				number.toDecimal(session),
 				session
 			)
@@ -289,7 +289,7 @@ const nPrecision = async (n, session) => {
 	if (n.children.length < 2) return false; // forward to N(expr)
 	
 	let precisionExpr = await session.reduceAndGet(n.children[1], 1);
-	let precision = CanonicalArithmetic.getNativeInteger(precisionExpr);
+	let precision = Arithmetic.getNativeInteger(precisionExpr);
 	if (precision === undefined || precision < 1 || precision > 1e+9) {
 		ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
 		throw new ReductionError();
@@ -340,7 +340,7 @@ const additionNumeric = async (addition, session) => {
 	
 	for (let i = n - 1; i > pos; --i) {
 		if (addition.children[i].isInternalNumber()) {
-			number = CanonicalArithmetic.addition(number, addition.children[i].get("Value"), session);
+			number = Arithmetic.addition(number, addition.children[i].get("Value"), session);
 			addition.removeChildAt(i);
 			performed = true;
 		}
@@ -350,7 +350,7 @@ const additionNumeric = async (addition, session) => {
 		switch (addition.children.length) {
 			case 1:
 				addition.replaceBy(
-					CanonicalArithmetic.createInternalNumber(number, session)
+					Arithmetic.createInternalNumber(number, session)
 				);
 				return true;
 			
@@ -368,7 +368,7 @@ const additionNumeric = async (addition, session) => {
 	
 	if (!performed) return false; // forward to other forms of Addition(...)
 	
-	let internalNumber = CanonicalArithmetic.createInternalNumber(number, session);
+	let internalNumber = Arithmetic.createInternalNumber(number, session);
 	
 	if (addition.children.length == 1) { // just one child
 		addition.replaceBy(internalNumber);
@@ -420,7 +420,7 @@ const multiplicationNumeric = async (multiplication, session) => {
 	
 	for (let i = n - 1; i > pos; --i) {
 		if (multiplication.children[i].isInternalNumber()) {
-			number = CanonicalArithmetic.multiplication(number, multiplication.children[i].get("Value"), session);
+			number = Arithmetic.multiplication(number, multiplication.children[i].get("Value"), session);
 			multiplication.removeChildAt(i);
 			performed = true;
 		}
@@ -429,7 +429,7 @@ const multiplicationNumeric = async (multiplication, session) => {
 	// Numeric result was zero
 	
 	if (number.isZero()) {
-		multiplication.replaceBy(CanonicalArithmetic.createInternalNumber(number, session));
+		multiplication.replaceBy(Arithmetic.createInternalNumber(number, session));
 		return true;
 	}
 	
@@ -438,7 +438,7 @@ const multiplicationNumeric = async (multiplication, session) => {
 	if (number.isOne()) {
 		switch (multiplication.children.length) {
 			case 1:
-				multiplication.replaceBy(CanonicalArithmetic.createInternalNumber(number, session));
+				multiplication.replaceBy(Arithmetic.createInternalNumber(number, session));
 				return true;
 			
 			case 2:
@@ -457,7 +457,7 @@ const multiplicationNumeric = async (multiplication, session) => {
 	
 	// numerical result is neither zero nor one
 	
-	let internalNumber = CanonicalArithmetic.createInternalNumber(number, session);
+	let internalNumber = Arithmetic.createInternalNumber(number, session);
 	
 	if (multiplication.children.length == 1) { // just one child
 		multiplication.replaceBy(internalNumber);
@@ -500,8 +500,8 @@ const divisionNumerics = async (division, session) => {
 				division.replaceBy(
 					Formulae.createExpression(
 						"Math.Arithmetic.Multiplication",
-						CanonicalArithmetic.createInternalNumber(
-							CanonicalArithmetic.createInteger(-1, session),
+						Arithmetic.createInternalNumber(
+							Arithmetic.createInteger(-1, session),
 							session
 						),
 						infinity
@@ -515,8 +515,8 @@ const divisionNumerics = async (division, session) => {
 		}
 		
 		division.replaceBy(
-			CanonicalArithmetic.createInternalNumber(
-				CanonicalArithmetic.division(n, d, session),
+			Arithmetic.createInternalNumber(
+				Arithmetic.division(n, d, session),
 				session
 			)
 		);
@@ -546,11 +546,11 @@ const exponentiationNumerics = async (exponentiation, session) => {
 		
 		if (b.isZero()) {
 			if (e.isZero()) {
-				if (CanonicalArithmetic.isInteger(b) && CanonicalArithmetic.isInteger(e)) { // 0 ^ 0
-					result = CanonicalArithmetic.createInternalNumber(
-						CanonicalArithmetic.isDecimal(b) || CanonicalArithmetic.isDecimal(e) ?
-						CanonicalArithmetic.getDecimalOne(session) :
-						CanonicalArithmetic.getIntegerOne(session),
+				if (Arithmetic.isInteger(b) && Arithmetic.isInteger(e)) { // 0 ^ 0
+					result = Arithmetic.createInternalNumber(
+						Arithmetic.isDecimal(b) || Arithmetic.isDecimal(e) ?
+						Arithmetic.getDecimalOne(session) :
+						Arithmetic.getIntegerOne(session),
 						session
 					);
 				}
@@ -559,14 +559,14 @@ const exponentiationNumerics = async (exponentiation, session) => {
 				}
 			}
 			else {
-				if (CanonicalArithmetic.isComplex(e)) { // exponent is complex
+				if (Arithmetic.isComplex(e)) { // exponent is complex
 					result = exponentiation.children[0];
 				}
 				else if (e.isPositive()) { // exponent is positive
-					result = CanonicalArithmetic.createInternalNumber(
-						CanonicalArithmetic.isDecimal(b) || CanonicalArithmetic.isDecimal(e) ?
-						CanonicalArithmetic.getDecimalZero(session) :
-						CanonicalArithmetic.getIntegerZero(session),
+					result = Arithmetic.createInternalNumber(
+						Arithmetic.isDecimal(b) || Arithmetic.isDecimal(e) ?
+						Arithmetic.getDecimalZero(session) :
+						Arithmetic.getIntegerZero(session),
 						session
 					);
 				}
@@ -587,13 +587,13 @@ const exponentiationNumerics = async (exponentiation, session) => {
 		// everything else
 		
 		try {
-			result = CanonicalArithmetic.createInternalNumber(
-				CanonicalArithmetic.exponentiation(b, e, session),
+			result = Arithmetic.createInternalNumber(
+				Arithmetic.exponentiation(b, e, session),
 				session
 			);
 		}
 		catch (e) {
-			if (e instanceof CanonicalArithmetic.NonNumericError) {
+			if (e instanceof Arithmetic.NonNumericError) {
 				return false;
 			}
 			
@@ -616,7 +616,7 @@ const comparisonNumerics = async (comparisonExpression, session) => {
 	}
 	
 	try {
-		let result = CanonicalArithmetic.comparison(
+		let result = Arithmetic.comparison(
 			comparisonExpression.children[0].get("Value"),
 			comparisonExpression.children[1].get("Value"),
 			session
@@ -642,11 +642,11 @@ const comparisonNumerics = async (comparisonExpression, session) => {
 // n      : native Naumber
 
 const movePointToRight = (number, n, session) => {
-	return CanonicalArithmetic.multiplication(
+	return Arithmetic.multiplication(
 		number,
-		CanonicalArithmetic.exponentiation(
-			CanonicalArithmetic.createInteger(10, session),
-			CanonicalArithmetic.createInteger(n, session),
+		Arithmetic.exponentiation(
+			Arithmetic.createInteger(10, session),
+			Arithmetic.createInteger(n, session),
 			session
 		),
 		session
@@ -661,14 +661,14 @@ const rationalizeDecimal = (number, repeating, session) => {
 		let bkpPrecision = session.Decimal.precision;
 		session.Decimal.precision = significantDigits;
 		
-		let tenPow = CanonicalArithmetic.exponentiation(
-			CanonicalArithmetic.createInteger(10, session),
-			CanonicalArithmetic.createInteger(decimalPlaces, session),
+		let tenPow = Arithmetic.exponentiation(
+			Arithmetic.createInteger(10, session),
+			Arithmetic.createInteger(decimalPlaces, session),
 			session
 		);
 		
-		let rational = CanonicalArithmetic.createRational(
-			CanonicalArithmetic.multiplication(number, tenPow, session).toInteger(session),
+		let rational = Arithmetic.createRational(
+			Arithmetic.multiplication(number, tenPow, session).toInteger(session),
 			tenPow
 		);
 		
@@ -687,23 +687,23 @@ const rationalizeDecimal = (number, repeating, session) => {
 		number = movePointToRight(number, offset, session);
 		let integralPart = number.floor();
 		let fractionalPart = movePointToRight(
-			CanonicalArithmetic.addition(number, integralPart.negation(), session),
+			Arithmetic.addition(number, integralPart.negation(), session),
 			repeating,
 			session
 		);
 		let divisor1 = movePointToRight(
-			CanonicalArithmetic.getIntegerOne(session),
+			Arithmetic.getIntegerOne(session),
 			offset,
 			session
 		);
 		let divisor2 = movePointToRight(
-			CanonicalArithmetic.addition(
+			Arithmetic.addition(
 				movePointToRight(
-					CanonicalArithmetic.getIntegerOne(session),
+					Arithmetic.getIntegerOne(session),
 					repeating,
 					session
 				),
-				CanonicalArithmetic.createInteger(-1, session),
+				Arithmetic.createInteger(-1, session),
 				session
 			),
 			offset,
@@ -712,16 +712,16 @@ const rationalizeDecimal = (number, repeating, session) => {
 		
 		session.Decimal.precision = bkpPrecision;
 		
-		let rational1 = CanonicalArithmetic.createRational(
+		let rational1 = Arithmetic.createRational(
 			integralPart.toInteger(session),
 			divisor1
 		);
-		let rational2 = CanonicalArithmetic.createRational(
+		let rational2 = Arithmetic.createRational(
 			fractionalPart.toInteger(session),
 			divisor2
 		);
 		
-		return CanonicalArithmetic.addition(rational1, rational2, session);
+		return Arithmetic.addition(rational1, rational2, session);
 	}
 };
 
@@ -733,14 +733,14 @@ const rationalize = async (rationalize, session) => {
 		case 1: { // decimal
 			let repeating = 0;
 			if (rationalize.children.length >= 2) {
-				repeating = CanonicalArithmetic.getNativeInteger(rationalize.children[1]);
+				repeating = Arithmetic.getNativeInteger(rationalize.children[1]);
 				if (repeating === undefined || repeating < 0) return false;
 			}
 			
 			let rational = rationalizeDecimal(number, repeating, session);
 			if (rational === null) return false;
 			
-			rationalize.replaceBy(CanonicalArithmetic.createInternalNumber(rational, session));
+			rationalize.replaceBy(Arithmetic.createInternalNumber(rational, session));
 			return true;
 		}
 		
@@ -760,9 +760,9 @@ const absNumeric = async (abs, session) => {
 	if (!abs.children[0].isInternalNumber()) return false;
 	let number = abs.children[0].get("Value");
 	
-	if (CanonicalArithmetic.isComplex(number)) {
-		let result = CanonicalArithmetic.createInternalNumber(
-			CanonicalArithmetic.addition(
+	if (Arithmetic.isComplex(number)) {
+		let result = Arithmetic.createInternalNumber(
+			Arithmetic.addition(
 				number.real.multiplication(number.real, session),
 				number.imaginary.multiplication(number.imaginary, session),
 				session
@@ -775,7 +775,7 @@ const absNumeric = async (abs, session) => {
 	
 	if (number.isNegative()) {
 		abs.replaceBy(
-			CanonicalArithmetic.createInternalNumber(number.negation(), session)
+			Arithmetic.createInternalNumber(number.negation(), session)
 		);
 	}
 	else {
@@ -789,11 +789,11 @@ const signNumeric = async (sign, session) => {
 	if (!sign.children[0].isInternalNumber()) return false;
 	let number = sign.children[0].get("Value");
 	
-	if (CanonicalArithmetic.isComplex(number)) return false;
+	if (Arithmetic.isComplex(number)) return false;
 	
 	sign.replaceBy(
-		CanonicalArithmetic.createInternalNumber(
-			CanonicalArithmetic.createInteger(
+		Arithmetic.createInternalNumber(
+			Arithmetic.createInteger(
 				number.isZero() ? 0 : (number.isNegative() ? -1 : 1),
 				session
 			),
@@ -813,7 +813,7 @@ const roundToPrecision = async (roundToPrecision, session) => {
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
 	
-	let precision = CanonicalArithmetic.getNativeInteger(roundToPrecision.children[1]);
+	let precision = Arithmetic.getNativeInteger(roundToPrecision.children[1]);
 	if (precision === undefined || precision <= 0n) return false;
 	
 	let roundingMode, bkpRoundingMode;
@@ -870,7 +870,7 @@ const roundToDecimalPlaces = async (roundToDecimalPlaces, session) => {
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
 	
-	let places = CanonicalArithmetic.getNativeInteger(roundToDecimalPlaces.children[1]);
+	let places = Arithmetic.getNativeInteger(roundToDecimalPlaces.children[1]);
 	if (places === undefined) return false;
 	
 	let roundingMode, bkpRoundingMode;
@@ -904,7 +904,7 @@ const roundToMultiple = async (roundToMultiple, session) => {
 	if (!multiple.isInternalNumber()) return false;
 	multiple = multiple.get("Value");
 	
-	if (CanonicalArithmetic.isComplex(n) || CanonicalArithmetic.isComplex(multiple)) return false;
+	if (Arithmetic.isComplex(n) || Arithmetic.isComplex(multiple)) return false;
 	
 	let roundingMode, bkpRoundingMode;
 	if (roundToMultiple.children.length >= 3) {
@@ -920,7 +920,7 @@ const roundToMultiple = async (roundToMultiple, session) => {
 	
 	expr.set(
 		"Value",
-		CanonicalArithmetic.multiplication(CanonicalArithmetic.divMod(n, multiple, true, false, session), multiple, session)
+		Arithmetic.multiplication(Arithmetic.divMod(n, multiple, true, false, session), multiple, session)
 	);
 	
 	if (roundingMode !== undefined) {
@@ -939,7 +939,7 @@ const floorCeilingRoundTruncate = async (fcrt, session) => {
 	let places = 0;
 	
 	if (fcrt.children.length >= 2) { // there is decimal places
-		if ((places = CanonicalArithmetic.getNativeInteger(fcrt.children[1])) === undefined) {
+		if ((places = Arithmetic.getNativeInteger(fcrt.children[1])) === undefined) {
 			ReductionManager.setInError(fcrt.children[1], "Expression must be an integer number");
 			throw new ReductionError();
 		}
@@ -975,7 +975,7 @@ const floorCeilingRoundTruncate = async (fcrt, session) => {
 	
 	//expr.set("Value", n.roundToDecimalPlaces(places, session));
 	
-	fcrt.replaceBy(CanonicalArithmetic.createInternalNumber(n, session));
+	fcrt.replaceBy(Arithmetic.createInternalNumber(n, session));
 	return true;
 };
 
@@ -987,8 +987,8 @@ const divMod = async (divMod, session) => {
 	let divisor = divMod.children[1].get("Value");
 	
 	if (
-		CanonicalArithmetic.isComplex(dividend) ||
-		CanonicalArithmetic.isComplex(divisor)
+		Arithmetic.isComplex(dividend) ||
+		Arithmetic.isComplex(divisor)
 	) return false;
 	
 	if (divisor.isZero()) {
@@ -1000,19 +1000,19 @@ const divMod = async (divMod, session) => {
 	let isDiv = tag.includes("Div");
 	let isMod = tag.includes("Mod");
 	
-	let dm = CanonicalArithmetic.divMod(dividend, divisor, isDiv, isMod, session);
+	let dm = Arithmetic.divMod(dividend, divisor, isDiv, isMod, session);
 	
 	let result;
 	
 	if (isDiv && isMod) {
 		result = Formulae.createExpression(
 			"List.List",
-			CanonicalArithmetic.createInternalNumber(dm[0], session),
-			CanonicalArithmetic.createInternalNumber(dm[1], session)
+			Arithmetic.createInternalNumber(dm[0], session),
+			Arithmetic.createInternalNumber(dm[1], session)
 		);
 	}
 	else {
-		result = CanonicalArithmetic.createInternalNumber(dm, session)
+		result = Arithmetic.createInternalNumber(dm, session)
 	}
 	
 	divMod.replaceBy(result);
@@ -1029,46 +1029,46 @@ const modPow = async (modPow, session) => {
 	}
 	
 	let b = modPow.children[0].get("Value");
-	if (!CanonicalArithmetic.isInteger(b) || b.isNegative()) {
+	if (!Arithmetic.isInteger(b) || b.isNegative()) {
 		ReductionManager.setInError(modPow.children[0], "Base must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
 	let e = modPow.children[1].get("Value");
-	if (!CanonicalArithmetic.isInteger(e) || e.isNegative()) {
+	if (!Arithmetic.isInteger(e) || e.isNegative()) {
 		ReductionManager.setInError(modPow.children[1], "Exponent must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
 	let m = modPow.children[2].get("Value");
-	if (!CanonicalArithmetic.isInteger(m) || m.isNegative()) {
+	if (!Arithmetic.isInteger(m) || m.isNegative()) {
 		ReductionManager.setInError(modPow.children[2], "Modulo must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
 	let r;
-	let zero = CanonicalArithmetic.getIntegerZero(session);
-	let one = CanonicalArithmetic.getIntegerOne(session);
-	let two = CanonicalArithmetic.createInteger(2, session);
+	let zero = Arithmetic.getIntegerZero(session);
+	let one = Arithmetic.getIntegerOne(session);
+	let two = Arithmetic.createInteger(2, session);
 	
 	if (m.comparedTo(one) === 0) {
 		r = zero;
 	}
 	else {
 		r = one;
-		b = CanonicalArithmetic.divMod(b, m, false, true, session);
+		b = Arithmetic.divMod(b, m, false, true, session);
 		
 		while (e.isPositive()) {
-			if (CanonicalArithmetic.divMod(e, two, false, true, session).comparedTo(one) === 0) {
-				r = CanonicalArithmetic.divMod(r.multiplication(b), m, false, true, session);
+			if (Arithmetic.divMod(e, two, false, true, session).comparedTo(one) === 0) {
+				r = Arithmetic.divMod(r.multiplication(b), m, false, true, session);
 			}
 			
-			b = CanonicalArithmetic.divMod(b.multiplication(b), m, false, true, session);
+			b = Arithmetic.divMod(b.multiplication(b), m, false, true, session);
 			e = e.integerDivision(two, session);
 		}
 	}
 	
-	modPow.replaceBy(CanonicalArithmetic.createInternalNumber(r, session));
+	modPow.replaceBy(Arithmetic.createInternalNumber(r, session));
 	return true;
 };
 
@@ -1081,19 +1081,19 @@ const modInverse = async (modInverse, session) => {
 	}
 	
 	let a = modInverse.children[0].get("Value");
-	if (!CanonicalArithmetic.isInteger(a) || a.isNegative()) {
+	if (!Arithmetic.isInteger(a) || a.isNegative()) {
 		ReductionManager.setInError(modInverse.children[0], "Expression must be an non-negative integer");
 		throw new ReductionError();
 	}
 	
 	let m = modInverse.children[1].get("Value");
-	if (!CanonicalArithmetic.isInteger(m) || m.isNegative()) {
+	if (!Arithmetic.isInteger(m) || m.isNegative()) {
 		ReductionManager.setInError(modInverse.children[1], "Modulo must be an integer, non-negative number");
 		throw new ReductionError();
 	}
 	
-	let zero = CanonicalArithmetic.getIntegerZero(session);
-	let one = CanonicalArithmetic.getIntegerOne(session);
+	let zero = Arithmetic.getIntegerZero(session);
+	let one = Arithmetic.getIntegerOne(session);
 	
 	let t = zero, newt = one;
 	let r = m,    newr = a;
@@ -1116,7 +1116,7 @@ const modInverse = async (modInverse, session) => {
 		t = t.addition(m);
 	}
 	
-	modInverse.replaceBy(CanonicalArithmetic.createInternalNumber(t, session));
+	modInverse.replaceBy(Arithmetic.createInternalNumber(t, session));
 	return true;
 };
 
@@ -1129,10 +1129,10 @@ const log = async (log, session) => {
 	
 	if (x.isOne()) {
 		log.replaceBy(
-			CanonicalArithmetic.createInternalNumber(
-				CanonicalArithmetic.isInteger(x) ?
-				CanonicalArithmetic.getIntegerZero(session) :
-				CanonicalArithmetic.getDecimalZero(session),
+			Arithmetic.createInternalNumber(
+				Arithmetic.isInteger(x) ?
+				Arithmetic.getIntegerZero(session) :
+				Arithmetic.getDecimalZero(session),
 				session
 			)
 		);
@@ -1153,7 +1153,7 @@ const log = async (log, session) => {
 	arg: {
 		// integer or rational
 		
-		if (CanonicalArithmetic.isInteger(x) || CanonicalArithmetic.isRational(x)) {
+		if (Arithmetic.isInteger(x) || Arithmetic.isRational(x)) {
 			if (session.numeric) {
 				x = x.toDecimal(session);
 			}
@@ -1164,15 +1164,15 @@ const log = async (log, session) => {
 		
 		// decimal
 		
-		if (CanonicalArithmetic.isDecimal(x)) {
+		if (Arithmetic.isDecimal(x)) {
 			if (x.isPositive()) {
-				result = CanonicalArithmetic.createInternalNumber(x.naturalLogarithm(session), session);
+				result = Arithmetic.createInternalNumber(x.naturalLogarithm(session), session);
 			}
 			else {
-				result = CanonicalArithmetic.createInternalNumber(
-					CanonicalArithmetic.createComplex(
+				result = Arithmetic.createInternalNumber(
+					Arithmetic.createComplex(
 						x.negation().naturalLogarithm(session),
-						CanonicalArithmetic.getPi(session)
+						Arithmetic.getPi(session)
 					),
 					session
 				);
@@ -1182,12 +1182,12 @@ const log = async (log, session) => {
 		
 		// complex
 		
-		if (CanonicalArithmetic.isDecimal(x.real) || CanonicalArithmetic.isDecimal(x.imaginary)) { // numeric
+		if (Arithmetic.isDecimal(x.real) || Arithmetic.isDecimal(x.imaginary)) { // numeric
 			let imaginary = x.imaginary.toDecimal(session).aTan2(x.real.toDecimal(session), session);
 			
 			if (x.real.isZero()) {
-				result = CanonicalArithmetic.createInternalNumber(
-					CanonicalArithmetic.createComplex(
+				result = Arithmetic.createInternalNumber(
+					Arithmetic.createComplex(
 						x.imaginary.absoluteValue().naturalLogarithm(session),
 						imaginary
 					),
@@ -1195,9 +1195,9 @@ const log = async (log, session) => {
 				);
 			}
 			else {
-				result = CanonicalArithmetic.createInternalNumber(
-					CanonicalArithmetic.createComplex(
-						CanonicalArithmetic.addition(
+				result = Arithmetic.createInternalNumber(
+					Arithmetic.createComplex(
+						Arithmetic.addition(
 							x.real.multiplication(x.real, session),
 							x.imaginary.multiplication(x.imaginary, session),
 							session
@@ -1214,17 +1214,17 @@ const log = async (log, session) => {
 					"Math.Arithmetic.Addition",
 					Formulae.createExpression(
 						"Math.Transcendental.NaturalLogarithm",
-						CanonicalArithmetic.createInternalNumber(
+						Arithmetic.createInternalNumber(
 							x.imaginary.absoluteValue(),
 							session
 						)
 					),
 					Formulae.createExpression(
 						"Math.Arithmetic.Multiplication",
-						CanonicalArithmetic.createInternalNumber(
-							CanonicalArithmetic.createRational(
-								CanonicalArithmetic.createInteger(x.imaginary.isPositive() ? 1 : -1, session),
-								CanonicalArithmetic.createInteger(2, session)
+						Arithmetic.createInternalNumber(
+							Arithmetic.createRational(
+								Arithmetic.createInteger(x.imaginary.isPositive() ? 1 : -1, session),
+								Arithmetic.createInteger(2, session)
 							),
 							session
 						),
@@ -1240,8 +1240,8 @@ const log = async (log, session) => {
 						"Math.Transcendental.NaturalLogarithm",
 						Formulae.createExpression(
 							"Math.Arithmetic.SquareRoot",
-							CanonicalArithmetic.createInternalNumber(
-								CanonicalArithmetic.addition(
+							Arithmetic.createInternalNumber(
+								Arithmetic.addition(
 									x.real.multiplication(x.real, session),
 									x.imaginary.multiplication(x.imaginary, session),
 									session
@@ -1254,8 +1254,8 @@ const log = async (log, session) => {
 						"Math.Arithmetic.Multiplication",
 						Formulae.createExpression(
 							"Math.Trigonometric.ArcTangent2",
-							CanonicalArithmetic.createInternalNumber(x.imaginary, session),
-							CanonicalArithmetic.createInternalNumber(x.real, session)
+							Arithmetic.createInternalNumber(x.imaginary, session),
+							Arithmetic.createInternalNumber(x.real, session)
 						),
 						Formulae.createExpression("Math.Complex.ImaginaryUnit")
 					)
@@ -1273,9 +1273,9 @@ const log = async (log, session) => {
 			if (result.isInternalNumber()) {
 				result.set(
 					"Value",
-					CanonicalArithmetic.division(
+					Arithmetic.division(
 						result.get("Value"),
-						CanonicalArithmetic.getLN10(session),
+						Arithmetic.getLN10(session),
 						session
 					)
 				);
@@ -1286,8 +1286,8 @@ const log = async (log, session) => {
 					result,
 					Formulae.createExpression(
 						"Math.Transcendental.NaturalLogarithm",
-						CanonicalArithmetic.createInternalNumber(
-							CanonicalArithmetic.createInteger(10, session),
+						Arithmetic.createInternalNumber(
+							Arithmetic.createInteger(10, session),
 							session
 						)
 					)
@@ -1301,9 +1301,9 @@ const log = async (log, session) => {
 			if (result.isInternalNumber()) {
 				result.set(
 					"Value",
-					CanonicalArithmetic.division(
+					Arithmetic.division(
 						result.get("Value"),
-						CanonicalArithmetic.getLN2(session),
+						Arithmetic.getLN2(session),
 						session
 					)
 				);
@@ -1314,8 +1314,8 @@ const log = async (log, session) => {
 					result,
 					Formulae.createExpression(
 						"Math.Transcendental.NaturalLogarithm",
-						CanonicalArithmetic.createInternalNumber(
-							CanonicalArithmetic.createInteger(2, session),
+						Arithmetic.createInternalNumber(
+							Arithmetic.createInteger(2, session),
 							session
 						)
 					)
@@ -1355,7 +1355,7 @@ const sqrt = async (sqrt, session) => {
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
 	
-	if (CanonicalArithmetic.isInteger(n)) {
+	if (Arithmetic.isInteger(n)) {
 		let isNegative = n.isNegative();
 		if (n.isNegative()) n = n.negation();
 		
@@ -1379,9 +1379,9 @@ const sqrt = async (sqrt, session) => {
 		else {
 			if (isNegative) {
 				sqrt.replaceBy(
-					CanonicalArithmetic.createInternalNumber(
-						CanonicalArithmetic.createComplex(
-							CanonicalArithmetic.getIntegerZero(session),
+					Arithmetic.createInternalNumber(
+						Arithmetic.createComplex(
+							Arithmetic.getIntegerZero(session),
 							sr
 						),
 						session
@@ -1390,7 +1390,7 @@ const sqrt = async (sqrt, session) => {
 				return true;
 			}
 			else {
-				sqrt.replaceBy(CanonicalArithmetic.createInternalNumber(sr, session));
+				sqrt.replaceBy(Arithmetic.createInternalNumber(sr, session));
 				return true;
 			}
 		}
@@ -1398,17 +1398,17 @@ const sqrt = async (sqrt, session) => {
 	
 	let sr;
 	try {
-		sr = CanonicalArithmetic.exponentiation(
+		sr = Arithmetic.exponentiation(
 			n,
-			CanonicalArithmetic.createRational(
-				CanonicalArithmetic.createInteger(1, session),
-				CanonicalArithmetic.createInteger(2, session)
+			Arithmetic.createRational(
+				Arithmetic.createInteger(1, session),
+				Arithmetic.createInteger(2, session)
 			),
 			session
 		);
 	}
 	catch (error) {
-		if (error instanceof CanonicalArithmetic.NonNumericError) {
+		if (error instanceof Arithmetic.NonNumericError) {
 			return false;
 		}
 		else {
@@ -1422,30 +1422,30 @@ const sqrt = async (sqrt, session) => {
 }
 
 const trigHyperMap = new Map();
-trigHyperMap.set("Math.Trigonometric.Sine",         CanonicalArithmetic.sine);
-trigHyperMap.set("Math.Trigonometric.Cosine",       CanonicalArithmetic.cosine);
-trigHyperMap.set("Math.Trigonometric.Tangent",      CanonicalArithmetic.tangent);
-trigHyperMap.set("Math.Trigonometric.Cotangent",    CanonicalArithmetic.cotangent);
-trigHyperMap.set("Math.Trigonometric.Secant",       CanonicalArithmetic.secant);
-trigHyperMap.set("Math.Trigonometric.Cosecant",     CanonicalArithmetic.cosecant);
-trigHyperMap.set("Math.Trigonometric.ArcSine",      CanonicalArithmetic.inverseSine);
-trigHyperMap.set("Math.Trigonometric.ArcCosine",    CanonicalArithmetic.inverseCosine);
-trigHyperMap.set("Math.Trigonometric.ArcTangent",   CanonicalArithmetic.inverseTangent);
-trigHyperMap.set("Math.Trigonometric.ArcCotangent", CanonicalArithmetic.inverseCotangent);
-trigHyperMap.set("Math.Trigonometric.ArcSecant",    CanonicalArithmetic.inverseSecant);
-trigHyperMap.set("Math.Trigonometric.ArcCosecant",  CanonicalArithmetic.inverseCosecant);
-trigHyperMap.set("Math.Hyperbolic.Sine",            CanonicalArithmetic.hyperbolicSine);
-trigHyperMap.set("Math.Hyperbolic.Cosine",          CanonicalArithmetic.hyperbolicCosine);
-trigHyperMap.set("Math.Hyperbolic.Tangent",         CanonicalArithmetic.hyperbolicTangent);
-trigHyperMap.set("Math.Hyperbolic.Cotangent",       CanonicalArithmetic.hyperbolicCotangent);
-trigHyperMap.set("Math.Hyperbolic.Secant",          CanonicalArithmetic.hyperbolicSecant);
-trigHyperMap.set("Math.Hyperbolic.Cosecant",        CanonicalArithmetic.hyperbolicCosecant);
-trigHyperMap.set("Math.Hyperbolic.ArcSine",         CanonicalArithmetic.inverseHyperbolicSine);
-trigHyperMap.set("Math.Hyperbolic.ArcCosine",       CanonicalArithmetic.inverseHyperbolicCosine);
-trigHyperMap.set("Math.Hyperbolic.ArcTangent",      CanonicalArithmetic.inverseHyperbolicTangent);
-trigHyperMap.set("Math.Hyperbolic.ArcCotangent",    CanonicalArithmetic.inverseHyperbolicCotangent);
-trigHyperMap.set("Math.Hyperbolic.ArcSecant",       CanonicalArithmetic.inverseHyperbolicSecant);
-trigHyperMap.set("Math.Hyperbolic.ArcCosecant",     CanonicalArithmetic.inverseHyperbolicCosecant);
+trigHyperMap.set("Math.Trigonometric.Sine",         Arithmetic.sine);
+trigHyperMap.set("Math.Trigonometric.Cosine",       Arithmetic.cosine);
+trigHyperMap.set("Math.Trigonometric.Tangent",      Arithmetic.tangent);
+trigHyperMap.set("Math.Trigonometric.Cotangent",    Arithmetic.cotangent);
+trigHyperMap.set("Math.Trigonometric.Secant",       Arithmetic.secant);
+trigHyperMap.set("Math.Trigonometric.Cosecant",     Arithmetic.cosecant);
+trigHyperMap.set("Math.Trigonometric.ArcSine",      Arithmetic.inverseSine);
+trigHyperMap.set("Math.Trigonometric.ArcCosine",    Arithmetic.inverseCosine);
+trigHyperMap.set("Math.Trigonometric.ArcTangent",   Arithmetic.inverseTangent);
+trigHyperMap.set("Math.Trigonometric.ArcCotangent", Arithmetic.inverseCotangent);
+trigHyperMap.set("Math.Trigonometric.ArcSecant",    Arithmetic.inverseSecant);
+trigHyperMap.set("Math.Trigonometric.ArcCosecant",  Arithmetic.inverseCosecant);
+trigHyperMap.set("Math.Hyperbolic.Sine",            Arithmetic.hyperbolicSine);
+trigHyperMap.set("Math.Hyperbolic.Cosine",          Arithmetic.hyperbolicCosine);
+trigHyperMap.set("Math.Hyperbolic.Tangent",         Arithmetic.hyperbolicTangent);
+trigHyperMap.set("Math.Hyperbolic.Cotangent",       Arithmetic.hyperbolicCotangent);
+trigHyperMap.set("Math.Hyperbolic.Secant",          Arithmetic.hyperbolicSecant);
+trigHyperMap.set("Math.Hyperbolic.Cosecant",        Arithmetic.hyperbolicCosecant);
+trigHyperMap.set("Math.Hyperbolic.ArcSine",         Arithmetic.inverseHyperbolicSine);
+trigHyperMap.set("Math.Hyperbolic.ArcCosine",       Arithmetic.inverseHyperbolicCosine);
+trigHyperMap.set("Math.Hyperbolic.ArcTangent",      Arithmetic.inverseHyperbolicTangent);
+trigHyperMap.set("Math.Hyperbolic.ArcCotangent",    Arithmetic.inverseHyperbolicCotangent);
+trigHyperMap.set("Math.Hyperbolic.ArcSecant",       Arithmetic.inverseHyperbolicSecant);
+trigHyperMap.set("Math.Hyperbolic.ArcCosecant",     Arithmetic.inverseHyperbolicCosecant);
 
 const trigHyper = async (f, session) => {
 	let expr = f.children[0];
@@ -1457,12 +1457,12 @@ const trigHyper = async (f, session) => {
 		x = x.toDecimal(session);
 	}
 	else {
-		if (CanonicalArithmetic.isInteger(x) || CanonicalArithmetic.isRational(x)) {
+		if (Arithmetic.isInteger(x) || Arithmetic.isRational(x)) {
 			return false; // forward
 		}
 		
-		if (CanonicalArithmetic.isComplex(x)) {
-			if (CanonicalArithmetic.isDecimal(x.real) || CanonicalArithmetic.isDecimal(x.imaginary)) {
+		if (Arithmetic.isComplex(x)) {
+			if (Arithmetic.isDecimal(x.real) || Arithmetic.isDecimal(x.imaginary)) {
 				x = x.toDecimal(session);
 			}	
 			else {
@@ -1476,13 +1476,13 @@ const trigHyper = async (f, session) => {
 		r = trigHyperMap.get(f.getTag())(x, session);
 	}
 	catch (error) {
-		if (error instanceof CanonicalArithmetic.NonNumericError) {
+		if (error instanceof Arithmetic.NonNumericError) {
 			return false;
 		}
 		else if (
-			error instanceof CanonicalArithmetic.OverflowError ||
-			error instanceof CanonicalArithmetic.UnderflowError ||
-			error instanceof CanonicalArithmetic.DomainError
+			error instanceof Arithmetic.OverflowError ||
+			error instanceof Arithmetic.UnderflowError ||
+			error instanceof Arithmetic.DomainError
 		) {
 			f.replaceBy(Formulae.createExpression("Undefined"));
 			return true;
@@ -1500,23 +1500,23 @@ const trigHyper = async (f, session) => {
 const atan2 = async (atan2, session) => {
 	if (!atan2.children[0].isInternalNumber()) return false;
 	let numbery = atan2.children[0].get("Value");
-	if (CanonicalArithmetic.isComplex(numbery)) return false;
+	if (Arithmetic.isComplex(numbery)) return false;
 	
 	if (!atan2.children[1].isInternalNumber()) return false;
 	let numberx = atan2.children[1].get("Value");
-	if (CanonicalArithmetic.isComplex(numberx)) return false;
+	if (Arithmetic.isComplex(numberx)) return false;
 	
 	/////////////
 	// numeric //
 	/////////////
 	
-	if (session.numeric || CanonicalArithmetic.isDecimal(numbery) || CanonicalArithmetic.isDecimal(numberx)) {
-		numbery = CanonicalArithmetic.toDecimal(numbery, session);
-		numberx = CanonicalArithmetic.toDecimal(numberx, session);
+	if (session.numeric || Arithmetic.isDecimal(numbery) || Arithmetic.isDecimal(numberx)) {
+		numbery = Arithmetic.toDecimal(numbery, session);
+		numberx = Arithmetic.toDecimal(numberx, session);
 		
 		try {
 			atan2.replaceBy(
-				CanonicalArithmetic.createInternalNumber(
+				Arithmetic.createInternalNumber(
 					numbery.aTan2(numberx, session),
 					session
 				)
@@ -1524,7 +1524,7 @@ const atan2 = async (atan2, session) => {
 			return true;
 		}
 		catch (e) {
-			if (e instanceof CanonicalArithmetic.DivisionByZeroError) {
+			if (e instanceof Arithmetic.DivisionByZeroError) {
 				atan2.replaceBy(Formulae.createExpression("Undefined"));
 				return true;
 			}
@@ -1540,8 +1540,8 @@ const atan2 = async (atan2, session) => {
 	if (numbery.isZero()) {
 		if (numberx.isPositive()) {
 			atan2.replaceBy(
-				CanonicalArithmetic.createInternalNumber(
-					CanonicalArithmetic.getIntegerZero(session),
+				Arithmetic.createInternalNumber(
+					Arithmetic.getIntegerZero(session),
 					session
 				)
 			);
@@ -1565,10 +1565,10 @@ const atan2 = async (atan2, session) => {
 			atan2.replaceBy(
 				Formulae.createExpression(
 					"Math.Arithmetic.Multiplication",
-					CanonicalArithmetic.createInternalNumber(
-						CanonicalArithmetic.createRational(
-							CanonicalArithmetic.getIntegerOne(session),
-							CanonicalArithmetic.createInteger(2, session)
+					Arithmetic.createInternalNumber(
+						Arithmetic.createRational(
+							Arithmetic.getIntegerOne(session),
+							Arithmetic.createInteger(2, session)
 						),
 						session
 					),
@@ -1580,10 +1580,10 @@ const atan2 = async (atan2, session) => {
 			atan2.replaceBy(
 				Formulae.createExpression(
 					"Math.Arithmetic.Multiplication",
-					CanonicalArithmetic.createInternalNumber(
-						CanonicalArithmetic.createRational(
-							CanonicalArithmetic.getIntegerOne(session),
-							CanonicalArithmetic.createInteger(-2, session)
+					Arithmetic.createInternalNumber(
+						Arithmetic.createRational(
+							Arithmetic.getIntegerOne(session),
+							Arithmetic.createInteger(-2, session)
 						),
 						session
 					),
@@ -1603,25 +1603,25 @@ const integerPart = async (f, session) => {
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
 	
-	if (CanonicalArithmetic.isDecimal(n)) {
+	if (Arithmetic.isDecimal(n)) {
 		expr.set("Value", n.absoluteValue().trunc().toInteger());
 		f.replaceBy(expr);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isInteger(n)) {
+	if (Arithmetic.isInteger(n)) {
 		expr.set("Value", n.absoluteValue());
 		f.replaceBy(expr);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isRational(n)) {
+	if (Arithmetic.isRational(n)) {
 		expr.set("Value", n.numerator.absoluteValue().integerDivisionForGCD(n.denominator));
 		f.replaceBy(expr);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isComplex(n)) {
+	if (Arithmetic.isComplex(n)) {
 		return false;
 	}
 };
@@ -1631,27 +1631,27 @@ const fractionalPart = async (f, session) => {
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
 	
-	if (CanonicalArithmetic.isDecimal(n)) {
+	if (Arithmetic.isDecimal(n)) {
 		n = n.absoluteValue();
 		expr.set("Value", n.addition(n.trunc().negation(), session));
 		f.replaceBy(expr);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isInteger(n)) {
-		expr.set("Value", CanonicalArithmetic.getDecimalZero(session));
+	if (Arithmetic.isInteger(n)) {
+		expr.set("Value", Arithmetic.getDecimalZero(session));
 		f.replaceBy(expr);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isRational(n)) {
+	if (Arithmetic.isRational(n)) {
 		n = n.absoluteValue();
-		expr.set("Value", CanonicalArithmetic.subtraction(n, n.numerator.integerDivisionForGCD(n.denominator)));
+		expr.set("Value", Arithmetic.subtraction(n, n.numerator.integerDivisionForGCD(n.denominator)));
 		f.replaceBy(expr);
 		return true;
 	}
 	
-	if (CanonicalArithmetic.isComplex(n)) {
+	if (Arithmetic.isComplex(n)) {
 		return false;
 	}
 };
@@ -1669,38 +1669,38 @@ const isX = async (is, session) => {
 	
 	switch (is.getTag()) {
 		case "Math.Arithmetic.IsInteger":
-			result = CanonicalArithmetic.isInteger(number);
+			result = Arithmetic.isInteger(number);
 			break;
 			
 		case "Math.Arithmetic.IsDecimal":
-			result = CanonicalArithmetic.isDecimal(number);
+			result = Arithmetic.isDecimal(number);
 			break;
 			
 		case "Math.Arithmetic.IsIntegerValue":
 			result =
-				CanonicalArithmetic.isInteger(number) ||
-				(CanonicalArithmetic.isDecimal(number) && number.hasIntegerValue())
+				Arithmetic.isInteger(number) ||
+				(Arithmetic.isDecimal(number) && number.hasIntegerValue())
 			;
 			break;
 			
 		case "Math.Arithmetic.IsRealNumber":
-			result = CanonicalArithmetic.isInteger(number) || CanonicalArithmetic.isDecimal(number);
+			result = Arithmetic.isInteger(number) || Arithmetic.isDecimal(number);
 			break;
 			
 		case "Math.Arithmetic.IsRationalNumber":
-			result = CanonicalArithmetic.isRational(number);
+			result = Arithmetic.isRational(number);
 			break;
 			
 		case "Math.Arithmetic.IsComplexNumber":
-			result = CanonicalArithmetic.isComplex(number);
+			result = Arithmetic.isComplex(number);
 			break;
 			
 		case "Math.Arithmetic.IsNegativeNumber":
-			result = !CanonicalArithmetic.isComplex(number) && number.isNegative();
+			result = !Arithmetic.isComplex(number) && number.isNegative();
 			break;
 			
 		case "Math.Arithmetic.IsPositiveNumber":
-			result = !CanonicalArithmetic.isComplex(number) && number.isPositive();
+			result = !Arithmetic.isComplex(number) && number.isPositive();
 			break;
 			
 		case "Math.Arithmetic.IsNumberZero":
@@ -1709,27 +1709,27 @@ const isX = async (is, session) => {
 			
 		case "Math.Arithmetic.IsEven": {
 				let i = undefined;
-				if (CanonicalArithmetic.isInteger(number)) i = number;
-				else if (CanonicalArithmetic.isDecimal(number) && number.hasIntegerValue()) i = number.toInteger();
+				if (Arithmetic.isInteger(number)) i = number;
+				else if (Arithmetic.isDecimal(number) && number.hasIntegerValue()) i = number.toInteger();
 				if (i === undefined) {
 					result = false;
 				}
 				else {
-					console.log(i.integerDivisionForGCD(CanonicalArithmetic.createInteger(2, session)));
-					result = i.remainder(CanonicalArithmetic.createInteger(2, session)).isZero();
+					console.log(i.integerDivisionForGCD(Arithmetic.createInteger(2, session)));
+					result = i.remainder(Arithmetic.createInteger(2, session)).isZero();
 				}
 			}
 			break;
 			
 		case "Math.Arithmetic.IsOdd": {
 				let i = undefined;
-				if (CanonicalArithmetic.isInteger(number)) i = number;
-				else if (CanonicalArithmetic.isDecimal(number) && number.hasIntegerValue()) i = number.toInteger();
+				if (Arithmetic.isInteger(number)) i = number;
+				else if (Arithmetic.isDecimal(number) && number.hasIntegerValue()) i = number.toInteger();
 				if (i === undefined) {
 					result = false;
 				}
 				else {
-					result = !i.remainder(CanonicalArithmetic.createInteger(2, session)).isZero();
+					result = !i.remainder(Arithmetic.createInteger(2, session)).isZero();
 				}
 			}
 			break;
@@ -1750,13 +1750,13 @@ const toX = async (to, session) => {
 	switch (tag) {
 		case "Math.Arithmetic.ToInteger":
 		case "Math.Arithmetic.ToIfInteger": {
-				if (CanonicalArithmetic.isDecimal(n)) {
+				if (Arithmetic.isDecimal(n)) {
 					if (n.hasIntegerValue()) nn = n.toInteger();
 				}
-				else if (CanonicalArithmetic.isInteger(n)) nn = n;
-				else if (CanonicalArithmetic.isComplex(n)) {
+				else if (Arithmetic.isInteger(n)) nn = n;
+				else if (Arithmetic.isComplex(n)) {
 					if (n.real.hasIntegerValue() && n.imaginary.hasIntegerValue()) {
-						nn = CanonicalArithmetic.createComplex(n.real.toInteger(), n.imaginary.toInteger());
+						nn = Arithmetic.createComplex(n.real.toInteger(), n.imaginary.toInteger());
 					}
 				}
 				
@@ -1776,7 +1776,7 @@ const toX = async (to, session) => {
 		to.replaceBy(expr);
 	}
 	else {
-		to.replaceBy(CanonicalArithmetic.createInternalNumber(nn, session));
+		to.replaceBy(Arithmetic.createInternalNumber(nn, session));
 	}
 	
 	return true;
@@ -1789,7 +1789,7 @@ const toNumber = async (toNumber, session) => {
 	
 	let base = 10;
 	if (toNumber.children.length >= 2) {
-		base = CanonicalArithmetic.getNativeInteger(toNumber.children[1]);
+		base = Arithmetic.getNativeInteger(toNumber.children[1]);
 		if (base === undefined) return false;
 		if (base < 2 || base > 36) return false;
 	}
@@ -1801,16 +1801,16 @@ const toNumber = async (toNumber, session) => {
 		
 		try {
 			toNumber.replaceBy(
-				CanonicalArithmetic.createInternalNumber(
+				Arithmetic.createInternalNumber(
 					point ?
-					CanonicalArithmetic.createDecimalFromString(s, session) :
-					CanonicalArithmetic.createIntegerFromString(s, session),
+					Arithmetic.createDecimalFromString(s, session) :
+					Arithmetic.createIntegerFromString(s, session),
 					session
 				)
 			);
 		}
 		catch (error) {
-			if (error instanceof CanonicalArithmetic.ConversionError) {
+			if (error instanceof Arithmetic.ConversionError) {
 				return false;
 			}
 		}
@@ -1824,13 +1824,13 @@ const toNumber = async (toNumber, session) => {
 		let number, fraction;
 		
 		if (hasDecimalPoint) {
-			base = CanonicalArithmetic.createDecimal(base, session);
-			number = CanonicalArithmetic.getDecimalZero(session);
-			fraction = CanonicalArithmetic.getDecimalOne(session);
+			base = Arithmetic.createDecimal(base, session);
+			number = Arithmetic.getDecimalZero(session);
+			fraction = Arithmetic.getDecimalOne(session);
 		}
 		else {
-			base = CanonicalArithmetic.createInteger(base, session);
-			number = CanonicalArithmetic.getIntegerZero(session);
+			base = Arithmetic.createInteger(base, session);
+			number = Arithmetic.getIntegerZero(session);
 		}
 		
 		// 0-9 48-57
@@ -1881,7 +1881,7 @@ const toNumber = async (toNumber, session) => {
 			if (!point) {
 				//number = session.Decimal.add(session.Decimal.mul(number, base), cp);
 				number = number.multiplication(base, session).addition(
-					hasDecimalPoint ? CanonicalArithmetic.createDecimal(cp, session) : CanonicalArithmetic.createInteger(cp, session),
+					hasDecimalPoint ? Arithmetic.createDecimal(cp, session) : Arithmetic.createInteger(cp, session),
 					session
 				);
 			}
@@ -1891,7 +1891,7 @@ const toNumber = async (toNumber, session) => {
 				fraction = fraction.division(base, session);
 				number = number.addition(
 					fraction.multiplication(
-						hasDecimalPoint ? CanonicalArithmetic.createDecimal(cp, session) : CanonicalArithmetic.reateInteger(cp, session),
+						hasDecimalPoint ? Arithmetic.createDecimal(cp, session) : Arithmetic.reateInteger(cp, session),
 						session
 					),
 					session
@@ -1904,25 +1904,25 @@ const toNumber = async (toNumber, session) => {
 		if (i == 0) return false;
 		if (negative) number = number.negation();
 		
-		toNumber.replaceBy(CanonicalArithmetic.createInternalNumber(number, session));
+		toNumber.replaceBy(Arithmetic.createInternalNumber(number, session));
 		
 		return true;
 	}
 };
 
 const factorial = async (factorial, session) => {
-	let number = CanonicalArithmetic.getNativeInteger(factorial.children[0]);
+	let number = Arithmetic.getNativeInteger(factorial.children[0]);
 	if (number === undefined || number < 0n) return false;
-	number = CanonicalArithmetic.createInteger(number, session);
+	number = Arithmetic.createInteger(number, session);
 	
-	let one = CanonicalArithmetic.getIntegerOne(session);
+	let one = Arithmetic.getIntegerOne(session);
 	
 	let result = one;
-	for (let i = CanonicalArithmetic.createInteger(2, session); i.comparedTo(number) <= 0; i = i.addition(one)) {
+	for (let i = Arithmetic.createInteger(2, session); i.comparedTo(number) <= 0; i = i.addition(one)) {
 		result = result.multiplication(i);
 	}
 	
-	factorial.replaceBy(CanonicalArithmetic.createInternalNumber(result, session));
+	factorial.replaceBy(Arithmetic.createInternalNumber(result, session));
 	
 	return true;
 };
@@ -1933,12 +1933,12 @@ const toString = async (toString, session) => {
 	
 	let base = 10;
 	if (toString.children.length >= 2) {
-		base = CanonicalArithmetic.getNativeInteger(toString.children[1]);
+		base = Arithmetic.getNativeInteger(toString.children[1]);
 		if (base === undefined) return false;
 	}
 	
 	if (base == 10) {
-		if (CanonicalArithmetic.isInteger(number) || CanonicalArithmetic.isDecimal(number)) {
+		if (Arithmetic.isInteger(number) || Arithmetic.isDecimal(number)) {
 			let expr = Formulae.createExpression("String.String");
 			expr.set("Value", number.toText());
 			toString.replaceBy(expr);
@@ -1952,15 +1952,15 @@ const toString = async (toString, session) => {
 const digits = async (digits, session) => {
 	if (!digits.children[0].isInternalNumber()) return false;
 	let number = digits.children[0].get("Value");
-	if (!CanonicalArithmetic.isInteger(number)) return false;
+	if (!Arithmetic.isInteger(number)) return false;
 	if (number.isNegative()) return false;
 	
 	let base = 10;
 	if (digits.children.length >= 2) {
-		base = CanonicalArithmetic.getNativeInteger(digits.children[1]);
+		base = Arithmetic.getNativeInteger(digits.children[1]);
 		if (base === undefined || base < 2 ) return false;
 	}
-	base = CanonicalArithmetic.createInteger(base, session);
+	base = Arithmetic.createInteger(base, session);
 	
 	let expr = Formulae.createExpression("List.List");
 	let quotient = number;
@@ -1969,16 +1969,16 @@ const digits = async (digits, session) => {
 	do {
 		remainder = quotient.remainder(base);
 		quotient = quotient.integerDivisionForGCD(base);
-		expr.addChildAt(0, CanonicalArithmetic.createInternalNumber(remainder, session));
+		expr.addChildAt(0, Arithmetic.createInternalNumber(remainder, session));
 	} while (!quotient.isZero());
 	
 	if (digits.children.length >= 3) {
-		let size = CanonicalArithmetic.getNativeInteger(digits.children[2]);
+		let size = Arithmetic.getNativeInteger(digits.children[2]);
 		if (size === undefined || base < 1 ) return false;
 		if (size > expr.children.length) {
-			let zero = CanonicalArithmetic.getIntegerZero(session);
+			let zero = Arithmetic.getIntegerZero(session);
 			for (let i = 0, n = size - expr.children.length; i < n; ++i) {
-				expr.addChildAt(0, CanonicalArithmetic.createInternalNumber(zero, session));
+				expr.addChildAt(0, Arithmetic.createInternalNumber(zero, session));
 			}
 		}
 	}
@@ -1988,7 +1988,7 @@ const digits = async (digits, session) => {
 };
 
 const toTime = async (toTime, session) => {
-	let number = CanonicalArithmetic.getNativeInteger(toTime.children[0]);
+	let number = Arithmetic.getNativeInteger(toTime.children[0]);
 	if (number === undefined) return false;
 	if (number < -8_640_000_000_000_000 || number > 8_640_000_000_000_000) return false;
 	
@@ -2010,7 +2010,7 @@ const gcdLcm = async (gcdLcm, session) => {
 		if (!pivot.isInternalNumber()) continue;
 		pivot = pivot.get("Value");
 		if (pivot.hasIntegerValue()) {
-			if (!CanonicalArithmetic.isInteger(pivot)) pivot = pivot.toInteger(session);
+			if (!Arithmetic.isInteger(pivot)) pivot = pivot.toInteger(session);
 			break;
 		}
 	}
@@ -2028,12 +2028,12 @@ const gcdLcm = async (gcdLcm, session) => {
 		sibling = sibling.get("Value");
 		
 		if (sibling.hasIntegerValue()) {
-			if (!CanonicalArithmetic.isInteger(sibling)) sibling = sibling.toInteger(session);
+			if (!Arithmetic.isInteger(sibling)) sibling = sibling.toInteger(session);
 			if (isGcd) {
 				r = r.gcd(sibling);
 			}
 			else {   // LCM(a, b) = | ab | / GCD(a, b)
-				//r = CanonicalArithmetic.abs(r * sibling) / CanonicalArithmetic.gcd(r, sibling);
+				//r = Arithmetic.abs(r * sibling) / Arithmetic.gcd(r, sibling);
 				r = r.multiplication(sibling).absoluteValue().integerDivisionForGCD(r.gcd(sibling));
 			}
 			
@@ -2043,18 +2043,18 @@ const gcdLcm = async (gcdLcm, session) => {
 	}
 		
 	if (list.children.length == 1) { // just one child
-		gcdLcm.replaceBy(CanonicalArithmetic.createInternalNumber(r, session));
+		gcdLcm.replaceBy(Arithmetic.createInternalNumber(r, session));
 		return true;
 	}
 	else { // more than one child
 		if (pos == 0) {
 			if (performed) {
-				list.setChild(0, CanonicalArithmetic.createInternalNumber(r, session));
+				list.setChild(0, Arithmetic.createInternalNumber(r, session));
 			}
 		}
 		else {
 			list.removeChildAt(pos);
-			list.addChildAt(0, CanonicalArithmetic.createInternalNumber(r, session));
+			list.addChildAt(0, Arithmetic.createInternalNumber(r, session));
 			//performed = true;
 		}
 	}
@@ -2067,17 +2067,17 @@ const factors = async (factors, session) => {
 	if (!n.isInternalNumber()) return false;
 	n = n.get("Value");
 	if (!n.hasIntegerValue()) return false;
-	if (!CanonicalArithmetic.isInteger(n)) n = n.toInteger(session);
+	if (!Arithmetic.isInteger(n)) n = n.toInteger(session);
 	if (!n.isPositive()) return false;
 	
-	let one = CanonicalArithmetic.getIntegerOne(session);
-	let two = CanonicalArithmetic.createInteger(2, session);
-	let three = CanonicalArithmetic.createInteger(3, session);
+	let one = Arithmetic.getIntegerOne(session);
+	let two = Arithmetic.createInteger(2, session);
+	let three = Arithmetic.createInteger(3, session);
 	
 	let list = Formulae.createExpression("List.List");
 	
 	while (n.remainder(two).isZero()) {
-		list.addChild(CanonicalArithmetic.createInternalNumber(two, session));
+		list.addChild(Arithmetic.createInternalNumber(two, session));
 		n = n.integerDivisionForGCD(two);
 	}
 	
@@ -2086,7 +2086,7 @@ const factors = async (factors, session) => {
 		
 		while (f.multiplication(f).comparedTo(n) <= 0) {
 			if (n.remainder(f).isZero()) {
-				list.addChild(CanonicalArithmetic.createInternalNumber(f, session));
+				list.addChild(Arithmetic.createInternalNumber(f, session));
 				n = n.integerDivisionForGCD(f);
 			}
 			else {
@@ -2094,7 +2094,7 @@ const factors = async (factors, session) => {
 			}
 		}
 		
-		list.addChild(CanonicalArithmetic.createInternalNumber(n, session));
+		list.addChild(Arithmetic.createInternalNumber(n, session));
 	}
 	
 	factors.replaceBy(list);
@@ -2102,10 +2102,10 @@ const factors = async (factors, session) => {
 };
 
 const divisionTest = async (divisionTest, session) => {
-	let divisor = CanonicalArithmetic.getInteger(divisionTest.children[0]);
+	let divisor = Arithmetic.getInteger(divisionTest.children[0]);
 	if (divisor === undefined || divisor.isZero()) return false;
 	
-	let multiple = CanonicalArithmetic.getInteger(divisionTest.children[1]);
+	let multiple = Arithmetic.getInteger(divisionTest.children[1]);
 	if (multiple === undefined) return false;
 	
 	let divides = multiple.remainder(divisor).isZero();
@@ -2118,10 +2118,10 @@ const divisionTest = async (divisionTest, session) => {
 	return true;
 	
 	/*
-	let divisor = CanonicalArithmetic.getBigInt(divisionTest.children[0]);
+	let divisor = Arithmetic.getBigInt(divisionTest.children[0]);
 	if (divisor === undefined || divisor === 0n) return false;
 	
-	let multiple = CanonicalArithmetic.getBigInt(divisionTest.children[1]);
+	let multiple = Arithmetic.getBigInt(divisionTest.children[1]);
 	if (multiple === undefined) return false;
 	
 	// DO NOT remove the part
@@ -2143,12 +2143,12 @@ const divisionTest = async (divisionTest, session) => {
 const random = (random, session) => {
 	let precision = -1;
 	if (random.children.length >= 1) {
-		precision = CanonicalArithmetic.getNativeInteger(random.children[0]);
+		precision = Arithmetic.getNativeInteger(random.children[0]);
 		if (precision === undefined || precision <= 0) return false;
 	}
 	
-	random.replaceBy(CanonicalArithmetic.createInternalNumber(
-		CanonicalArithmetic.getRandom(precision, session),
+	random.replaceBy(Arithmetic.createInternalNumber(
+		Arithmetic.getRandom(precision, session),
 		session
 	));
 	
@@ -2156,18 +2156,18 @@ const random = (random, session) => {
 };
 
 const randomInRange = async (randomInRange, session) => {
-	let n1 = CanonicalArithmetic.getNativeInteger(randomInRange.children[0]);
+	let n1 = Arithmetic.getNativeInteger(randomInRange.children[0]);
 	if (n1 === undefined) return false;
 	
-	let n2 = CanonicalArithmetic.getNativeInteger(randomInRange.children[1]);
+	let n2 = Arithmetic.getNativeInteger(randomInRange.children[1]);
 	if (n2 === undefined) return false;
 	
 	if (n1 == n2) return false;
 
 	let x = Math.min(n1, n2) + Math.trunc(Math.random() * (Math.abs(n2 - n1) + 1));
 	
-	randomInRange.replaceBy(CanonicalArithmetic.createInternalNumber(
-		CanonicalArithmetic.createInteger(x, session),
+	randomInRange.replaceBy(Arithmetic.createInternalNumber(
+		Arithmetic.createInteger(x, session),
 		session
 	));
 	return true;
@@ -2223,15 +2223,15 @@ const constant = async (c, session) => {
 		let r;
 		switch (c.getTag()) {
 			case "Math.Constant.Pi":
-				r = CanonicalArithmetic.getPi(session);
+				r = Arithmetic.getPi(session);
 				break;
 			
 			case "Math.Constant.Euler":
-				r = CanonicalArithmetic.getE(session);
+				r = Arithmetic.getE(session);
 				break;
 		}
 		
-		c.replaceBy(CanonicalArithmetic.createInternalNumber(r, session));
+		c.replaceBy(Arithmetic.createInternalNumber(r, session));
 	}
 	
 	return true;
@@ -2246,7 +2246,7 @@ const summationProductReducer = async (summationProduct, session) => {
 		let arg = await session.reduceAndGet(summationProduct.children[0], 0);
 		let _N = await session.reduceAndGet(summationProduct.children[1], 1);
 		
-		let N = CanonicalArithmetic.getInteger(_N);
+		let N = Arithmetic.getInteger(_N);
 		if (N === undefined) return false;
 		
 		result = Formulae.createExpression(
@@ -2279,26 +2279,26 @@ const summationProductReducer = async (summationProduct, session) => {
 		if (n >= 4) {
 			if (!summationProduct.children[2].isInternalNumber()) return false;
 			from = summationProduct.children[2].get("Value");
-			if (CanonicalArithmetic.isComplex(from)) return false;
+			if (Arithmetic.isComplex(from)) return false;
 		}
 		else {
-			from = CanonicalArithmetic.getIntegerOne(session);
+			from = Arithmetic.getIntegerOne(session);
 		}
 		
 		// to
 		if (!summationProduct.children[n == 3 ? 2 : 3].isInternalNumber()) return false;
 		let to = summationProduct.children[n == 3 ? 2 : 3].get("Value");
-		if (CanonicalArithmetic.isComplex(to)) return false;
+		if (Arithmetic.isComplex(to)) return false;
 		
 		// step
 		let step;
 		if (n == 5) {
 			if (!summationProduct.children[4].isInternalNumber()) return false;
 			step = summationProduct.children[4].get("Value");
-			if (CanonicalArithmetic.isComplex(step)) return false;
+			if (Arithmetic.isComplex(step)) return false;
 		}
 		else {
-			step = CanonicalArithmetic.getIntegerOne(session);
+			step = Arithmetic.getIntegerOne(session);
 		}
 		
 		if (step.isZero()) return false;
@@ -2326,24 +2326,24 @@ const summationProductReducer = async (summationProduct, session) => {
 		
 		filling: while (true) {
 			if (negative) {
-				if (CanonicalArithmetic.comparison(from, to, session) < 0) {
+				if (Arithmetic.comparison(from, to, session) < 0) {
 					break filling;
 				}
 			}
 			else {
-				if (CanonicalArithmetic.comparison(from, to, session) > 0) {
+				if (Arithmetic.comparison(from, to, session) > 0) {
 					break filling;
 				}
 			}
 			
-			scopeEntry.setValue(CanonicalArithmetic.createInternalNumber(from, session));
+			scopeEntry.setValue(Arithmetic.createInternalNumber(from, session));
 			
 			result.addChild(clone = arg.clone());
 			//session.log("Element created");
 			
 			await session.reduce(clone);
 			
-			from = CanonicalArithmetic.addition(from, step, session);
+			from = Arithmetic.addition(from, step, session);
 		}
 		
 		result.removeScope();
@@ -2351,8 +2351,8 @@ const summationProductReducer = async (summationProduct, session) => {
 	
 	if ((n = result.children.length) == 0) {
 		result.replaceBy(
-			CanonicalArithmetic.createInternalNumber(
-				summation ? CanonicalArithmetic.getIntegerZero(session) : CanonicalArithmetic.getIntegerOne(session),
+			Arithmetic.createInternalNumber(
+				summation ? Arithmetic.getIntegerZero(session) : Arithmetic.getIntegerOne(session),
 				session
 			)
 		);
@@ -2410,8 +2410,8 @@ const summationProductListReducer = async (summationProduct, session) => {
 	let n = result.children.length;
 	if (n == 0) {
 		result.replaceBy(
-			CanonicalArithmetic.createInternalNumber(
-				summation ? CanonicalArithmetic.getIntegerZero(session) : CanonicalArithmetic.getIntegerOne(session),
+			Arithmetic.createInternalNumber(
+				summation ? Arithmetic.getIntegerZero(session) : Arithmetic.getIntegerOne(session),
 				session
 			)
 		);
@@ -2435,8 +2435,8 @@ const summationProductListReducer = async (summationProduct, session) => {
 const modularExponentiationNumeric = (x, y, p, session) => {
 	// Initialize result
 	
-	let two = CanonicalArithmetic.createInteger(2, session);
-	let res = CanonicalArithmetic.getIntegerOne(session);
+	let two = Arithmetic.createInteger(2, session);
+	let res = Arithmetic.getIntegerOne(session);
 	
 	// Update x if it is greater than or equal to p
 	x = x.remainder(p);
@@ -2459,18 +2459,18 @@ const modularExponentiationNumeric = (x, y, p, session) => {
  */
 
 const millerRabinTestNumeric = (n, d, session) => {
-	let one = CanonicalArithmetic.getIntegerOne(session);
-	let two = CanonicalArithmetic.createInteger(2, session);
+	let one = Arithmetic.getIntegerOne(session);
+	let two = Arithmetic.createInteger(2, session);
 	
 	// Pick a random number in [2 .. n - 2]
 	// Corner cases make sure that n > 4
 	
-	let a = two.randomInRange(CanonicalArithmetic.subtraction(n, two));
+	let a = two.randomInRange(Arithmetic.subtraction(n, two));
 	
 	// Compute a ^ d % n
 	let x = modularExponentiationNumeric(a, d, n, session);
 	
-	if (x.isOne() || x.comparedTo(CanonicalArithmetic.subtraction(n, one)) === 0) {
+	if (x.isOne() || x.comparedTo(Arithmetic.subtraction(n, one)) === 0) {
 		return true;
 	}
 	
@@ -2479,12 +2479,12 @@ const millerRabinTestNumeric = (n, d, session) => {
 	// (b) (x ^ 2) % n is not 1
 	// (c) (x ^ 2) % n is not n - 1
 	
-	while (d.comparedTo(CanonicalArithmetic.subtraction(n, one)) !== 0) {
+	while (d.comparedTo(Arithmetic.subtraction(n, one)) !== 0) {
 		x = x.multiplication(x).remainder(n);
 		d = d.multiplication(two);
 		
 		if (x.isOne()) return false;
-		if (x.comparedTo(CanonicalArithmetic.subtraction(n, one)) === 0) return true;
+		if (x.comparedTo(Arithmetic.subtraction(n, one)) === 0) return true;
 	}
 	
 	// Return composite
@@ -2492,17 +2492,17 @@ const millerRabinTestNumeric = (n, d, session) => {
 };
 
 const isProbablePrimeNumeric = (n, k, session) => {
-	let one = CanonicalArithmetic.getIntegerOne(session);
-	let two = CanonicalArithmetic.createInteger(2, session);
+	let one = Arithmetic.getIntegerOne(session);
+	let two = Arithmetic.createInteger(2, session);
 	
 	// Corner cases
-	if (n.comparedTo(one) <= 0 || n.comparedTo(CanonicalArithmetic.createInteger(4, session)) === 0) return false;
-	if (n.comparedTo(CanonicalArithmetic.createInteger(3, session)) <= 0) return true;
+	if (n.comparedTo(one) <= 0 || n.comparedTo(Arithmetic.createInteger(4, session)) === 0) return false;
+	if (n.comparedTo(Arithmetic.createInteger(3, session)) <= 0) return true;
 	
 	// Find r such that n =
 	// 2^d * r + 1 for some r >= 1
 	
-	let d = CanonicalArithmetic.subtraction(n, one);
+	let d = Arithmetic.subtraction(n, one);
 	while (d.remainder(two).isZero()) {
 		d = d.integerDivisionForGCD(two);
 	}
@@ -2522,7 +2522,7 @@ const isPrime = async (isPrime, session) => {
 	if (!isPrime.children[0].isInternalNumber()) return false;
 	let n = isPrime.children[0].get("Value");
 	
-	if (!CanonicalArithmetic.isInteger(n) || n.isNegative()) {
+	if (!Arithmetic.isInteger(n) || n.isNegative()) {
 		ReductionManager.setInError(isPrime.children[0], "Expression must be an integer, non-negative number");
 		throw new ReductionError();
 	}

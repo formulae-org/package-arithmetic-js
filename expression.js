@@ -198,10 +198,10 @@ const InternalNumber = class extends Expression.NullaryExpression {
 	prepareDisplay(context) {
 		this.s = this.number.toInternalText();
 		
-		//if (this.number instanceof CanonicalArithmetic.Integer) {
+		//if (this.number instanceof Arithmetic.Integer) {
 		//	this.s = this.number.integer.toString()
 		//}
-		//else if (this.number instanceof CanonicalArithmetic.Decimal) {
+		//else if (this.number instanceof Arithmetic.Decimal) {
 		//	this.s = this.number.decimal.toFixed() + "."
 		//}
 		//else {
