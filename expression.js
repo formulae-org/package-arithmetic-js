@@ -95,7 +95,8 @@ const Number = class extends Expression.NullaryExpression {
 	}
 	
 	async getSerializationStrings() {
-		if (typeof this.number === "bigint") {
+		//if (typeof this.number === "bigint") {
+		if (this.number.constructor === BigInt) {
 			return [ this.number.toString() ];
 		}
 		else { // Decimal
@@ -156,7 +157,8 @@ const Number = class extends Expression.NullaryExpression {
 	}
 	
 	evaluate() {
-		return ( typeof this.number === "bigint" ) ? Number(this.number) : this.number.toNumber();
+		//return ( typeof this.number === "bigint" ) ? Number(this.number) : this.number.toNumber();
+		return (this.number.constructor === BigInt) ? Number(this.number) : this.number.toNumber();
 	}
 }
 
