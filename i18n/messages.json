@@ -7,14 +7,21 @@
 	"updateNumber" : "Update number",
 	"actionNumber" : "Update number...",
 	
+	"pathNumeric" : "Math.Numeric",
+	
 	"mnemonicNumeric" : "Numeric",
 	"nameNumeric"     : "Numeric",
 	"leafNumeric"     : "Numeric",
 	"childrenNumeric" : [ "Argument", "Precision" ],
 	
-	"mnemonicSetNoSymbolic" : "No symbolic",
-	"nameSetNoSymbolic"     : "Set as no symbolic",
-	"leafSetNoSymbolic"     : "Set as no symbolic",
+	"mnemonicN" : "N",
+	"nameN"     : "N",
+	"leafN"     : "N",
+	"childrenN" : [ "Argument", "Precision" ],
+	
+	"mnemonicSetAsNumeric" : "SetAsNumeric",
+	"nameSetAsNumeric"     : "Set as numeric",
+	"leafSetAsNumeric"     : "Set as numeric",
 	
 	"pathPrecision" : "Math.Arithmetic.Precision",
 	

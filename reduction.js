@@ -235,55 +235,34 @@ const numeric = async (numeric, session) => {
 	return true;
 };
 
-////////////////////////
-// Set as no symbolic //
-////////////////////////
+// N(expression)
 
-// SetNoSymbolic
-
-const setNoSymbolic = async (setNoSymbolic, session) => {
-	session.noSymbolic = true;
+const n = async (n, session) => {
+	if (n.children.length != 1) return false; // forward to N(expr, precision)
+	let expr = n.children[0];
+	
+	if (expr.isInternalNumber()) {
+		let internalNumber = expr.get("Value");
+		
+		if (internalNumber.type !== 1) { // it is already decimal
+			expr.set("Value", internalNumber.toDecimal(session));
+		}
+		
+		n.replaceBy(expr);
+	}
+	else {
+		let result = Formulae.createExpression("Math.Numeric");
+		n.replaceBy(result);
+		result.addChild(expr);
+		
+		await session.reduce(result);
+	}
+	
 	return true;
 };
 
-/*
-// N(numeric)
-
-const nNumeric = async (n, session) => {
-	if (n.children.length != 1) return false; // forward to N(expr, precision)
-	
-	if (!n.children[0].isInternalNumber()) return false;
-	
-	let number = n.children[0].get("Value");
-	
-	if (Arithmetic.isInteger(number)) {
-		n.replaceBy(
-			Arithmetic.canonical2InternalNumber(
-				Arithmetic.ToDecimal(number, session)
-			)
-		);
-		return true;
-	}
-	
-	if (Arithmetic.isDecimal(number)) {
-		n.replaceBy(n.children[0]);
-		return true;
-	}
-	
-	if (Arithmetic.isRational(number)) {
-		n.replaceBy(
-			Arithmetic.createInternalNumber(
-				number.toDecimal(session),
-				session
-			)
-		);
-		return true;
-	}
-	
-	return false; // forward to other patterns
-};
-
 // N(expression, precision)
+
 const nPrecision = async (n, session) => {
 	//console.log("N(expression, precision)");
 	if (n.children.length < 2) return false; // forward to N(expr)
@@ -305,7 +284,11 @@ const nPrecision = async (n, session) => {
 	session.Decimal.set({ precision: oldPrecision });
 	return true;
 };
-*/
+
+const setAsNumeric = async (setAsNumeric, session) => {
+	session.numeric = true;
+	return true;
+};
 
 //////////////
 // addition //
@@ -2237,6 +2220,18 @@ const constant = async (c, session) => {
 	return true;
 };
 
+const nPi = async (n, session) => {
+	if (n.children.length > 1 || n.children[0].getTag() !== "Math.Constant.Pi") return false;
+	n.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getPi(session), session));
+	return true;
+};
+
+const nE = async (n, session) => {
+	if (n.children.length > 1 || n.children[0].getTag() !== "Math.Constant.Euler") return false;
+	n.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getE(session), session));
+	return true;
+};
+
 const summationProductReducer = async (summationProduct, session) => {
 	let n = summationProduct.children.length;
 	let summation = summationProduct.getTag() === "Math.Arithmetic.Summation";
@@ -2555,8 +2550,15 @@ ArithmeticPackage.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.SetEuclideanDivisionMode", setEuclideanDivisionMode, "ArithmeticPackage.setEuclideanDivisionMode");
 	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", getEuclideanDivisionMode, "ArithmeticPackage.getEuclideanDivisionMode");
 	
-	ReductionManager.addReducer("Math.Numeric",       numeric,       "ArithmeticPackage.numeric", { special: true });
-	ReductionManager.addReducer("Math.SetNoSymbolic", setNoSymbolic, "ArithmeticPackage.setNoSymbolic");
+	// numeric
+	
+	ReductionManager.addReducer("Math.Numeric",      numeric,                           "ArithmeticPackage.numeric",    { special: true });
+	ReductionManager.addReducer("Math.N",            n,                                 "ArithmeticPackage.n");
+	ReductionManager.addReducer("Math.N",            nPrecision,                        "ArithmeticPackage.nPrecision", { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
+	ReductionManager.addReducer("Math.N",            nPi,                               "ArithmeticPackage.nPi");
+	ReductionManager.addReducer("Math.N",            nE,                                "ArithmeticPackage.nE");
+	ReductionManager.addReducer("Math.N",            ReductionManager.expansionReducer, "ReductionManager.expansion",   { precedence: ReductionManager.PRECEDENCE_LOW});
+	ReductionManager.addReducer("Math.SetAsNumeric", setAsNumeric,                      "ArithmeticPackage.setAsNumeric");
 	
 	// NO NEGATIVES, acoording to internal representation
 	//ReductionManager.addReducer("Math.Arithmetic.Negative", negativeNumeric, "ArithmeticPackage.negativeNumeric");
@@ -2668,8 +2670,8 @@ ArithmeticPackage.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.Arithmetic.Piecewise", piecewise, "ArithmeticPackage.piecewise", { special: true });
 	
-	ReductionManager.addReducer("Math.Constant.Pi",    constant, "ArithmeticPackage.constant");
-	ReductionManager.addReducer("Math.Constant.Euler", constant, "ArithmeticPackage.constant");
+	//ReductionManager.addReducer("Math.Constant.Pi",    constant, "ArithmeticPackage.constant");
+	//ReductionManager.addReducer("Math.Constant.Euler", constant, "ArithmeticPackage.constant");
 	
 	ReductionManager.addReducer("Math.Arithmetic.Summation", summationProductReducer,     "ArithmeticPackage.summationProductReducer", { special: true });
 	ReductionManager.addReducer("Math.Arithmetic.Summation", summationProductListReducer, "ArithmeticPackage.summationProductListReducer", { special: true });

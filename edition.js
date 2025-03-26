@@ -124,10 +124,13 @@ const operatorEdition = function(tag, next, forced, negative) {
 };
 
 ArithmeticPackage.setEditions = function() {
+	// number
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = editionNumber);
 	
-	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumeric, () => Expression.wrapperEdition("Math.Numeric"));
-	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafSetNoSymbolic, () => Expression.replacingEdition("Math.SetNoSymbolic"));
+	// numeric / symbolic
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafNumeric,      () => Expression.wrapperEdition("Math.Numeric"));
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafN,            () => Expression.wrapperEdition("Math.N"));
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafSetAsNumeric, () => Expression.replacingEdition("Math.SetAsNumeric"));
 	
 	Formulae.addEdition(this.messages.pathMath, null, "∞", () => Expression.replacingEdition("Math.Infinity"));
 	

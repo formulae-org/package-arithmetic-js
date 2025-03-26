@@ -872,8 +872,9 @@ const Piecewise = class extends Expression {
 };
 
 ArithmeticPackage.setExpressions = function(module) {
-	Formulae.setExpression(module, "Math.Number",                    Number);
-	Formulae.setExpression(module, "Math.InternalNumber",            InternalNumber);
+	Formulae.setExpression(module, "Math.Number",         Number);
+	Formulae.setExpression(module, "Math.InternalNumber", InternalNumber);
+	
 	Formulae.setExpression(module, "Math.Arithmetic.Negative",       Negative);
 	Formulae.setExpression(module, "Math.Arithmetic.Addition",       Addition);
 	Formulae.setExpression(module, "Math.Arithmetic.Multiplication", Multiplication);
@@ -941,11 +942,20 @@ ArithmeticPackage.setExpressions = function(module) {
 		max:          2
 	});
 	
-	Formulae.setExpression(module, "Math.SetNoSymbolic", {
+	Formulae.setExpression(module, "Math.N", {
 		clazz:        Expression.Function,
-		getTag:       () => "Math.SetNoSymbolic",
-		getMnemonic:  () => ArithmeticPackage.messages.mnemonicSetNoSymbolic,
-		getName:      () => ArithmeticPackage.messages.nameSetNoSymbolic,
+		getTag:       () => "Math.N",
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicN,
+		getName:      () => ArithmeticPackage.messages.nameN,
+		getChildName: index => ArithmeticPackage.messages.childrenN[index],
+		max:          2
+	});
+	
+	Formulae.setExpression(module, "Math.SetAsNumeric", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.SetAsNumeric",
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicSetAsNumeric,
+		getName:      () => ArithmeticPackage.messages.nameSetAsNumeric,
 		min: 0, max: 0
 	});
 	
