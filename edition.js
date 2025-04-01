@@ -51,7 +51,8 @@ const actionNumber = {
 		let s;
 		{
 			let x = Formulae.sExpression.get("Value");
-			if (typeof x === "bigint") {
+			//if (typeof x === "bigint") {
+			if (x.constructor === BigInt) {
 				s = x.toString();
 			}
 			else { // Decimal
