@@ -1014,7 +1014,7 @@ ArithmeticPackage.setExpressions = function(module) {
 	[ // 1-parameter function, no child name
 		"SignificantDigits",    "SetPrecision", "SetRoundingMode", "SetEuclideanDivisionMode",
 		"IntegerPart",  "FractionalPart", "DecimalPlaces",
-		"Sign",         "Factors",
+		"Sign",         "Factors", "FactorsWithExponents", "Divisors",
 		"IsRealNumber", "IsRationalNumber", "IsNumeric", "IsIntegerValue", "IsInteger", "IsDecimal", "IsPositiveNumber", "IsNegativeNumber", "IsNumberZero",
 		"IsEven",       "IsOdd",            "IsPrime",
 		"ToInteger",    "ToIfInteger",      "ToDecimal"

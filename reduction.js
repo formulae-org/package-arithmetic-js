@@ -2045,22 +2045,32 @@ const gcdLcm = async (gcdLcm, session) => {
 	return false; // Ok, forward to other forms of GCD/LCM(...)
 };
 
-const factors = async (factors, session) => {
-	let n = factors.children[0];
-	if (!n.isInternalNumber()) return false;
-	n = n.get("Value");
-	if (!n.hasIntegerValue()) return false;
-	if (!Arithmetic.isInteger(n)) n = n.toInteger(session);
-	if (!n.isPositive()) return false;
+// n: internal integer number
+// asList: whether the result will be a list expression, or a native Map: internal number -> native number
+
+const calculateFactors = (n, session, asList) => {
+	let list, map, m;
+	
+	if (asList) {
+		list = Formulae.createExpression("List.List");
+	}
+	else {
+		map = new Map();
+	}
 	
 	let one = Arithmetic.getIntegerOne(session);
 	let two = Arithmetic.createInteger(2, session);
 	let three = Arithmetic.createInteger(3, session);
 	
-	let list = Formulae.createExpression("List.List");
-	
 	while (n.remainder(two).isZero()) {
-		list.addChild(Arithmetic.createInternalNumber(two, session));
+		if (asList) {
+			list.addChild(Arithmetic.createInternalNumber(two, session));
+		}
+		else {
+			m = map.get(two);
+			map.set(two, m === undefined ? 1 : m + 1);
+		}
+		
 		n = n.integerDivisionForGCD(two);
 	}
 	
@@ -2069,7 +2079,14 @@ const factors = async (factors, session) => {
 		
 		while (f.multiplication(f).comparedTo(n) <= 0) {
 			if (n.remainder(f).isZero()) {
-				list.addChild(Arithmetic.createInternalNumber(f, session));
+				if (asList) {
+					list.addChild(Arithmetic.createInternalNumber(f, session));
+				}
+				else {
+					m = map.get(f);
+					map.set(f, m === undefined ? 1 : m + 1);
+				}
+				
 				n = n.integerDivisionForGCD(f);
 			}
 			else {
@@ -2077,11 +2094,120 @@ const factors = async (factors, session) => {
 			}
 		}
 		
-		list.addChild(Arithmetic.createInternalNumber(n, session));
+		if (asList) {
+			list.addChild(Arithmetic.createInternalNumber(n, session));
+		}
+		else {
+			m = map.get(n);
+			map.set(n, m === undefined ? 1 : m + 1);
+		}
 	}
 	
-	factors.replaceBy(list);
-	return true;
+	return asList ? list : map;
+};
+
+const factorsDivisors = async (factorsDivisors, session) => {
+	let n = factorsDivisors.children[0];
+	if (!n.isInternalNumber()) return false;
+	n = n.get("Value");
+	if (!n.hasIntegerValue()) return false;
+	if (!Arithmetic.isInteger(n)) n = n.toInteger(session);
+	if (!n.isPositive()) return false;
+	
+	////////////////////////
+	
+	if (n.isOne()) {
+		switch (factorsDivisors.getTag()) {
+			case "Math.Arithmetic.Factors":
+			case "Math.Arithmetic.Divisors":
+				factorsDivisors.replaceBy(
+					Formulae.createExpression(
+						"List.List",
+						Arithmetic.createInternalNumber(Arithmetic.getIntegerOne(session), session)
+					)
+				);
+				return true;
+				
+			case "Math.Arithmetic.FactorsWithExponents":
+				factorsDivisors.replaceBy(
+					Formulae.createExpression(
+						"List.List",
+						Formulae.createExpression(
+							"List.List",
+							Arithmetic.createInternalNumber(Arithmetic.getIntegerOne(session), session),
+							Arithmetic.createInternalNumber(Arithmetic.getIntegerOne(session), session)
+						)
+					)
+				);
+				return true;
+		}
+	}
+	
+	switch (factorsDivisors.getTag()) {
+		case "Math.Arithmetic.Factors": {
+				factorsDivisors.replaceBy(calculateFactors(n, session, true));
+				return true;
+			}
+		
+		case "Math.Arithmetic.FactorsWithExponents": {
+				let map = calculateFactors(n, session, false);
+				let list = Formulae.createExpression("List.List");
+				map.forEach((value, key) => {
+					list.addChild(
+						Formulae.createExpression(
+							"List.List",
+							Arithmetic.createInternalNumber(key, session),
+							Arithmetic.createInternalNumber(Arithmetic.createInteger(value, session), session)
+						)
+					);
+				});
+				factorsDivisors.replaceBy(list);
+				return true;
+			}
+		
+		case "Math.Arithmetic.Divisors": {
+				let list = Formulae.createExpression("List.List");
+				let map = calculateFactors(n, session, false);
+				let bases = Array.from(map.keys());
+				let maxExponents = Array.from(map.values());
+				n = bases.length;
+				let indices = Array(n).fill(0);
+				
+				let divisor, i, m;
+				
+				product: while (true) {
+					divisor = Arithmetic.getIntegerOne(session);
+					for (i = 0; i < n; ++i) {
+						if (indices[i] !== 0) {
+							divisor = Arithmetic.multiplication(
+								divisor,
+								Arithmetic.exponentiation(bases[i], Arithmetic.createInteger(indices[i], session), session),
+								session
+							);
+						}
+					}
+					list.addChild(Arithmetic.createInternalNumber(divisor, session));
+					
+					for (i = 0; i < n; ++i) {
+						m = n - i - 1;
+						
+						++indices[m];
+						if (indices[m] > maxExponents[m]) {
+							if (m == 0) {
+								break product;
+							}
+							indices[m] = 0;
+						}
+						else {
+							break;
+						}
+					}
+				}
+				
+				factorsDivisors.replaceBy(list);
+				return true;
+			}
+	}
 };
 
 const divisionTest = async (divisionTest, session) => {
@@ -2660,7 +2786,9 @@ ArithmeticPackage.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.GreatestCommonDivisor", gcdLcm, "ArithmeticPackage.gcdLcm");
 	ReductionManager.addReducer("Math.Arithmetic.LeastCommonMultiple",   gcdLcm, "ArithmeticPackage.gcdLcm");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Factors", factors, "ArithmeticPackage.factors");
+	ReductionManager.addReducer("Math.Arithmetic.Factors",              factorsDivisors, "ArithmeticPackage.factors");
+	ReductionManager.addReducer("Math.Arithmetic.FactorsWithExponents", factorsDivisors, "ArithmeticPackage.factorsWithExponents");
+	ReductionManager.addReducer("Math.Arithmetic.Divisors",             factorsDivisors, "ArithmeticPackage.divisors");
 	
 	ReductionManager.addReducer("Math.Arithmetic.Divides",       divisionTest, "ArithmeticPackage.divisionTest");
 	ReductionManager.addReducer("Math.Arithmetic.DoesNotDivide", divisionTest, "ArithmeticPackage.divisionTest");

@@ -202,12 +202,14 @@ ArithmeticPackage.setEditions = function() {
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafTruncate,      () => Expression.wrapperEdition("Math.Arithmetic.Truncate"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRound   ,      () => Expression.wrapperEdition("Math.Arithmetic.Round"));
 	
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSign,           () => Expression.wrapperEdition("Math.Arithmetic.Sign"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafIntegerPart,    () => Expression.wrapperEdition("Math.Arithmetic.IntegerPart"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFractionalPart, () => Expression.wrapperEdition("Math.Arithmetic.FractionalPart"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDecimalPlaces,  () => Expression.wrapperEdition("Math.Arithmetic.DecimalPlaces"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactors,        () => Expression.wrapperEdition("Math.Arithmetic.Factors"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDigits,         () => Expression.wrapperEdition("Math.Arithmetic.Digits"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSign,                 () => Expression.wrapperEdition("Math.Arithmetic.Sign"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafIntegerPart,          () => Expression.wrapperEdition("Math.Arithmetic.IntegerPart"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFractionalPart,       () => Expression.wrapperEdition("Math.Arithmetic.FractionalPart"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDecimalPlaces,        () => Expression.wrapperEdition("Math.Arithmetic.DecimalPlaces"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactors,              () => Expression.wrapperEdition("Math.Arithmetic.Factors"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactorsWithExponents, () => Expression.wrapperEdition("Math.Arithmetic.FactorsWithExponents"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDivisors,             () => Expression.wrapperEdition("Math.Arithmetic.Divisors"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDigits,               () => Expression.wrapperEdition("Math.Arithmetic.Digits"));
 	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafGreatestCommonDivisor, () => Expression.wrapperEdition("Math.Arithmetic.GreatestCommonDivisor"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafLeastCommonMultiple,   () => Expression.wrapperEdition("Math.Arithmetic.LeastCommonMultiple"));

@@ -179,6 +179,14 @@
 	"mnemonicFactors" : "Factors",
 	"leafFactors"     : "Factors",
 	
+	"nameFactorsWithExponents"     : "Factors with exponents",
+	"mnemonicFactorsWithExponents" : "FactorsWithExponents",
+	"leafFactorsWithExponents"     : "Factors with exponents",
+	
+	"nameDivisors"     : "Divisors",
+	"mnemonicDivisors" : "Divisors",
+	"leafDivisors"     : "Divisors",
+	
 	"nameGreatestCommonDivisor"    : "Greatest common divisor",
 	"literalGreatestCommonDivisor" : "GCD",
 	"leafGreatestCommonDivisor"    : "Greatest common divisor",
