@@ -209,6 +209,7 @@ ArithmeticPackage.setEditions = function() {
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactors,              () => Expression.wrapperEdition("Math.Arithmetic.Factors"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactorsWithExponents, () => Expression.wrapperEdition("Math.Arithmetic.FactorsWithExponents"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDivisors,             () => Expression.wrapperEdition("Math.Arithmetic.Divisors"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafProperDivisors,       () => Expression.wrapperEdition("Math.Arithmetic.ProperDivisors"));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDigits,               () => Expression.wrapperEdition("Math.Arithmetic.Digits"));
 	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafGreatestCommonDivisor, () => Expression.wrapperEdition("Math.Arithmetic.GreatestCommonDivisor"));

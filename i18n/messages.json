@@ -187,6 +187,10 @@
 	"mnemonicDivisors" : "Divisors",
 	"leafDivisors"     : "Divisors",
 	
+	"nameProperDivisors"     : "Proper divisors",
+	"mnemonicProperDivisors" : "ProperDivisors",
+	"leafProperDivisors"     : "Proper divisors",
+	
 	"nameGreatestCommonDivisor"    : "Greatest common divisor",
 	"literalGreatestCommonDivisor" : "GCD",
 	"leafGreatestCommonDivisor"    : "Greatest common divisor",

@@ -2120,6 +2120,7 @@ const factorsDivisors = async (factorsDivisors, session) => {
 		switch (factorsDivisors.getTag()) {
 			case "Math.Arithmetic.Factors":
 			case "Math.Arithmetic.Divisors":
+			case "Math.Arithmetic.ProperDivisors":
 				factorsDivisors.replaceBy(
 					Formulae.createExpression(
 						"List.List",
@@ -2165,7 +2166,8 @@ const factorsDivisors = async (factorsDivisors, session) => {
 				return true;
 			}
 		
-		case "Math.Arithmetic.Divisors": {
+		case "Math.Arithmetic.Divisors":
+		case "Math.Arithmetic.ProperDivisors": {
 				let list = Formulae.createExpression("List.List");
 				let map = calculateFactors(n, session, false);
 				let bases = Array.from(map.keys());
@@ -2202,6 +2204,10 @@ const factorsDivisors = async (factorsDivisors, session) => {
 							break;
 						}
 					}
+				}
+				
+				if (factorsDivisors.getTag() === "Math.Arithmetic.ProperDivisors") {
+					list.removeChildAt(list.children.length - 1);
 				}
 				
 				factorsDivisors.replaceBy(list);
@@ -2789,6 +2795,7 @@ ArithmeticPackage.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.Factors",              factorsDivisors, "ArithmeticPackage.factors");
 	ReductionManager.addReducer("Math.Arithmetic.FactorsWithExponents", factorsDivisors, "ArithmeticPackage.factorsWithExponents");
 	ReductionManager.addReducer("Math.Arithmetic.Divisors",             factorsDivisors, "ArithmeticPackage.divisors");
+	ReductionManager.addReducer("Math.Arithmetic.ProperDivisors",       factorsDivisors, "ArithmeticPackage.properDivisors");
 	
 	ReductionManager.addReducer("Math.Arithmetic.Divides",       divisionTest, "ArithmeticPackage.divisionTest");
 	ReductionManager.addReducer("Math.Arithmetic.DoesNotDivide", divisionTest, "ArithmeticPackage.divisionTest");
