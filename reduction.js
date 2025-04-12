@@ -1920,13 +1920,22 @@ const toString = async (toString, session) => {
 		if (base === undefined) return false;
 	}
 	
-	if (base == 10) {
+	if (base === 10) {
 		if (Arithmetic.isInteger(number) || Arithmetic.isDecimal(number)) {
 			let expr = Formulae.createExpression("String.String");
 			expr.set("Value", number.toText());
 			toString.replaceBy(expr);
 			return true;
 		}
+	}
+	else {
+		number = Arithmetic.getNativeInteger(toString.children[0]);
+		if (number === undefined) return false;
+		
+		let expr = Formulae.createExpression("String.String");
+		expr.set("Value", number.toString(base));
+		toString.replaceBy(expr);
+		return true;
 	}
 	
 	return false;
