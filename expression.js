@@ -166,7 +166,8 @@ const InternalNumber = class extends Expression.NullaryExpression {
 	getTag() { return "Math.InternalNumber"; }
 	getName() { return "Internal number"; }
 	isInternalNumber() { return true; }
-	isReduced() { return this.reduced; }
+	//isReduced() { return this.reduced; }
+	isReduced() { return true; }
 	
 	set(name, value) {
 		if (name === "Value") {

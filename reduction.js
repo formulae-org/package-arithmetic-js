@@ -27,18 +27,10 @@ const TAG_INFINITY = "Math.Infinity";
 /////////////////////
 
 const internalNumber = async (internalNumber, session) => {
-	if (session.numeric || session.noSymbolic) {
+	if (session.numeric && number.type !== 1) { // integer, rational or complex
 		let number = internalNumber.get("Value");
-		
-		if (session.numeric && number.type !== 1) { // integer, rational or complex
-			internalNumber.set("Value", number.toDecimal(session));
-			return false;
-		}
-		
-		if (session.noSymbolic && number.type === 2) { // rational
-			internalNumber.set("Value", number.toDecimal(session));
-			return false;
-		}
+		internalNumber.set("Value", number.toDecimal(session));
+		return false;
 	}
 	
 	return false;
@@ -1338,6 +1330,10 @@ const sqrt = async (sqrt, session) => {
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
 	
+	if (session.numeric && n.type !== 1) {
+		n = n.toDecimal(session);
+	}
+	
 	if (Arithmetic.isInteger(n)) {
 		let isNegative = n.isNegative();
 		if (n.isNegative()) n = n.negation();
@@ -1436,7 +1432,7 @@ const trigHyper = async (f, session) => {
 	if (!expr.isInternalNumber()) return false;
 	let x = expr.get("Value");
 	
-	if (session.numeric || session.noSymbolic) {
+	if (session.numeric) {
 		x = x.toDecimal(session);
 	}
 	else {
@@ -2343,7 +2339,7 @@ const piecewise = async (piecewise, session) => {
 
 
 const constant = async (c, session) => {
-	if (session.numeric || session.noSymbolic) {
+	if (session.numeric) {
 		let r;
 		switch (c.getTag()) {
 			case "Math.Constant.Pi":
@@ -2361,6 +2357,7 @@ const constant = async (c, session) => {
 	return true;
 };
 
+/*
 const nPi = async (n, session) => {
 	if (n.children.length > 1 || n.children[0].getTag() !== "Math.Constant.Pi") return false;
 	n.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getPi(session), session));
@@ -2372,6 +2369,22 @@ const nE = async (n, session) => {
 	n.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getE(session), session));
 	return true;
 };
+*/
+
+const pi = async (pi, session) => {
+	if (!session.numeric) return false;
+	
+	pi.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getPi(session), session));
+	return true;
+};
+
+const e = async (e, session) => {
+	if (!session.numeric) return false;
+	
+	e.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getE(session), session));
+	return true;
+};
+
 
 const summationProductReducer = async (summationProduct, session) => {
 	let n = summationProduct.children.length;
@@ -2674,7 +2687,7 @@ const isPrime = async (isPrime, session) => {
 ArithmeticPackage.setReducers = () => {
 	// internal numbers
 	
-	ReductionManager.addReducer("Math.InternalNumber", internalNumber, "Arithmetic.internalNumber");
+	//ReductionManager.addReducer("Math.InternalNumber", internalNumber, "Arithmetic.internalNumber");
 	
 	// precision
 	
@@ -2694,12 +2707,16 @@ ArithmeticPackage.setReducers = () => {
 	// numeric
 	
 	ReductionManager.addReducer("Math.Numeric",      numeric,                           "ArithmeticPackage.numeric",    { special: true });
-	ReductionManager.addReducer("Math.N",            n,                                 "ArithmeticPackage.n");
-	ReductionManager.addReducer("Math.N",            nPrecision,                        "ArithmeticPackage.nPrecision", { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
-	ReductionManager.addReducer("Math.N",            nPi,                               "ArithmeticPackage.nPi");
-	ReductionManager.addReducer("Math.N",            nE,                                "ArithmeticPackage.nE");
-	ReductionManager.addReducer("Math.N",            ReductionManager.expansionReducer, "ReductionManager.expansion",   { precedence: ReductionManager.PRECEDENCE_LOW});
+	//ReductionManager.addReducer("Math.N",            n,                                 "ArithmeticPackage.n");
+	//ReductionManager.addReducer("Math.N",            nPrecision,                        "ArithmeticPackage.nPrecision", { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
+	//ReductionManager.addReducer("Math.N",            nPi,                               "ArithmeticPackage.nPi");
+	//ReductionManager.addReducer("Math.N",            nE,                                "ArithmeticPackage.nE");
+	//ReductionManager.addReducer("Math.N",            ReductionManager.expansionReducer, "ReductionManager.expansion",   { precedence: ReductionManager.PRECEDENCE_LOW});
 	ReductionManager.addReducer("Math.SetAsNumeric", setAsNumeric,                      "ArithmeticPackage.setAsNumeric");
+	
+	ReductionManager.addReducer("Math.Constant.Pi",    pi, "ArithmeticPackage.pi");
+	ReductionManager.addReducer("Math.Constant.Euler", e,  "ArithmeticPackage.e");
+	
 	
 	// NO NEGATIVES, acoording to internal representation
 	//ReductionManager.addReducer("Math.Arithmetic.Negative", negativeNumeric, "ArithmeticPackage.negativeNumeric");
