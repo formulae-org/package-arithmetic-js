@@ -280,7 +280,7 @@ const nPrecision = async (n, session) => {
 	return true;
 };
 
-const setAsNumeric = async (setAsNumeric, session) => {
+const setNumericMode = async (set, session) => {
 	session.numeric = true;
 	return true;
 };
@@ -2742,7 +2742,7 @@ ArithmeticPackage.setReducers = () => {
 	//ReductionManager.addReducer("Math.N",            nPi,                               "ArithmeticPackage.nPi");
 	//ReductionManager.addReducer("Math.N",            nE,                                "ArithmeticPackage.nE");
 	//ReductionManager.addReducer("Math.N",            ReductionManager.expansionReducer, "ReductionManager.expansion",   { precedence: ReductionManager.PRECEDENCE_LOW});
-	ReductionManager.addReducer("Math.SetAsNumeric", setAsNumeric,                      "ArithmeticPackage.setAsNumeric");
+	ReductionManager.addReducer("Math.SetNumericMode", setNumericMode,  "ArithmeticPackage.setNumericMode");
 	
 	ReductionManager.addReducer("Math.Constant.Pi",    pi, "ArithmeticPackage.pi");
 	ReductionManager.addReducer("Math.Constant.Euler", e,  "ArithmeticPackage.e");

@@ -933,7 +933,6 @@ ArithmeticPackage.setExpressions = function(module) {
 	));
 	
 	// numeric
-	
 	Formulae.setExpression(module, "Math.Numeric", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Numeric",
@@ -952,16 +951,16 @@ ArithmeticPackage.setExpressions = function(module) {
 		max:          2
 	});
 	
-	Formulae.setExpression(module, "Math.SetAsNumeric", {
-		clazz:        Expression.Function,
-		getTag:       () => "Math.SetAsNumeric",
-		getMnemonic:  () => ArithmeticPackage.messages.mnemonicSetAsNumeric,
-		getName:      () => ArithmeticPackage.messages.nameSetAsNumeric,
+	// numeric mode
+	Formulae.setExpression(module, "Math.SetNumericMode", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.SetNumericMode",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicSetNumericMode,
+		getName:     () => ArithmeticPackage.messages.nameSetNumericMode,
 		min: 0, max: 0
 	});
 	
-	// With precision
-	
+	// with precision
 	Formulae.setExpression(module, "Math.Arithmetic.WithPrecision", {
 		clazz:        Expression.Function,
 		getTag:       () => "Math.Arithmetic.WithPrecision",
@@ -973,7 +972,7 @@ ArithmeticPackage.setExpressions = function(module) {
 	
 	// exponentiation
 	Formulae.setExpression(module, "Math.Arithmetic.Exponentiation", {
-		clazz: Expression.Exponentiation,
+		clazz:        Expression.Exponentiation,
 		getTag:       () => "Math.Arithmetic.Exponentiation",
 		getName:      () => ArithmeticPackage.messages.nameExponentiation,
 		getChildName: index => ArithmeticPackage.messages.childrenExponentiation[index]
@@ -991,8 +990,8 @@ ArithmeticPackage.setExpressions = function(module) {
 	));
 	
 	[ // constants
-		[ "Math.Constant", "Pi",        "π" ],
-		[ "Math.Constant", "Euler",     "e" ],
+		[ "Math.Constant", "Pi",    "π" ],
+		[ "Math.Constant", "Euler", "e" ],
 	].forEach(row =>
 		Formulae.setExpression(module, row[0] + "." + row[1], {
 			clazz:      Expression.Literal,

@@ -129,9 +129,9 @@ ArithmeticPackage.setEditions = function() {
 	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = editionNumber);
 	
 	// numeric / symbolic
-	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafNumeric,      () => Expression.wrapperEdition("Math.Numeric"));
-	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafN,            () => Expression.wrapperEdition("Math.N"));
-	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafSetAsNumeric, () => Expression.replacingEdition("Math.SetAsNumeric"));
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafNumeric,           () => Expression.wrapperEdition("Math.Numeric"));
+	//Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafN,                 () => Expression.wrapperEdition("Math.N"));
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafSetNumericMode,  () => Expression.replacingEdition("Math.SetNumericMode"));
 	
 	Formulae.addEdition(this.messages.pathMath, null, "∞", () => Expression.replacingEdition("Math.Infinity"));
 	

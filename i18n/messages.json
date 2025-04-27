@@ -19,9 +19,9 @@
 	"leafN"     : "N",
 	"childrenN" : [ "Argument", "Precision" ],
 	
-	"mnemonicSetAsNumeric" : "SetAsNumeric",
-	"nameSetAsNumeric"     : "Set as numeric",
-	"leafSetAsNumeric"     : "Set as numeric",
+	"labelSetNumericMode  "  : "Set numeric mode",
+	"mnemonicSetNumericMode" : "SetNumericMode",
+	"leafSetNumericMode"     : "Set numeric mode",
 	
 	"pathPrecision" : "Math.Arithmetic.Precision",
 	
