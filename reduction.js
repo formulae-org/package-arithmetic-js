@@ -27,7 +27,10 @@ const TAG_INFINITY = "Math.Infinity";
 /////////////////////
 
 const internalNumber = async (internalNumber, session) => {
-	if (session.numeric && number.type !== 1) { // integer, rational or complex
+	if (!session.numeric) return false;
+	let number = internalNumber.get("Value");
+	
+	if (number.type !== 1) { // integer, rational or complex
 		let number = internalNumber.get("Value");
 		internalNumber.set("Value", number.toDecimal(session));
 		return false;
@@ -1718,37 +1721,26 @@ const isX = async (is, session) => {
 	return true;
 };
 
-const toX = async (to, session) => {
+const toIntegerIfInteger = async (to, session) => {
 	let expr = to.children[0];
 	if (!expr.isInternalNumber()) return false;
 	let n = expr.get("Value");
 	
-	let tag = to.getTag();
 	let nn = null;
 	
-	switch (tag) {
-		case "Math.Arithmetic.ToInteger":
-		case "Math.Arithmetic.ToIfInteger": {
-				if (Arithmetic.isDecimal(n)) {
-					if (n.hasIntegerValue()) nn = n.toInteger();
-				}
-				else if (Arithmetic.isInteger(n)) nn = n;
-				else if (Arithmetic.isComplex(n)) {
-					if (n.real.hasIntegerValue() && n.imaginary.hasIntegerValue()) {
-						nn = Arithmetic.createComplex(n.real.toInteger(), n.imaginary.toInteger());
-					}
-				}
-				
-				if (nn === null && tag === "Math.Arithmetic.ToInteger") { // It could not be converted to integer
-					ReductionManager.setInError(expr, "Number cannot be converted to integer");
-					throw new ReductionError();
-				}
-			}
-			break;
-			
-		case "Math.Arithmetic.ToDecimal":
-			nn = n.toDecimal(session);
-			break;
+	if (Arithmetic.isDecimal(n)) {
+		if (n.hasIntegerValue()) nn = n.toInteger();
+	}
+	else if (Arithmetic.isInteger(n)) nn = n;
+	else if (Arithmetic.isComplex(n)) {
+		if (n.real.hasIntegerValue() && n.imaginary.hasIntegerValue()) {
+			nn = Arithmetic.createComplex(n.real.toInteger(), n.imaginary.toInteger());
+		}
+	}
+	
+	if (nn === null && to.getTag() === "Math.Arithmetic.ToInteger") { // It could not be converted to integer
+		ReductionManager.setInError(expr, "Number cannot be converted to integer");
+		throw new ReductionError();
 	}
 	
 	if (nn === null) {
@@ -1756,6 +1748,44 @@ const toX = async (to, session) => {
 	}
 	else {
 		to.replaceBy(Arithmetic.createInternalNumber(nn, session));
+	}
+	
+	return true;
+};
+
+const toDecimal = async (toDecimal, session) => {
+	let expr = toDecimal.children[0];
+	if (!expr.isInternalNumber()) return false;
+	let n = expr.get("Value");
+	
+	let precision = undefined;
+	
+	if (toDecimal.children.length >= 2) {
+		let precisionExpr = await session.reduceAndGet(toDecimal.children[1], 1);
+		precision = Arithmetic.getNativeInteger(precisionExpr);
+		if (precision === undefined || precision <= 0) {
+			ReductionManager.setInError(precisionExpr, "Expression must be a positive integer number");
+			throw new ReductionError();
+		}
+	}
+	
+	let bkpPrecision;
+	if (precision !== undefined) {
+		bkpPrecision = session.Decimal.precision;
+		session.Decimal.set({ precision: precision });
+	}
+	
+	let nn = n.toDecimal(session);
+	
+	if (precision !== undefined) {
+		session.Decimal.set({ precision: bkpPrecision });
+	}
+	
+	if (nn === null) {
+		toDecimal.replaceBy(expr);
+	}
+	else {
+		toDecimal.replaceBy(Arithmetic.createInternalNumber(nn, session));
 	}
 	
 	return true;
@@ -2687,7 +2717,7 @@ const isPrime = async (isPrime, session) => {
 ArithmeticPackage.setReducers = () => {
 	// internal numbers
 	
-	//ReductionManager.addReducer("Math.InternalNumber", internalNumber, "Arithmetic.internalNumber");
+	ReductionManager.addReducer("Math.InternalNumber", internalNumber, "Arithmetic.internalNumber");
 	
 	// precision
 	
@@ -2802,9 +2832,9 @@ ArithmeticPackage.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.IsEven",           isX, "ArithmeticPackage.isX");
 	ReductionManager.addReducer("Math.Arithmetic.IsOdd",            isX, "ArithmeticPackage.isX");
 	
-	ReductionManager.addReducer("Math.Arithmetic.ToInteger",   toX, "ArithmeticPackage.toX");
-	ReductionManager.addReducer("Math.Arithmetic.ToIfInteger", toX, "ArithmeticPackage.toX");
-	ReductionManager.addReducer("Math.Arithmetic.ToDecimal",   toX, "ArithmeticPackage.toX");
+	ReductionManager.addReducer("Math.Arithmetic.ToInteger",   toIntegerIfInteger, "ArithmeticPackage.toIntegerIfInteger");
+	ReductionManager.addReducer("Math.Arithmetic.ToIfInteger", toIntegerIfInteger, "ArithmeticPackage.toIntegerIfInteger");
+	ReductionManager.addReducer("Math.Arithmetic.ToDecimal",   toDecimal,          "ArithmeticPackage.toDecimal");
 	
 	ReductionManager.addReducer("Math.Arithmetic.ToNumber", toNumber, "ArithmeticPackage.toNumber");
 	

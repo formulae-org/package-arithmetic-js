@@ -289,6 +289,7 @@
 	
 	"nameToDecimal"     : "A decimal",
 	"mnemonicToDecimal" : "ADecimal",
+	"childrenToDecimal" : [ "Argumento", "Precisión" ],
 	"leafToDecimal"     : "A decimal",
 	
 	"nameToNumber"     : "A número",

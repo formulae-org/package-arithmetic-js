@@ -1018,13 +1018,22 @@ ArithmeticPackage.setExpressions = function(module) {
 		"Sign",         "Factors", "FactorsWithExponents", "Divisors", "ProperDivisors",
 		"IsRealNumber", "IsRationalNumber", "IsNumeric", "IsIntegerValue", "IsInteger", "IsDecimal", "IsPositiveNumber", "IsNegativeNumber", "IsNumberZero",
 		"IsEven",       "IsOdd",            "IsPrime",
-		"ToInteger",    "ToIfInteger",      "ToDecimal"
+		"ToInteger",    "ToIfInteger",
 	].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:       Expression.Function,
 		getTag:      () => "Math.Arithmetic." + tag,
 		getMnemonic: () => ArithmeticPackage.messages["mnemonic" + tag],
 		getName:     () => ArithmeticPackage.messages["name" + tag]
 	}));
+	
+	Formulae.setExpression(module, "Math.Arithmetic.ToDecimal", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.Arithmetic.ToDecimal",
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicToDecimal,
+		getName:      () => ArithmeticPackage.messages.nameToDecimal,
+		getChildName: index => ArithmeticPackage.messages.childrenToDecimal[index],
+		max:          2
+	});
 	
 	// truncationg & rounding
 	[ "Truncate", "Round" ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
