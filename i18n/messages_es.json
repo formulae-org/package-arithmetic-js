@@ -7,27 +7,16 @@
 	"updateNumber" : "Actualice número",
 	"actionNumber" : "Actualizar número...",
 	
-	"pathNumeric" : "Matemáticas.Numérico",
-	
-	"mnemonicNumeric" : "Numérico",
-	"nameNumeric"     : "Numérico",
-	"leafNumeric"     : "Numerico",
-	"childrenNumeric" : [ "Argumento", "Precisión" ],
-	
-	"mnemonicN" : "N",
-	"nameN"     : "N",
-	"leafN"     : "N",
-	"childrenN" : [ "Argumento", "Precisión" ],
-	
-	"labelSetNumericMode  "  : "Fijar modo numérico",
-	"mnemonicSetNumericMode" : "FijarModoNumérico",
-	"leafSetNumericMode"     : "Fijar modo numérico",
-	
 	"pathPrecision" : "Matemáticas.Aritmética.Precisión",
 	
 	"mnemonicSignificantDigits" : "CifrasSignificativas",
 	"nameSignificantDigits"     : "Cifras significativas",
 	"leafSignificantDigits"     : "Cifras significativas",
+	
+	"mnemonicWithPrecision" : "ConPrecisión",
+	"nameWithPrecision"     : "Con precisión",
+	"leafWithPrecision"     : "Con precisión",
+	"childrenWithPrecision" : [ "Argumento", "Precisión" ],
 	
 	"mnemonicGetPrecision" : "ObtenerPrecisión",
 	"nameGetPrecision"     : "Obtener precisión",
@@ -37,12 +26,28 @@
 	"nameSetPrecision"     : "Fijar precisión",
 	"leafSetPrecision"     : "Fijar precisión",
 	
-	"mnemonicWithPrecision" : "ConPrecisión",
-	"nameWithPrecision"     : "Con precisión",
-	"leafWithPrecision"     : "Con precisión",
-	"childrenWithPrecision" : [ "Argumento", "Precisión" ],
+	"pathRoundingModes" : "Matemáticas.Aritmética.Redondeo.Modo de redondeo.Modos",
 	
-	"pathRoundingMode" : "Matemáticas.Aritmética.Modo de redondeo",
+	"labelRoundingModeTowardsZero"                      : "Hacia 0 / Truncación",
+	"labelRoundingModeAwayFromZero"                     : "Alejado de 0",
+	"labelRoundingModeTowardsMinusInfinity"             : "Hacia -∞ / Piso",
+	"labelRoundingModeTowardsInfinity"                  : "Hacia ∞ / Techo",
+	"labelRoundingModeNearest.HalfTowardsZero"          : "Hacia cercano, ½ hacia 0",
+	"labelRoundingModeNearest.HalfAwayFromZero"         : "Hacia cercano, ½ alejado de 0",
+	"labelRoundingModeNearest.HalfTowardsMinusInfinity" : "Hacia cercano, ½ hacia -∞",
+	"labelRoundingModeNearest.HalfTowardsInfinity"      : "Hacia cercano, ½ hacia ∞",
+	"labelRoundingModeNearest.HalfEven"                 : "Hacia cercano, ½ a par",
+	
+	"pathRoundingMode" : "Matemáticas.Aritmética.Redondeo.Modo de redondeo",
+	
+	"mnemonicRoundingModes" : "Modos de redondeo",
+	"nameRoundingModes"     : "Modos de redondeo",
+	"leafRoundingModes"     : "Modos de redondeo",
+	
+	"mnemonicWithRoundingMode" : "EnModoDeRedondeo",
+	"nameWithRoundingMode"     : "En modo de redondeo",
+	"leafWithRoundingMode"     : "En modo de redondeo",
+	"childrenWithRoundingMode" : [ "Argumento", "Mode de redondeo" ],
 	
 	"mnemonicGetRoundingMode" : "ObtenerModoRedondeo",
 	"nameGetRoundingMode"     : "Obtener modo de redondeo",
@@ -52,17 +57,20 @@
 	"nameSetRoundingMode"     : "Fijar modo de redondeo",
 	"leafSetRoundingMode"     : "Fijar modo de redondeo",
 	
-	"pathRoundingModes" : "Matemáticas.Aritmética.Modo de redondeo.Modos",
+	"pathNumeric" : "Matemáticas.Aritmética.Modo numérico",
 	
-	"labelRoundingModeTowardsZero"                      : "Hacia 0 / Truncación",
-	"labelRoundingModeAwayFromZero"                     : "Alejado de  0",
-	"labelRoundingModeTowardsMinusInfinity"             : "Hacia -∞ / Piso",
-	"labelRoundingModeTowardsInfinity"                  : "Hacia ∞ / Techo",
-	"labelRoundingModeNearest.HalfTowardsZero"          : "Hacia cercano, ½ hacia 0",
-	"labelRoundingModeNearest.HalfAwayFromZero"         : "Hacia cercano, ½ alejado de 0",
-	"labelRoundingModeNearest.HalfTowardsMinusInfinity" : "Hacia cercano, ½ hacia -∞",
-	"labelRoundingModeNearest.HalfTowardsInfinity"      : "Hacia cercano, ½ hacia ∞",
-	"labelRoundingModeNearest.HalfEven"                 : "Hacia cercano, ½ a par",
+	"mnemonicNumeric" : "Numérico",
+	"nameNumeric"     : "Numérico",
+	"leafNumeric"     : "Numérico",
+	"childrenNumeric" : [ "Argumento", "Modo numérico" ],
+	
+	"mnemonicInNumericMode" : "EstaEnModoNumérico",
+	"labelInNumericMode"    : "Esta en modo numérico",
+	"leafInNumericMode"     : "Esta en modo numérico",
+	
+	"mnemonicSetNumericMode" : "FijarModoNumérico",
+	"labelSetNumericMode"    : "Fijar modo numérico",
+	"leafSetNumericMode"     : "Fijar modo numérico",
 	
 	"pathRounding" : "Matemáticas.Aritmética.Redondeo",
 	
@@ -228,6 +236,14 @@
 	"nameIsRationalNumber"     : "Es número racional",
 	"mnemonicIsRationalNumber" : "EsNúmeroRacional",
 	"leafIsRationalNumber"     : "Es número racional",
+	
+	"nameNumerator"     : "Numerador",
+	"mnemonicNumerator" : "Numerador",
+	"leafNumerator"     : "Numerador",
+	
+	"nameDenominator"     : "Denominador",
+	"mnemonicDenominator" : "Denominador",
+	"leafDenominator"     : "Denominador",
 	
 	"nameIsNumeric"     : "Es numérico",
 	"mnemonicIsNumeric" : "EsNumérico",
@@ -422,3 +438,4 @@
 	"namePi" : "Número π",
 	"nameE" : "Número e"
 }
+

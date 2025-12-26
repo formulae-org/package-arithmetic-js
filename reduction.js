@@ -28,15 +28,44 @@ const TAG_INFINITY = "Math.Infinity";
 
 const internalNumber = async (internalNumber, session) => {
 	if (!session.numeric) return false;
-	let number = internalNumber.get("Value");
 	
-	if (number.type !== 1) { // integer, rational or complex
-		let number = internalNumber.get("Value");
-		internalNumber.set("Value", number.toDecimal(session));
-		return false;
+	let number = internalNumber.get("Value");
+	switch (number.type) {
+		case 2: // rational
+			internalNumber.set("Value", number.toDecimal(session));
+			return false;
+		
+		case 3: // complex
+			if (number.real.type === 2 || number.imaginary.type === 2) { // real or imaginary part is rational
+				internalNumber.set("Value", number.toNumeric(session));
+			}
+			return false;
 	}
 	
 	return false;
+};
+
+///////////////
+// constants //
+///////////////
+
+const constant = async (c, session) => {
+	if (session.numeric) {
+		let r;
+		switch (c.getTag()) {
+			case "Math.Constant.Pi":
+				r = Arithmetic.getPi(session);
+				break;
+			
+			case "Math.Constant.Euler":
+				r = Arithmetic.getE(session);
+				break;
+		}
+		
+		c.replaceBy(Arithmetic.createInternalNumber(r, session));
+	}
+	
+	return true;
 };
 
 ///////////////
@@ -145,6 +174,13 @@ for (let i = 0, n = arrayRoundingModes.length; i < n; ++i) {
 	mapRoundingModes.set(arrayRoundingModes[i], i);
 };
 
+const roundingModes = async (roundingModes, session) => {
+	let list = Formulae.createExpression("List.List");
+	arrayRoundingModes.forEach(tag => list.addChild(Formulae.createExpression(tag)));
+	roundingModes.replaceBy(list);
+	return true;
+};
+
 const setRoundingMode = async (setRoundingMode, session) => {
 	let tag = setRoundingMode.children[0].getTag();
 	if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) {
@@ -167,6 +203,28 @@ const getRoundingMode = async (getRoundingMode, session) => {
 	);
 	return true;
 };
+
+const withRoundingMode = async (withRoundingMode, session) => {
+	let tag = withRoundingMode.children[1].getTag();
+	if (!tag.startsWith("Math.Arithmetic.RoundingMode.")) {
+		ReductionManager.setInError(
+			withRoundingMode.children[1],
+			"Expression must be a rounding mode"
+		);
+		throw new ReductionError();
+	}
+	
+	let bkpRoundingMode = session.Decimal.rounding;
+	session.Decimal.rounding = mapRoundingModes.get(tag);
+	
+	await session.reduce(withRoundingMode.children[0]);
+	
+	session.Decimal.rounding = bkpRoundingMode;
+	
+	withRoundingMode.replaceBy(withRoundingMode.children[0]);
+	return true;
+};
+
 
 const setEuclideanDivisionMode = async (setEuclideanDivisionMode, session) => {
 	let tag = setEuclideanDivisionMode.children[0].getTag();
@@ -194,6 +252,35 @@ const getEuclideanDivisionMode = async (getEuclideanDivisionMode, session) => {
 /////////////
 // Numeric //
 /////////////
+
+const inNumericMode = async (inNumericMode, session) => {
+	inNumericMode.replaceBy(
+		Formulae.createExpression(
+			session.numeric ? "Logic.True" : "Logic.False"
+		)
+	);
+	return true;
+};
+
+const setNumericMode = async (setNumericMode, session) => {
+	let numericMode = true;
+	
+	if (setNumericMode.children.length >= 1) {
+		let tag = setNumericMode.children[0].getTag();
+		if (!(tag == "Logic.True" || tag === "Logic.False")) {
+			ReductionManager.setInError(
+				setNumericMode.children[0],
+				"Expression must be the true of false expressions"
+			);
+			throw new ReductionError();
+		}
+		
+		numericMode = tag === "Logic.True";
+	}
+	
+	session.numeric = numericMode;
+	return true;
+};
 
 // Numeric(expression, [precision])
 
@@ -232,6 +319,7 @@ const numeric = async (numeric, session) => {
 
 // N(expression)
 
+/*
 const n = async (n, session) => {
 	if (n.children.length != 1) return false; // forward to N(expr, precision)
 	let expr = n.children[0];
@@ -246,7 +334,7 @@ const n = async (n, session) => {
 		n.replaceBy(expr);
 	}
 	else {
-		let result = Formulae.createExpression("Math.Numeric");
+		let result = Formulae.createExpression("Math.Arithmetic.Numeric");
 		n.replaceBy(result);
 		result.addChild(expr);
 		
@@ -279,11 +367,7 @@ const nPrecision = async (n, session) => {
 	session.Decimal.set({ precision: oldPrecision });
 	return true;
 };
-
-const setNumericMode = async (set, session) => {
-	session.numeric = true;
-	return true;
-};
+*/
 
 //////////////
 // addition //
@@ -1328,6 +1412,28 @@ const log = async (log, session) => {
 	return true;
 };
 
+const numerator = async (numerator, session) => {
+	let expr = numerator.children[0];
+	if (!expr.isInternalNumber()) return false;
+	
+	let x = expr.get("Value");
+	if (!Arithmetic.isRational(x)) return false;
+	
+	numerator.replaceBy(Arithmetic.createInternalNumber(x.numerator, session));
+	return true;
+};
+
+const denominator = async (denominator, session) => {
+	let expr = denominator.children[0];
+	if (!expr.isInternalNumber()) return false;
+	
+	let x = expr.get("Value");
+	if (!Arithmetic.isRational(x)) return false;
+	
+	denominator.replaceBy(Arithmetic.createInternalNumber(x.denominator, session));
+	return true;
+};
+
 const sqrt = async (sqrt, session) => {
 	let expr = sqrt.children[0];
 	if (!expr.isInternalNumber()) return false;
@@ -2367,55 +2473,6 @@ const piecewise = async (piecewise, session) => {
 	return true;
 };
 
-
-const constant = async (c, session) => {
-	if (session.numeric) {
-		let r;
-		switch (c.getTag()) {
-			case "Math.Constant.Pi":
-				r = Arithmetic.getPi(session);
-				break;
-			
-			case "Math.Constant.Euler":
-				r = Arithmetic.getE(session);
-				break;
-		}
-		
-		c.replaceBy(Arithmetic.createInternalNumber(r, session));
-	}
-	
-	return true;
-};
-
-/*
-const nPi = async (n, session) => {
-	if (n.children.length > 1 || n.children[0].getTag() !== "Math.Constant.Pi") return false;
-	n.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getPi(session), session));
-	return true;
-};
-
-const nE = async (n, session) => {
-	if (n.children.length > 1 || n.children[0].getTag() !== "Math.Constant.Euler") return false;
-	n.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getE(session), session));
-	return true;
-};
-*/
-
-const pi = async (pi, session) => {
-	if (!session.numeric) return false;
-	
-	pi.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getPi(session), session));
-	return true;
-};
-
-const e = async (e, session) => {
-	if (!session.numeric) return false;
-	
-	e.replaceBy(Arithmetic.createInternalNumber(Arithmetic.getE(session), session));
-	return true;
-};
-
-
 const summationProductReducer = async (summationProduct, session) => {
 	let n = summationProduct.children.length;
 	let summation = summationProduct.getTag() === "Math.Arithmetic.Summation";
@@ -2719,6 +2776,11 @@ ArithmeticPackage.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.InternalNumber", internalNumber, "Arithmetic.internalNumber");
 	
+	// constants
+	
+	ReductionManager.addReducer("Math.Constant.Pi",    constant, "ArithmeticPackage.constant");
+	ReductionManager.addReducer("Math.Constant.Euler", constant, "ArithmeticPackage.constant");
+	
 	// precision
 	
 	ReductionManager.addReducer("Math.Arithmetic.SignificantDigits", significantDigits, "ArithmeticPackage.significantDigits");
@@ -2728,28 +2790,23 @@ ArithmeticPackage.setReducers = () => {
 	
 	// rounding mode
 	
-	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode", setRoundingMode, "ArithmeticPackage.setRoundingMode");
-	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode", getRoundingMode, "ArithmeticPackage.getRoundingMode");
+	ReductionManager.addReducer("Math.Arithmetic.RoundingModes",    roundingModes,    "ArithmeticPackage.roundingModes");
+	ReductionManager.addReducer("Math.Arithmetic.SetRoundingMode",  setRoundingMode,  "ArithmeticPackage.setRoundingMode");
+	ReductionManager.addReducer("Math.Arithmetic.GetRoundingMode",  getRoundingMode,  "ArithmeticPackage.getRoundingMode");
+	ReductionManager.addReducer("Math.Arithmetic.WithRoundingMode", withRoundingMode, "ArithmeticPackage.withRoundingMode", { special: true });
 	
 	ReductionManager.addReducer("Math.Arithmetic.SetEuclideanDivisionMode", setEuclideanDivisionMode, "ArithmeticPackage.setEuclideanDivisionMode");
 	ReductionManager.addReducer("Math.Arithmetic.GetEuclideanDivisionMode", getEuclideanDivisionMode, "ArithmeticPackage.getEuclideanDivisionMode");
 	
 	// numeric
 	
-	ReductionManager.addReducer("Math.Numeric",      numeric,                           "ArithmeticPackage.numeric",    { special: true });
-	//ReductionManager.addReducer("Math.N",            n,                                 "ArithmeticPackage.n");
-	//ReductionManager.addReducer("Math.N",            nPrecision,                        "ArithmeticPackage.nPrecision", { special: true, precedence: ReductionManager.PRECEDENCE_HIGH});
-	//ReductionManager.addReducer("Math.N",            nPi,                               "ArithmeticPackage.nPi");
-	//ReductionManager.addReducer("Math.N",            nE,                                "ArithmeticPackage.nE");
-	//ReductionManager.addReducer("Math.N",            ReductionManager.expansionReducer, "ReductionManager.expansion",   { precedence: ReductionManager.PRECEDENCE_LOW});
-	ReductionManager.addReducer("Math.SetNumericMode", setNumericMode,  "ArithmeticPackage.setNumericMode");
+	ReductionManager.addReducer("Math.Arithmetic.InNumericMode",  inNumericMode,   "ArithmeticPackage.inNumericMode");
+	ReductionManager.addReducer("Math.Arithmetic.SetNumericMode", setNumericMode,  "ArithmeticPackage.setNumericMode");
+	ReductionManager.addReducer("Math.Arithmetic.Numeric",        numeric,         "ArithmeticPackage.numeric", { special: true });
 	
-	ReductionManager.addReducer("Math.Constant.Pi",    pi, "ArithmeticPackage.pi");
-	ReductionManager.addReducer("Math.Constant.Euler", e,  "ArithmeticPackage.e");
+	// negative. NO NEGATIVES, acording to internal representation
 	
-	
-	// NO NEGATIVES, acoording to internal representation
-	//ReductionManager.addReducer("Math.Arithmetic.Negative", negativeNumeric, "ArithmeticPackage.negativeNumeric");
+	// arithmetic operations
 	
 	ReductionManager.addReducer("Math.Arithmetic.Addition",       additionNumeric,        "ArithmeticPackage.additionNumeric");
 	ReductionManager.addReducer("Math.Arithmetic.Multiplication", multiplicationNumeric,  "ArithmeticPackage.multiplicationNumeric");
@@ -2832,6 +2889,9 @@ ArithmeticPackage.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.IsEven",           isX, "ArithmeticPackage.isX");
 	ReductionManager.addReducer("Math.Arithmetic.IsOdd",            isX, "ArithmeticPackage.isX");
 	
+	ReductionManager.addReducer("Math.Arithmetic.Numerator",   numerator,   "ArithmeticPackage.numerator");
+	ReductionManager.addReducer("Math.Arithmetic.Denominator", denominator, "ArithmeticPackage.numerator");
+	
 	ReductionManager.addReducer("Math.Arithmetic.ToInteger",   toIntegerIfInteger, "ArithmeticPackage.toIntegerIfInteger");
 	ReductionManager.addReducer("Math.Arithmetic.ToIfInteger", toIntegerIfInteger, "ArithmeticPackage.toIntegerIfInteger");
 	ReductionManager.addReducer("Math.Arithmetic.ToDecimal",   toDecimal,          "ArithmeticPackage.toDecimal");
@@ -2860,9 +2920,6 @@ ArithmeticPackage.setReducers = () => {
 	ReductionManager.addReducer("Math.Arithmetic.RandomInRange", randomInRange, "ArithmeticPackage.randomInRange");
 	
 	ReductionManager.addReducer("Math.Arithmetic.Piecewise", piecewise, "ArithmeticPackage.piecewise", { special: true });
-	
-	//ReductionManager.addReducer("Math.Constant.Pi",    constant, "ArithmeticPackage.constant");
-	//ReductionManager.addReducer("Math.Constant.Euler", constant, "ArithmeticPackage.constant");
 	
 	ReductionManager.addReducer("Math.Arithmetic.Summation", summationProductReducer,     "ArithmeticPackage.summationProductReducer", { special: true });
 	ReductionManager.addReducer("Math.Arithmetic.Summation", summationProductListReducer, "ArithmeticPackage.summationProductListReducer", { special: true });

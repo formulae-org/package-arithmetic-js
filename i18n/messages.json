@@ -7,27 +7,16 @@
 	"updateNumber" : "Update number",
 	"actionNumber" : "Update number...",
 	
-	"pathNumeric" : "Math.Numeric",
-	
-	"mnemonicNumeric" : "Numeric",
-	"nameNumeric"     : "Numeric",
-	"leafNumeric"     : "Numeric",
-	"childrenNumeric" : [ "Argument", "Precision" ],
-	
-	"mnemonicN" : "N",
-	"nameN"     : "N",
-	"leafN"     : "N",
-	"childrenN" : [ "Argument", "Precision" ],
-	
-	"labelSetNumericMode  "  : "Set numeric mode",
-	"mnemonicSetNumericMode" : "SetNumericMode",
-	"leafSetNumericMode"     : "Set numeric mode",
-	
 	"pathPrecision" : "Math.Arithmetic.Precision",
 	
 	"mnemonicSignificantDigits" : "SignificantDigits",
 	"nameSignificantDigits"     : "Significant digits",
 	"leafSignificantDigits"     : "Significant digits",
+	
+	"mnemonicWithPrecision" : "WithPrecision",
+	"nameWithPrecision"     : "With precision",
+	"leafWithPrecision"     : "With precision",
+	"childrenWithPrecision" : [ "Argument", "Precision" ],
 	
 	"mnemonicGetPrecision" : "GetPrecision",
 	"nameGetPrecision"     : "Get precision",
@@ -37,22 +26,7 @@
 	"nameSetPrecision"     : "Set precision",
 	"leafSetPrecision"     : "Set precision",
 	
-	"mnemonicWithPrecision" : "WithPrecision",
-	"nameWithPrecision"     : "With precision",
-	"leafWithPrecision"     : "With precision",
-	"childrenWithPrecision" : [ "Argument", "Precision" ],
-	
-	"pathRoundingMode" : "Math.Arithmetic.Rounding mode",
-	
-	"mnemonicGetRoundingMode" : "GetRoundingMode",
-	"nameGetRoundingMode"     : "Get rounding mode",
-	"leafGetRoundingMode"     : "Get rounding mode",
-	
-	"mnemonicSetRoundingMode" : "SetRoundingMode",
-	"nameSetRoundingMode"     : "Set rounding mode",
-	"leafSetRoundingMode"     : "Set rounding mode",
-	
-	"pathRoundingModes" : "Math.Arithmetic.Rounding mode.Modes",
+	"pathRoundingModes" : "Math.Arithmetic.Rounding.Rounding mode.Modes",
 	
 	"labelRoundingModeTowardsZero"                      : "Towards 0 / Truncate",
 	"labelRoundingModeAwayFromZero"                     : "Away from 0",
@@ -63,6 +37,40 @@
 	"labelRoundingModeNearest.HalfTowardsMinusInfinity" : "Nearest, ½ towards -∞",
 	"labelRoundingModeNearest.HalfTowardsInfinity"      : "Nearest, ½ towards ∞",
 	"labelRoundingModeNearest.HalfEven"                 : "Nearest, ½ to even",
+	
+	"pathRoundingMode" : "Math.Arithmetic.Rounding.Rounding mode",
+	
+	"mnemonicRoundingModes" : "RoundingModes",
+	"nameRoundingModes"     : "Rounding modes",
+	"leafRoundingModes"     : "Rounding modes",
+	
+	"mnemonicWithRoundingMode" : "WithRoundingMode",
+	"nameWithRoundingMode"     : "With rounding mode",
+	"leafWithRoundingMode"     : "With rounding mode",
+	"childrenWithRoundingMode" : [ "Argument", "Rounding mode" ],
+	
+	"mnemonicGetRoundingMode" : "GetRoundingMode",
+	"nameGetRoundingMode"     : "Get rounding mode",
+	"leafGetRoundingMode"     : "Get rounding mode",
+	
+	"mnemonicSetRoundingMode" : "SetRoundingMode",
+	"nameSetRoundingMode"     : "Set rounding mode",
+	"leafSetRoundingMode"     : "Set rounding mode",
+	
+	"pathNumeric" : "Math.Arithmetic.Numeric mode",
+	
+	"mnemonicNumeric" : "Numeric",
+	"nameNumeric"     : "Numeric",
+	"leafNumeric"     : "Numeric",
+	"childrenNumeric" : [ "Argument", "Numeric mode" ],
+	
+	"mnemonicInNumericMode" : "InNumericMode",
+	"labelInNumericMode"    : "In numeric mode",
+	"leafInNumericMode"     : "In numeric mode",
+	
+	"mnemonicSetNumericMode" : "SetNumericMode",
+	"labelSetNumericMode"    : "Set numeric mode",
+	"leafSetNumericMode"     : "Set numeric mode",
 	
 	"pathRounding" : "Math.Arithmetic.Rounding",
 	
@@ -228,6 +236,14 @@
 	"nameIsRationalNumber"     : "Is rational number",
 	"mnemonicIsRationalNumber" : "IsRationalNumber",
 	"leafIsRationalNumber"     : "Is rationl number",
+	
+	"nameNumerator"     : "Numerator",
+	"mnemonicNumerator" : "Numerator",
+	"leafNumerator"     : "Numerator",
+	
+	"nameDenominator"     : "Denominator",
+	"mnemonicDenominator" : "Denominator",
+	"leafDenominator"     : "Denominator",
 	
 	"nameIsNumeric"     : "Is numeric",
 	"mnemonicIsNumeric" : "IsNumeric",

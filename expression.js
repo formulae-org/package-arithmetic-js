@@ -156,18 +156,20 @@ const Number = class extends Expression.NullaryExpression {
 		super.drawText(context, this.visualizationNumber, x, y + this.height);
 	}
 	
-	evaluate() {
-		//return ( typeof this.number === "bigint" ) ? Number(this.number) : this.number.toNumber();
-		return (this.number.constructor === BigInt) ? Number(this.number) : this.number.toNumber();
-	}
+	//evaluate() {
+	//	//return ( typeof this.number === "bigint" ) ? Number(this.number) : this.number.toNumber();
+	//	return (this.number.constructor === BigInt) ? Number(this.number) : this.number.toNumber();
+	//}
 }
 
 const InternalNumber = class extends Expression.NullaryExpression {
 	getTag() { return "Math.InternalNumber"; }
+	
 	getName() { return "Internal number"; }
+	
 	isInternalNumber() { return true; }
-	//isReduced() { return this.reduced; }
-	isReduced() { return true; }
+	
+	isReduced() { return false; }
 	
 	set(name, value) {
 		if (name === "Value") {
@@ -200,16 +202,6 @@ const InternalNumber = class extends Expression.NullaryExpression {
 	
 	prepareDisplay(context) {
 		this.s = this.number.toInternalText();
-		
-		//if (this.number instanceof Arithmetic.Integer) {
-		//	this.s = this.number.integer.toString()
-		//}
-		//else if (this.number instanceof Arithmetic.Decimal) {
-		//	this.s = this.number.decimal.toFixed() + "."
-		//}
-		//else {
-		//	this.s = this.number.numerator.toString() + "/" + this.number.denominator.toString(); 
-		//}
 		
 		this.width = Math.ceil(context.measureText(this.s).width);
 		this.height = context.fontInfo.size;
@@ -873,8 +865,121 @@ const Piecewise = class extends Expression {
 };
 
 ArithmeticPackage.setExpressions = function(module) {
+	// Numbers
+	
 	Formulae.setExpression(module, "Math.Number",         Number);
 	Formulae.setExpression(module, "Math.InternalNumber", InternalNumber);
+	
+	// Significant digits
+	
+	Formulae.setExpression(module, "Math.Arithmetic.SignificantDigits", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.SignificantDigits",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicSignificantDigits,
+		getName:     () => ArithmeticPackage.messages.nameSignificantDigits
+	});
+	
+	// Precision
+	
+	Formulae.setExpression(module, "Math.Arithmetic.WithPrecision", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.Arithmetic.WithPrecision",
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicWithPrecision,
+		getName:      () => ArithmeticPackage.messages.nameWithPrecision,
+		getChildName: index => ArithmeticPackage.messages.childrenWithPrecision[index],
+		min: 2, max: 2
+	});
+	
+	Formulae.setExpression(module, "Math.Arithmetic.GetPrecision", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.GetPrecision",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicGetPrecision,
+		getName:     () => ArithmeticPackage.messages.nameGetPrecision,
+		min: 0, max: 0
+	});
+	
+	Formulae.setExpression(module, "Math.Arithmetic.SetPrecision", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.SetPrecision",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicSetPrecision,
+		getName:     () => ArithmeticPackage.messages.nameSetPrecision
+	});
+	
+	// Rounding modes
+	
+	[
+		            "TowardsZero",             "AwayFromZero",             "TowardsMinusInfinity",             "TowardsInfinity",
+		"Nearest.HalfTowardsZero", "Nearest.HalfAwayFromZero", "Nearest.HalfTowardsMinusInfinity", "Nearest.HalfTowardsInfinity",
+		"Nearest.HalfEven"
+	].forEach(
+		tag => Formulae.setExpression(module, "Math.Arithmetic.RoundingMode." + tag, {
+			clazz   : Expression.LabelExpression,
+			getTag  : () => "Math.Arithmetic.RoundingMode." + tag,
+			getLabel: () => ArithmeticPackage.messages["labelRoundingMode" + tag],
+			getName : () => "Rounding mode " + ArithmeticPackage.messages["labelRoundingMode" + tag]
+		}
+	));
+	
+	Formulae.setExpression(module, "Math.Arithmetic.RoundingModes", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.RoundingModes",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicRoundingModes,
+		getName:     () => ArithmeticPackage.messages.nameRoundingModes,
+		min: 0, max: 0
+	});
+	
+	Formulae.setExpression(module, "Math.Arithmetic.WithRoundingMode", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.Arithmetic.WithRoundingMode",
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicWithRoundingMode,
+		getName:      () => ArithmeticPackage.messages.nameWithRoundingMode,
+		getChildName: index => ArithmeticPackage.messages.childrenWithRoundingMode[index],
+		min: 2, max: 2
+	});
+	
+	Formulae.setExpression(module, "Math.Arithmetic.GetRoundingMode", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.GetRoundingMode",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicGetRoundingMode,
+		getName:     () => ArithmeticPackage.messages.nameGetRoundingMode,
+		min: 0, max: 0
+	});
+	
+	Formulae.setExpression(module, "Math.Arithmetic.SetRoundingMode", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.SetRoundingMode",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicSetRoundingMode,
+		getName:     () => ArithmeticPackage.messages.nameSetRoundingMode
+	});
+	
+	// Numeric mode
+	
+	Formulae.setExpression(module, "Math.Arithmetic.Numeric", {
+		clazz:        Expression.Function,
+		getTag:       () => "Math.Arithmetic.Numeric",
+		getMnemonic:  () => ArithmeticPackage.messages.mnemonicNumeric,
+		getName:      () => ArithmeticPackage.messages.nameNumeric,
+		getChildName: index => ArithmeticPackage.messages.childrenNumeric[index],
+		max:          2
+	});
+	
+	Formulae.setExpression(module, "Math.Arithmetic.InNumericMode", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.InNumericMode",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicInNumericMode,
+		getName:     () => ArithmeticPackage.messages.nameInNumericMode,
+		min: 0, max: 0
+	});
+	
+	Formulae.setExpression(module, "Math.Arithmetic.SetNumericMode", {
+		clazz:       Expression.Function,
+		getTag:      () => "Math.Arithmetic.SetNumericMode",
+		getMnemonic: () => ArithmeticPackage.messages.mnemonicSetNumericMode,
+		getName:     () => ArithmeticPackage.messages.nameSetNumericMode,
+		min: 0, max: 1
+	});
+	
+	// Visualization of operations
 	
 	Formulae.setExpression(module, "Math.Arithmetic.Negative",       Negative);
 	Formulae.setExpression(module, "Math.Arithmetic.Addition",       Addition);
@@ -886,7 +991,7 @@ ArithmeticPackage.setExpressions = function(module) {
 	Formulae.setExpression(module, "Math.Arithmetic.Product",        Product);
 	Formulae.setExpression(module, "Math.Arithmetic.Piecewise",      Piecewise);
 	
-	// rounding operations
+	// Rounding operations
 	
 	Formulae.setExpression(module, "Math.Arithmetic.RoundToInteger", {
 		clazz:        Expression.Function,
@@ -908,21 +1013,6 @@ ArithmeticPackage.setExpressions = function(module) {
 		}
 	));
 	
-	// rounding modes
-	
-	[
-		            "TowardsZero",             "AwayFromZero",             "TowardsMinusInfinity",             "TowardsInfinity",
-		"Nearest.HalfTowardsZero", "Nearest.HalfAwayFromZero", "Nearest.HalfTowardsMinusInfinity", "Nearest.HalfTowardsInfinity",
-		"Nearest.HalfEven"
-	].forEach(
-		tag => Formulae.setExpression(module, "Math.Arithmetic.RoundingMode." + tag, {
-			clazz   : Expression.LabelExpression,
-			getTag  : () => "Math.Arithmetic.RoundingMode." + tag,
-			getLabel: () => ArithmeticPackage.messages["labelRoundingMode" + tag],
-			getName : () => "Rounding mode " + ArithmeticPackage.messages["labelRoundingMode" + tag]
-		}
-	));
-	
 	// absolute value, floor, ceiling
 	
 	[ "AbsoluteValue", "Floor", "Ceiling" ].forEach((tag, type) =>
@@ -931,44 +1021,6 @@ ArithmeticPackage.setExpressions = function(module) {
 			type:  type
 		}
 	));
-	
-	// numeric
-	Formulae.setExpression(module, "Math.Numeric", {
-		clazz:        Expression.Function,
-		getTag:       () => "Math.Numeric",
-		getMnemonic:  () => ArithmeticPackage.messages.mnemonicNumeric,
-		getName:      () => ArithmeticPackage.messages.nameNumeric,
-		getChildName: index => ArithmeticPackage.messages.childrenNumeric[index],
-		max:          2
-	});
-	
-	Formulae.setExpression(module, "Math.N", {
-		clazz:        Expression.Function,
-		getTag:       () => "Math.N",
-		getMnemonic:  () => ArithmeticPackage.messages.mnemonicN,
-		getName:      () => ArithmeticPackage.messages.nameN,
-		getChildName: index => ArithmeticPackage.messages.childrenN[index],
-		max:          2
-	});
-	
-	// numeric mode
-	Formulae.setExpression(module, "Math.SetNumericMode", {
-		clazz:       Expression.Function,
-		getTag:      () => "Math.SetNumericMode",
-		getMnemonic: () => ArithmeticPackage.messages.mnemonicSetNumericMode,
-		getName:     () => ArithmeticPackage.messages.nameSetNumericMode,
-		min: 0, max: 0
-	});
-	
-	// with precision
-	Formulae.setExpression(module, "Math.Arithmetic.WithPrecision", {
-		clazz:        Expression.Function,
-		getTag:       () => "Math.Arithmetic.WithPrecision",
-		getMnemonic:  () => ArithmeticPackage.messages.mnemonicWithPrecision,
-		getName:      () => ArithmeticPackage.messages.nameWithPrecision,
-		getChildName: index => ArithmeticPackage.messages.childrenWithPrecision[index],
-		min: 2, max: 2
-	});
 	
 	// exponentiation
 	Formulae.setExpression(module, "Math.Arithmetic.Exponentiation", {
@@ -1003,7 +1055,7 @@ ArithmeticPackage.setExpressions = function(module) {
 	));
 	
 	// 0-parameter function
-	[ "GetPrecision", "GetRoundingMode", "GetEuclideanDivisionMode" /*, "Random" */  ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
+	[ "GetEuclideanDivisionMode" /*, "Random" */  ].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:       Expression.Function,
 		getTag:      () => "Math.Arithmetic." + tag,
 		getMnemonic: () => ArithmeticPackage.messages["mnemonic" + tag],
@@ -1012,12 +1064,12 @@ ArithmeticPackage.setExpressions = function(module) {
 	}));
 	
 	[ // 1-parameter function, no child name
-		"SignificantDigits",    "SetPrecision", "SetRoundingMode", "SetEuclideanDivisionMode",
+		"SetEuclideanDivisionMode",
 		"IntegerPart",  "FractionalPart", "DecimalPlaces",
 		"Sign",         "Factors", "FactorsWithExponents", "Divisors", "ProperDivisors",
 		"IsRealNumber", "IsRationalNumber", "IsNumeric", "IsIntegerValue", "IsInteger", "IsDecimal", "IsPositiveNumber", "IsNegativeNumber", "IsNumberZero",
 		"IsEven",       "IsOdd",            "IsPrime",
-		"ToInteger",    "ToIfInteger",
+		"ToInteger",    "ToIfInteger", "Numerator", "Denominator"
 	].forEach(tag => Formulae.setExpression(module, "Math.Arithmetic." + tag, {
 		clazz:       Expression.Function,
 		getTag:      () => "Math.Arithmetic." + tag,

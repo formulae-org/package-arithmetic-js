@@ -126,12 +126,8 @@ const operatorEdition = function(tag, next, forced, negative) {
 
 ArithmeticPackage.setEditions = function() {
 	// number
-	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = editionNumber);
 	
-	// numeric / symbolic
-	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafNumeric,           () => Expression.wrapperEdition("Math.Numeric"));
-	//Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafN,                 () => Expression.wrapperEdition("Math.N"));
-	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafSetNumericMode,  () => Expression.replacingEdition("Math.SetNumericMode"));
+	Formulae.addEdition(this.messages.pathMath, null, this.messages.leafNumber, Formulae.editionNumber = editionNumber);
 	
 	Formulae.addEdition(this.messages.pathMath, null, "∞", () => Expression.replacingEdition("Math.Infinity"));
 	
@@ -158,19 +154,22 @@ ArithmeticPackage.setEditions = function() {
 	Formulae.addEdition(this.messages.pathExponentiation, null, this.messages.leafExponent, () => Expression.binaryEdition("Math.Arithmetic.Exponentiation", false));
 	Formulae.addEdition(this.messages.pathExponentiation, null, this.messages.leafBase,     () => Expression.binaryEdition("Math.Arithmetic.Exponentiation", true));
 	
-	// precision
+	// significant digits
 	
 	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSignificantDigits, () => Expression.wrapperEdition ("Math.Arithmetic.SignificantDigits"));
-	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSetPrecision,      () => Expression.wrapperEdition ("Math.Arithmetic.SetPrecision"));
-	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafGetPrecision,      () => Expression.replacingEdition("Math.Arithmetic.GetPrecision"));
-	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafWithPrecision,     () => Expression.binaryEdition("Math.Arithmetic.WithPrecision", false));
+	
+	// precision
+	
+	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafSetPrecision,  () => Expression.wrapperEdition ("Math.Arithmetic.SetPrecision"));
+	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafGetPrecision,  () => Expression.replacingEdition("Math.Arithmetic.GetPrecision"));
+	Formulae.addEdition(this.messages.pathPrecision, null, this.messages.leafWithPrecision, () => Expression.binaryEdition("Math.Arithmetic.WithPrecision", false));
 	
 	// rounding mode
 	
-	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafSetRoundingMode, () => Expression.wrapperEdition("Math.Arithmetic.SetRoundingMode"));
-	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafGetRoundingMode, () => Expression.replacingEdition("Math.Arithmetic.GetRoundingMode"));
-	
-	// rounding modes
+	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafRoundingModes,    () => Expression.replacingEdition("Math.Arithmetic.RoundingModes"));
+	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafSetRoundingMode,  () => Expression.wrapperEdition("Math.Arithmetic.SetRoundingMode"));
+	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafGetRoundingMode,  () => Expression.replacingEdition("Math.Arithmetic.GetRoundingMode"));
+	Formulae.addEdition(this.messages.pathRoundingMode, null, this.messages.leafWithRoundingMode, () => Expression.binaryEdition("Math.Arithmetic.WithRoundingMode", false));
 	
 	[
 		            "TowardsZero",             "AwayFromZero",             "TowardsMinusInfinity",             "TowardsInfinity",
@@ -184,6 +183,12 @@ ArithmeticPackage.setEditions = function() {
 			() => Expression.replacingEdition("Math.Arithmetic.RoundingMode." + tag)
 		)
 	});
+	
+	// numeric mode
+	
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafSetNumericMode, () => Expression.wrapperEdition("Math.Arithmetic.SetNumericMode"));
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafInNumericMode,  () => Expression.replacingEdition("Math.Arithmetic.InNumericMode"));
+	Formulae.addEdition(this.messages.pathNumeric, null, this.messages.leafNumeric,        () => Expression.wrapperEdition("Math.Arithmetic.Numeric"));
 	
 	// rounding
 	
@@ -219,6 +224,9 @@ ArithmeticPackage.setEditions = function() {
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRandomPrecision, () => Expression.wrapperEdition  ("Math.Arithmetic.Random"));
 	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRandomInRange,  () => Expression.binaryEdition("Math.Arithmetic.RandomInRange", false));
+	
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafNumerator,   () => Expression.wrapperEdition("Math.Arithmetic.Numerator"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafDenominator, () => Expression.wrapperEdition("Math.Arithmetic.Denominator"));
 	
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsRealNumber,     () => Expression.wrapperEdition("Math.Arithmetic.IsRealNumber"));
 	Formulae.addEdition(this.messages.pathTesting, null, this.messages.leafIsRationalNumber, () => Expression.wrapperEdition("Math.Arithmetic.IsRationalNumber"));
