@@ -1024,7 +1024,7 @@ ArithmeticPackage.setExpressions = function(module) {
 	
 	// exponentiation
 	Formulae.setExpression(module, "Math.Arithmetic.Exponentiation", {
-		clazz:        Expression.Exponentiation,
+		clazz:        Expression.Superscript,
 		getTag:       () => "Math.Arithmetic.Exponentiation",
 		getName:      () => ArithmeticPackage.messages.nameExponentiation,
 		getChildName: index => ArithmeticPackage.messages.childrenExponentiation[index]
