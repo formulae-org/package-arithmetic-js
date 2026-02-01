@@ -1803,7 +1803,7 @@ const isX = async (is, session) => {
 					result = false;
 				}
 				else {
-					console.log(i.integerDivisionForGCD(Arithmetic.createInteger(2, session)));
+					//console.log(i.integerDivisionForGCD(Arithmetic.createInteger(2, session)));
 					result = i.remainder(Arithmetic.createInteger(2, session)).isZero();
 				}
 			}
