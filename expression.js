@@ -42,17 +42,17 @@ const Number = class extends Expression.NullaryExpression {
 			return this.createGroups(this.translate(str, numeral), spec[0]);
 		}
 		else { // decimal
-			return this.createGroups(this.translate(str.substr(0, dot), numeral), spec[0]) + spec[1] + this.translate(str.substr(dot + 1), numeral);
+			return this.createGroups(this.translate(str.substring(0, dot), numeral), spec[0]) + spec[1] + this.translate(str.substring(dot + 1), numeral);
 		}
 	}
 	
 	createGroups(str, groupSeparator) {
 		let groups = Math.floor((str.length - 1) / 3);
 		let rest = ((str.length - 1) % 3) + 1;
-		let output = str.substr(0, rest);
+		let output = str.substring(0, rest);
 		
 		for (let i = 0; i < groups; ++i) {
-			output += groupSeparator + str.substr(3 * i + rest, 3);
+			output += groupSeparator + str.substring(3 * i + rest, 3 * i + rest + 3);
 		}
 		
 		return output;
