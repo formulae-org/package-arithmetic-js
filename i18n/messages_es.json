@@ -85,9 +85,9 @@
 	"childrenRoundToInteger" : [ "Argumento", "Modo de redondeo" ],
 	
 	"mnemonicRoundToDecimalPlaces" : "RedondearACifrasDecimales",
-	"nameRoundToDecimalPlaces"     : "Redondeara cifras decimales",
-	"leafRoundToDecimalPlaces"     : "Redondeara cifras decimales",
-	"childrenRoundToDecimalPlaces" : [ "Argumento", "Cifras decimales", "Modo de redondo" ],
+	"nameRoundToDecimalPlaces"     : "Redondear a cifras decimales",
+	"leafRoundToDecimalPlaces"     : "Redondear a cifras decimales",
+	"childrenRoundToDecimalPlaces" : [ "Argumento", "Cifras decimales", "Modo de redondeo" ],
 	
 	"mnemonicRoundToMultiple" : "RedondearAMúltiplo",
 	"nameRoundToMultiple"     : "Redondear a múltiplo",
@@ -113,7 +113,7 @@
 	"pathSubtraction" : "Matemáticas.Aritmética.Resta",
 	
 	"leafSubtractionAfter"        : "Añadir sustraendo",
-	"leafSubtractionAfterForced"  : "añadir sustraendo!",
+	"leafSubtractionAfterForced"  : "Añadir sustraendo!",
 	"leafSubtractionBefore"       : "Anteponer minuendo",
 	"leafSubtractionBeforeForced" : "Anteponer minuendo!",
 	
@@ -134,7 +134,7 @@
 	"leafDenominator"  : "Crear denominador",
 	
 	"pathExponentiation"     : "Matemáticas.Aritmética.Exponenciación",
-	"nameExponentiation"     : "Exponencición",
+	"nameExponentiation"     : "Exponenciación",
 	"childrenExponentiation" : [ "Base", "Exponente" ],
 	"leafBase"               : "Crear base",
 	"leafExponent"           : "Crear exponente",
@@ -341,13 +341,13 @@
 	"leafEuclideanMode" : "Tipo euclídeo",
 	
 	"nameModularExponentiation"     : "Exponenciación modular",
-	"mnemonicModularExponentiation" : "ExponentcaciónModular",
+	"mnemonicModularExponentiation" : "ExponenciaciónModular",
 	"childrenModularExponentiation" : [ "Base", "Exponente", "Módulo" ],
 	"leafModularExponentiation"     : "Exponenciación modular",
 	
 	"nameModularMultiplicativeInverse"     : "Inverso multiplicativo modular",
 	"mnemonicModularMultiplicativeInverse" : "InversoMultiplicativoModular",
-	"childrenModularMultiplicativeInverse" : [ "Númbero", "Módulo" ],
+	"childrenModularMultiplicativeInverse" : [ "Número", "Módulo" ],
 	"leafModularMultiplicativeInverse"     : "Inverso multiplicativo modular",
 	
 	"pathSummation" : "Matemáticas.Aritmética.∑",
@@ -366,17 +366,17 @@
 	
 	"pathTranscendental" : "Matemáticas.Funciones trascendentales",
 	
-	"nameDecimalLogarithm"     : "logaritmo decimal",
+	"nameDecimalLogarithm"     : "Logaritmo decimal",
 	"mnemonicDecimalLogarithm" : "log₁₀",
-	"leafDecimalLogarithm"     : "logaritmo decimal",
+	"leafDecimalLogarithm"     : "Logaritmo decimal",
 	
-	"nameNaturalLogarithm"     : "Logarithm natural",
+	"nameNaturalLogarithm"     : "Logaritmo natural",
 	"mnemonicNaturalLogarithm" : "ln",
-	"leafNaturalLogarithm"     : "Logarithm natural",
+	"leafNaturalLogarithm"     : "Logaritmo natural",
 	
-	"nameBinaryLogarithm"     : "Logarithm binario",
+	"nameBinaryLogarithm"     : "Logaritmo binario",
 	"mnemonicBinaryLogarithm" : "lg",
-	"leafBinaryLogarithm"     : "Logarithm binario",
+	"leafBinaryLogarithm"     : "Logaritmo binario",
 	
 	"nameLogarithm"     : "Logaritmo",
 	"mnemonicLogarithm" : "log",
@@ -408,7 +408,7 @@
 	"nameTArcSine"      : "Arco seno trigonométrico",       "mnemonicTArcSine"      : "asen",
 	"nameTArcCosine"    : "Arco coseno trigonométrico",     "mnemonicTArcCosine"    : "acos",
 	"nameTArcTangent"   : "Arco tangente trigonométrico",   "mnemonicTArcTangent"   : "atan",
-	"nameTArcCotangent" : "Arco cotangento trigonométrico", "mnemonicTArcCotangent" : "acot",
+	"nameTArcCotangent" : "Arco cotangente trigonométrico", "mnemonicTArcCotangent" : "acot",
 	"nameTArcSecant"    : "Arco secante trigonométrico",    "mnemonicTArcSecant"    : "asec",
 	"nameTArcCosecant"  : "Arco cosecante trigonométrico",  "mnemonicTArcCosecant"  : "acsc",
 	
@@ -428,10 +428,10 @@
 	
 	"nameHArcSine"      : "Arco seno hiperbolico",      "mnemonicHArcSine"      : "asenh",
 	"nameHArcCosine"    : "Arco coseno hiperbolico",    "mnemonicHArcCosine"    : "acosh",
-	"nameHArcTangent"   : "Arco tangent hiperbolica",   "mnemonicHArcTangent"   : "atanh",
-	"nameHArcCotangent" : "Arco cotangent hiperbolica", "mnemonicHArcCotangent" : "acoth",
-	"nameHArcSecant"    : "Arco secant hiperbolica",    "mnemonicHArcSecant"    : "asech",
-	"nameHArcCosecant"  : "Arco cosecant hiperbolica",  "mnemonicHArcCosecant"  : "acsch",
+	"nameHArcTangent"   : "Arco tangente hiperbólica",   "mnemonicHArcTangent"   : "atanh",
+	"nameHArcCotangent" : "Arco cotangente hiperbólica", "mnemonicHArcCotangent" : "acoth",
+	"nameHArcSecant"    : "Arco secante hiperbólica",    "mnemonicHArcSecant"    : "asech",
+	"nameHArcCosecant"  : "Arco cosecante hiperbólica",  "mnemonicHArcCosecant"  : "acsch",
 	
 	"pathConstant" : "Matemáticas.Constantes",
 	
