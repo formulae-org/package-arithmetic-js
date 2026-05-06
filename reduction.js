@@ -823,14 +823,22 @@ const absNumeric = async (abs, session) => {
 	let number = abs.children[0].get("Value");
 	
 	if (Arithmetic.isComplex(number)) {
-		let result = Arithmetic.createInternalNumber(
+		console.log(
 			Arithmetic.addition(
 				number.real.multiplication(number.real, session),
 				number.imaginary.multiplication(number.imaginary, session),
 				session
-			).squareRoot(session),
-			session
+			)
 		);
+		let sqrt = Arithmetic.addition(
+			number.real.multiplication(number.real, session),
+			number.imaginary.multiplication(number.imaginary, session),
+			session
+		).squareRoot();
+		
+		if (sqrt === null) return true;
+		
+		let result = Arithmetic.createInternalNumber(sqrt, session);
 		abs.replaceBy(result);
 		return true;
 	}
