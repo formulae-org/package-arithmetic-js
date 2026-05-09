@@ -149,6 +149,10 @@
 	
 	"leafFactorial"  : "▮! Factorial",
 	"nameFactorial"  : "Factorial",
+
+	"leafBinomialCoefficient"     : "Binomial coefficient C(n,k)",
+	"nameBinomialCoefficient"     : "Binomial coefficient",
+	"childrenBinomialCoefficient" : [ "Upper index", "Lower index" ],
 	
 	"nameAbsoluteValue" : "Absolute value",
 	"leafAbsoluteValue" : "∣▮∣ Absolute value",

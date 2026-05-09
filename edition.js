@@ -198,8 +198,9 @@ ArithmeticPackage.setEditions = function() {
 	Formulae.addEdition(this.messages.pathRounding, null, this.messages.leafRoundToMultiple,      () => Expression.multipleEdition("Math.Arithmetic.RoundToMultiple",      2, 0));
 	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafRationalize,   () => Expression.wrapperEdition("Math.Arithmetic.Rationalize"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSquareRoot,    () => Expression.wrapperEdition("Math.Arithmetic.SquareRoot"));
-	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactorial,     () => Expression.wrapperEdition("Math.Arithmetic.Factorial"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafSquareRoot,          () => Expression.wrapperEdition("Math.Arithmetic.SquareRoot"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFactorial,           () => Expression.wrapperEdition("Math.Arithmetic.Factorial"));
+	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafBinomialCoefficient, () => Expression.binaryEdition ("Math.Arithmetic.BinomialCoefficient", true));
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafAbsoluteValue, () => Expression.wrapperEdition("Math.Arithmetic.AbsoluteValue"));
 	
 	Formulae.addEdition(this.messages.pathArithmetic, null, this.messages.leafFloor,         () => Expression.wrapperEdition("Math.Arithmetic.Floor"));

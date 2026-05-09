@@ -2046,7 +2046,36 @@ const factorial = async (factorial, session) => {
 	}
 	
 	factorial.replaceBy(Arithmetic.createInternalNumber(result, session));
-	
+
+	return true;
+};
+
+const binomialCoefficient = async (expression, session) => {
+	let n = Arithmetic.getInteger(expression.children[0]);
+	let k = Arithmetic.getInteger(expression.children[1]);
+
+	if (n === undefined || k === undefined) return false;
+	if (n.isNegative() || k.isNegative() || k.comparedTo(n) > 0) return false;
+
+	const one    = Arithmetic.getIntegerOne(session);
+	const negOne = one.negation();
+
+	// C(n, k) = C(n, n-k): iterate over whichever index is smaller
+	const nk = n.addition(k.negation());
+	if (k.comparedTo(nk) > 0) k = nk;
+
+	// Multiplicative formula: result = ∏ (n-i)/(i+1)  for i = 0..k-1
+	let result = one;
+	let ni     = n;    // tracks n - i
+	let ip1    = one;  // tracks i + 1
+
+	while (ip1.comparedTo(k) <= 0) {
+		result = result.multiplication(ni).integerDivisionForGCD(ip1);
+		ni  = ni.addition(negOne);
+		ip1 = ip1.addition(one);
+	}
+
+	expression.replaceBy(Arithmetic.createInternalNumber(result, session));
 	return true;
 };
 
@@ -2906,7 +2935,8 @@ ArithmeticPackage.setReducers = () => {
 	
 	ReductionManager.addReducer("Math.Arithmetic.ToNumber", toNumber, "ArithmeticPackage.toNumber");
 	
-	ReductionManager.addReducer("Math.Arithmetic.Factorial", factorial, "ArithmeticPackage.factorial");
+	ReductionManager.addReducer("Math.Arithmetic.Factorial",           factorial,           "ArithmeticPackage.factorial");
+	ReductionManager.addReducer("Math.Arithmetic.BinomialCoefficient", binomialCoefficient, "ArithmeticPackage.binomialCoefficient");
 	
 	ReductionManager.addReducer("String.ToString", toString, "ArithmeticPackage.toString");
 	ReductionManager.addReducer("Time.ToTime",     toTime,   "ArithmeticPackage.toTime");
