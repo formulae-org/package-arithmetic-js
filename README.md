@@ -1,14 +1,12 @@
 # package-arithmetic-js
 
-Arithmetic package for the [Fōrmulæ](https://formulae.org) programming language.
+Arithmetic and numeric computation for [Fōrmulæ](https://formulae.org) — the visual environment for **computing**, **composing**, and **conversing** with tree-structured expressions.
 
-Fōrmulæ is also a software framework for visualization, edition and manipulation of complex expressions, from many fields. The code for an specific field —i.e. arithmetics— is encapsulated in a single unit called a Fōrmulæ **package**.
+This repository contains the **arithmetic package**: integer, decimal and rational numbers of arbitrary size and precision, and the many operations that act on them.
 
-This repository contains the source code for the **arithmetic package**. It is intended to the computation of many arithmetical and mathematical operations.
+> Part of the [formulae-org](https://github.com/formulae-org) organization: the [web application](https://github.com/formulae-org/formulae-js) plus one repository per package.
 
-The GitHub organization [formulae-org](https://github.com/formulae-org) encompasses the source code for the rest of packages, as well as the [web application](https://github.com/formulae-org/formulae-js).
-
-Take a look at this [tutorial](https://formulae.org/?script=tutorials/Arithmetic) to know the capabilities of the Fōrmulæ arithmetic package.
+▶ **[Showcase](https://formulae.org/?script=showcases/Arithmetic)** — worked examples of this package.
 
 ### Capabilities ###
 
