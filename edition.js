@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-'use strict';
+"use strict";
 
 export class ArithmeticPackage extends Formulae.EditionPackage {};
 
@@ -108,7 +108,7 @@ const operatorEdition = function(tag, next, forced, negative) {
 	else {
 		newExpr = nullExpr;
 	}
-		
+	
 	if (!forced && Formulae.sExpression.parent instanceof Expression && Formulae.sExpression.parent.getTag() == tag) {
 		Formulae.sExpression.parent.addChildAt(Formulae.sExpression.index + (next ? 1 : 0), newExpr);
 	}

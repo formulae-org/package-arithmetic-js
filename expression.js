@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-'use strict';
+"use strict";
 
 export class ArithmeticPackage extends Formulae.ExpressionPackage {};
 
@@ -78,7 +78,7 @@ const Number = class extends Expression.NullaryExpression {
 			}
 			return;
 		}
-			
+		
 		super.set(name, value);
 	}
 	
@@ -564,45 +564,45 @@ const BinomialCoefficient = class extends Expression.BinaryExpression {
 	getTag()            { return "Math.Arithmetic.BinomialCoefficient"; }
 	getName()           { return ArithmeticPackage.messages.nameBinomialCoefficient; }
 	getChildName(index) { return ArithmeticPackage.messages.childrenBinomialCoefficient[index]; }
-
+	
 	moveAcross(i, direction) {
 		if (direction == Expression.UP   && i == 1) return this.children[0].moveTo(Expression.UP);
 		if (direction == Expression.DOWN && i == 0) return this.children[1].moveTo(Expression.DOWN);
 		return this.moveOut(direction);
 	}
-
+	
 	moveTo(direction) {
 		return this.children[direction == Expression.UP ? 1 : 0].moveTo(direction);
 	}
-
+	
 	prepareDisplay(context) {
 		let ch0 = this.children[0];
 		let ch1 = this.children[1];
-
+		
 		ch0.prepareDisplay(context);
 		ch1.prepareDisplay(context);
-
+		
 		const inner = Math.max(ch0.width, ch1.width);
-
+		
 		this.width        = inner + 12;
 		this.height       = ch0.height + 4 + ch1.height;
 		this.horzBaseline = Math.round(this.height / 2);
 		this.vertBaseline = Math.round(this.width  / 2);
-
+		
 		ch0.x = Math.round((this.width - ch0.width) / 2);
 		ch0.y = 0;
-
+		
 		ch1.x = Math.round((this.width - ch1.width) / 2);
 		ch1.y = ch0.height + 4;
 	}
-
+	
 	display(context, x, y) {
 		let ch0 = this.children[0];
 		let ch1 = this.children[1];
-
+		
 		ch0.display(context, x + ch0.x, y + ch0.y);
 		ch1.display(context, x + ch1.x, y + ch1.y);
-
+		
 		this.drawParentheses(context, x + 1,              y, this.height, true );
 		this.drawParentheses(context, x + this.width - 1, y, this.height, false);
 	}

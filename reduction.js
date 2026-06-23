@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-'use strict';
+"use strict";
 
 export class ArithmeticPackage extends Formulae.ReductionPackage {};
 
@@ -1968,7 +1968,7 @@ const toNumber = async (toNumber, session) => {
 		//let number = new session.Decimal(0);
 		//let fraction = new session.Decimal(1);
 		let negative = false;
-			
+		
 		for (const codePoint of s) {
 			cp = codePoint.codePointAt(0);
 			
@@ -2046,35 +2046,35 @@ const factorial = async (factorial, session) => {
 	}
 	
 	factorial.replaceBy(Arithmetic.createInternalNumber(result, session));
-
+	
 	return true;
 };
 
 const binomialCoefficient = async (expression, session) => {
 	let n = Arithmetic.getInteger(expression.children[0]);
 	let k = Arithmetic.getInteger(expression.children[1]);
-
+	
 	if (n === undefined || k === undefined) return false;
 	if (n.isNegative() || k.isNegative() || k.comparedTo(n) > 0) return false;
-
+	
 	const one    = Arithmetic.getIntegerOne(session);
 	const negOne = one.negation();
-
+	
 	// C(n, k) = C(n, n-k): iterate over whichever index is smaller
 	const nk = n.addition(k.negation());
 	if (k.comparedTo(nk) > 0) k = nk;
-
+	
 	// Multiplicative formula: result = ∏ (n-i)/(i+1)  for i = 0..k-1
 	let result = one;
 	let ni     = n;    // tracks n - i
 	let ip1    = one;  // tracks i + 1
-
+	
 	while (ip1.comparedTo(k) <= 0) {
 		result = result.multiplication(ni).integerDivisionForGCD(ip1);
 		ni  = ni.addition(negOne);
 		ip1 = ip1.addition(one);
 	}
-
+	
 	expression.replaceBy(Arithmetic.createInternalNumber(result, session));
 	return true;
 };
@@ -2202,7 +2202,7 @@ const gcdLcm = async (gcdLcm, session) => {
 			performed = true;
 		}
 	}
-		
+	
 	if (list.children.length == 1) { // just one child
 		gcdLcm.replaceBy(Arithmetic.createInternalNumber(r, session));
 		return true;
@@ -2456,7 +2456,7 @@ const randomInRange = async (randomInRange, session) => {
 	if (n2 === undefined) return false;
 	
 	if (n1 == n2) return false;
-
+	
 	let x = Math.min(n1, n2) + Math.trunc(Math.random() * (Math.abs(n2 - n1) + 1));
 	
 	randomInRange.replaceBy(Arithmetic.createInternalNumber(
