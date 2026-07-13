@@ -61,7 +61,7 @@
 	
 	"mnemonicNumeric" : "Numérico",
 	"nameNumeric"     : "Numérico",
-	"leafNumeric"     : "Numérico",
+	"leafNumeric"     : "Evaluación numérica",
 	"childrenNumeric" : [ "Argumento", "Modo numérico" ],
 	
 	"mnemonicInNumericMode" : "EstaEnModoNumérico",
@@ -144,28 +144,31 @@
 	"childrenRationalize" : [ "Argument", "Precisión" ],
 	"leafRationalize"     : "Racionalizar",
 	
-	"leafSquareRoot" : "√ Raíz cuadrada",
+	"leafSquareRoot" : "Raíz cuadrada",
 	"nameSquareRoot" : "Raíz cuadrada",
 	
-	"leafFactorial"  : "▪! Factorial",
+	"leafFactorial"  : "Factorial",
 	"nameFactorial"  : "Factorial",
-
-	"leafBinomialCoefficient"     : "Coeficiente binomial C(n,k)",
+	
+	"pathBinomialCoefficient" : "Matemáticas.Aritmética.Coeficiente binomial",
+	
 	"nameBinomialCoefficient"     : "Coeficiente binomial",
 	"childrenBinomialCoefficient" : [ "Índice superior", "Índice inferior" ],
+	"leafLowerIndex"              : "Crear índice inferior de coeficiente binomial",
+	"leafUpperIndex"              : "Crear índice superior de coeficiente binomial",
 	
 	"nameAbsoluteValue" : "Valor absoluto",
-	"leafAbsoluteValue" : "∣▪∣ Valor absoluto",
+	"leafAbsoluteValue" : "Valor absoluto",
 	
 	"childrenRoundingTruncation" : [ "Argumento", "Escala" ],
 	
 	"nameFloor"     : "Piso",
 	"mnemonicFloor" : "piso",
-	"leafFloor"     : "⌊▪⌋ Piso",
+	"leafFloor"     : "Piso",
 	
 	"nameCeiling"     : "Techo",
 	"mnemonicCeiling" : "techo",
-	"leafCeiling"     : "⌈▪⌉ Techo",
+	"leafCeiling"     : "Techo",
 	
 	"nameTruncate"     : "Truncación",
 	"mnemonicTruncate" : "Truncación",
@@ -290,10 +293,10 @@
 	"leafIsPrime"     : "Es primo",
 	
 	"nameDivides" : "Divide a",
-	"leafDivides" : "∣ Divide a",
+	"leafDivides" : "Divide a",
 	
 	"nameDoesNotDivide" : "No divide a",
-	"leafDoesNotDivide" : "∤ No divide a",
+	"leafDoesNotDivide" : "No divide a",
 	
 	"childrenDivisions" : [ "Dividendo", "Divisor" ],
 	
@@ -305,7 +308,7 @@
 	
 	"nameToIfInteger"     : "A si entero",
 	"mnemonicToIfInteger" : "ASiEntero",
-	"leafToIfInteger"     : "A si entero",
+	"leafToIfInteger"     : "A entero si es entero",
 	
 	"nameToDecimal"     : "A decimal",
 	"mnemonicToDecimal" : "ADecimal",
@@ -317,21 +320,21 @@
 	"childrenToNumber" : [ "Argumento", "Base" ],
 	"leafToNumber"     : "A número",
 	
-	"pathEuclideanDivision" : "Matemáticas.Aritmética.Divison entera",
+	"pathEuclideanDivision" : "Matemáticas.Aritmética.División entera",
 	
 	"operatorDivMod" : "divmod",
 	"operatorDiv"    : "div",
 	"operatorMod"    : "mod",
 	
-	"nameDivMod" : "Cociente y residuo de division entera",
-	"nameDiv"    : "Cociente de division entera",
-	"nameMod"    : "Residuo y residuo de division entera",
+	"nameDivMod" : "Cociente y residuo de división entera",
+	"nameDiv"    : "Cociente de división entera",
+	"nameMod"    : "Residuo de división entera",
 	
-	"leafDivMod" : "divmod",
-	"leafDiv"    : "div",
-	"leafMod"    : "mod",
+	"leafDivMod" : "Cociente y residuo de división entera",
+	"leafDiv"    : "Cociente de división entera",
+	"leafMod"    : "Residuo de división entera",
 	
-	"PathEuclideanDivisionMode" : "Matemáticas.Aritmética.Divison entera.Tipo",
+	"PathEuclideanDivisionMode" : "Matemáticas.Aritmética.División entera.Tipo",
 	
 	"mnemonicGetEuclideanDivisionMode" : "ObtenerTipoDivisiónEntera",
 	"nameGetEuclideanDivisionMode"     : "Obtener tipo de división entera",
@@ -354,19 +357,32 @@
 	"childrenModularMultiplicativeInverse" : [ "Número", "Módulo" ],
 	"leafModularMultiplicativeInverse"     : "Inverso multiplicativo modular",
 	
+	"namePiecewise" : "Por casos",
+	"leafPiecewise" : "Por casos",
+
 	"pathSummation" : "Matemáticas.Aritmética.∑",
 	"pathProduct" : "Matemáticas.Aritmética.∏",
 	
 	"nameSummation" : "Sumatoria",
 	"nameProduct"   : "Producto",
 	
+	"leafSummationRange"     : "Sumatoria en un rango",
+	"leafSummationRangeStep" : "Sumatoria en un rango, con incremento",
+	"leafSummationList"      : "Sumatoria sobre una lista",
+	"leafSummationCount"     : "Sumatoria de términos repetidos",
+
+	"leafProductRange"     : "Producto en un rango",
+	"leafProductRangeStep" : "Producto en un rango, con incremento",
+	"leafProductList"      : "Producto sobre una lista",
+	"leafProductCount"     : "Producto de factores repetidos",
+
 	"childSummation0"         : "Expresión a ser usada para la sumatoria",
 	"childProduct0"           : "Expresión a ser usada para el producto",
-	"childSummationproduct1"  : "Símbolo a ser usado durante la iteración",
-	"childSummationproduct23" : "Lista conteniéndo los elementos para iterar",
-	"childSummationproduct2X" : "Valor inicial de la iteración",
-	"childSummationproduct3"  : "Valor final de la iteración",
-	"childSummationproduct4"  : "Incremento de la iteración",
+	"childSummationProduct1"  : "Símbolo a ser usado durante la iteración",
+	"childSummationProduct23" : "Lista conteniéndo los elementos para iterar",
+	"childSummationProduct2X" : "Valor inicial de la iteración",
+	"childSummationProduct3"  : "Valor final de la iteración",
+	"childSummationProduct4"  : "Incremento de la iteración",
 	
 	"pathTranscendental" : "Matemáticas.Funciones trascendentales",
 	

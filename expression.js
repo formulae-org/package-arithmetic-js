@@ -807,7 +807,7 @@ const Product = class extends Expression.SummationLikeSymbol {
 
 const Piecewise = class extends Expression {
 	getTag() { return "Math.Arithmetic.Piecewise"; }
-	getName() { return "Piecewise"; }
+	getName() { return ArithmeticPackage.messages.namePiecewise; }
 	canHaveChildren(count) { return count >= 2; }
 	
 	prepareDisplay(context) {

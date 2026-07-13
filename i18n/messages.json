@@ -61,7 +61,7 @@
 	
 	"mnemonicNumeric" : "Numeric",
 	"nameNumeric"     : "Numeric",
-	"leafNumeric"     : "Numeric",
+	"leafNumeric"     : "Numeric evaluation",
 	"childrenNumeric" : [ "Argument", "Numeric mode" ],
 	
 	"mnemonicInNumericMode" : "InNumericMode",
@@ -144,28 +144,31 @@
 	"childrenRationalize" : [ "Argument", "Precision" ],
 	"leafRationalize"     : "Rationalize",
 	
-	"leafSquareRoot" : "√ Square root",
+	"leafSquareRoot" : "Square root",
 	"nameSquareRoot" : "Square root",
 	
-	"leafFactorial"  : "▮! Factorial",
+	"leafFactorial"  : "Factorial",
 	"nameFactorial"  : "Factorial",
-
-	"leafBinomialCoefficient"     : "Binomial coefficient C(n,k)",
+	
+	"pathBinomialCoefficient" : "Math.Arithmetic.Binomial coefficient",
+	
 	"nameBinomialCoefficient"     : "Binomial coefficient",
 	"childrenBinomialCoefficient" : [ "Upper index", "Lower index" ],
+	"leafLowerIndex"              : "Create lower index of a binomial coefficient",
+	"leafUpperIndex"              : "Create upper index of a binomial coefficient",
 	
 	"nameAbsoluteValue" : "Absolute value",
-	"leafAbsoluteValue" : "∣▮∣ Absolute value",
+	"leafAbsoluteValue" : "Absolute value",
 	
 	"childrenRoundingTruncation" : [ "Argument", "Scale" ],
 	
 	"nameFloor"     : "Floor",
 	"mnemonicFloor" : "floor",
-	"leafFloor"     : "⌊▮⌋ Floor",
+	"leafFloor"     : "Floor",
 	
 	"nameCeiling"     : "Ceiling",
 	"mnemonicCeiling" : "ceiling",
-	"leafCeiling"     : "⌈▮⌉ Ceiling",
+	"leafCeiling"     : "Ceiling",
 	
 	"nameTruncate"     : "Truncation",
 	"mnemonicTruncate" : "Truncate",
@@ -290,10 +293,10 @@
 	"leafIsPrime"     : "Is prime",
 	
 	"nameDivides" : "Divides",
-	"leafDivides" : "∣ Divides",
+	"leafDivides" : "Divides",
 	
 	"nameDoesNotDivide" : "Does not divide",
-	"leafDoesNotDivide" : "∤ Does not divide",
+	"leafDoesNotDivide" : "Does not divide",
 	
 	"childrenDivisions" : [ "Dividend", "Divisor" ],
 	
@@ -305,7 +308,7 @@
 	
 	"nameToIfInteger"     : "To if integer",
 	"mnemonicToIfInteger" : "ToIfInteger",
-	"leafToIfInteger"     : "To if integer",
+	"leafToIfInteger"     : "To integer if integral",
 	
 	"nameToDecimal"     : "To decimal",
 	"mnemonicToDecimal" : "ToDecimal",
@@ -323,13 +326,13 @@
 	"operatorDiv"    : "div",
 	"operatorMod"    : "mod",
 	
-	"nameDivMod" : "Quotient and remainder of euclidean division",
-	"nameDiv"    : "Quotient of euclidean division",
-	"nameMod"    : "Remainder of euclidean division",
+	"nameDivMod" : "Quotient and remainder of Euclidean division",
+	"nameDiv"    : "Quotient of Euclidean division",
+	"nameMod"    : "Remainder of Euclidean division",
 	
-	"leafDivMod" : "divmod",
-	"leafDiv"    : "div",
-	"leafMod"    : "mod",
+	"leafDivMod" : "Quotient and remainder of Euclidean division",
+	"leafDiv"    : "Quotient of Euclidean division",
+	"leafMod"    : "Remainder of Euclidean division",
 	
 	"PathEuclideanDivisionMode" : "Math.Arithmetic.Euclidean division.Mode",
 	
@@ -354,12 +357,25 @@
 	"childrenModularMultiplicativeInverse" : [ "Number", "Modulo" ],
 	"leafModularMultiplicativeInverse"     : "Modular multiplicative inverse",
 	
+	"namePiecewise" : "Piecewise",
+	"leafPiecewise" : "Piecewise",
+
 	"pathSummation" : "Math.Arithmetic.∑",
 	"pathProduct" : "Math.Arithmetic.∏",
 	
 	"nameSummation" : "Summation",
 	"nameProduct"   : "Product",
 	
+	"leafSummationRange"     : "Summation over a range",
+	"leafSummationRangeStep" : "Summation over a range, with step",
+	"leafSummationList"      : "Summation over a list",
+	"leafSummationCount"     : "Summation of repeated terms",
+
+	"leafProductRange"     : "Product over a range",
+	"leafProductRangeStep" : "Product over a range, with step",
+	"leafProductList"      : "Product over a list",
+	"leafProductCount"     : "Product of repeated factors",
+
 	"childSummation0"         : "Expression to be used to create the summation",
 	"childProduct0"           : "Expression to be used to create the product",
 	"childSummationProduct1"  : "Symbol to be used over the iteration",
@@ -439,7 +455,7 @@
 	
 	"pathConstant" : "Math.Constant",
 	
-	"namePi" : "π number",
-	"nameE" : "Euler number"
+	"namePi" : "The number π",
+	"nameE" : "Euler's number"
 }
 
