@@ -1,6 +1,6 @@
 # package-arithmetic-js
 
-Arithmetic and numeric computation for [Fōrmulæ](https://formulae.org) — the visual environment for **computing**, **composing**, and **conversing** with tree-structured expressions.
+Arithmetic and numeric computation for [Fōrmulæ](https://formulae.org) — the visual environment for **composing**, **conversing**, and **computing** with tree-structured expressions.
 
 This repository contains the **arithmetic package**: integer, decimal and rational numbers of arbitrary size and precision, and the many operations that act on them.
 
